@@ -9,4 +9,7 @@ public class DemoController {
 		if (me == null) me = new DemoController();
 		return me;
 	}
+	
+	public synchronized void doSomething() {
+	}
 }
