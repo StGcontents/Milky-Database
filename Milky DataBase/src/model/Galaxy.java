@@ -6,15 +6,32 @@ public class Galaxy {
 	private double redShift;
 	private Coordinates coordinates;
 	private double distance;
-	private String[] alternativeNames;
+	private String[] alternativeNames;	
 	/*
 	 * other parameters
 	 */
 	
-	
-	
-	
+	public String getName() { return name; }
+	public void setName(String name) { this.name = name; }
+
+	public double getRedShift() { return redShift; }
+	public void setRedShift(double redShift) { this.redShift = redShift; }
+
+	public Coordinates getCoordinates() { return coordinates; }
+	public void setCoordinates(Coordinates coordinates) { 
+		this.coordinates = coordinates;
+	}
+
+	public double getDistance() { return distance; }
+	public void setDistance(double distance) { this.distance = distance; }
+
+	public String[] getAlternativeNames() { return alternativeNames; }
+	public void setAlternativeNames(String[] alternativeNames) {
+		this.alternativeNames = alternativeNames;
+	}
+
 	public class Coordinates {
+		
 		private int rightAscensionHours;
 		private int rightAscensionMinutes;
 		private double rightAscensionSeconds;

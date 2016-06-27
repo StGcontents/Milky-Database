@@ -8,25 +8,23 @@ public class Flux {
 	private boolean upperLimit;
 	private double error;
 	private String aperture;
+	public boolean isContinuous() { return isContinuous; }
+	public void setContinuous(boolean isContinuous) { this.isContinuous = isContinuous; }
 	
-	protected class Ion {
-		private String atom;
-		private int chargedState;
-		private int line;
-		
-		public String getAtom() { return atom; }
-		public void setAtom(String atom) { this.atom = atom; }
-
-		public int getChargedState() { return chargedState; }
-		public void setChargedState(int chargedState) { this.chargedState = chargedState; }
-
-		public int getLine() { return line; }
-		public void setLine(int line) { this.line = line; }
-
-		protected Ion(String atom, int chargedState, int line) {
-			setAtom(atom);
-			setChargedState(chargedState);
-			setLine(line);
-		}
-	}
+	public Ion getIon() { return ion; }
+	public void setIon(Ion ion) { this.ion = ion; }
+	
+	public double getFlux() { return flux; }
+	public void setFlux(double flux) { this.flux = flux; }
+	
+	public boolean isUpperLimit() { return upperLimit; }
+	public void setUpperLimit(boolean upperLimit) { this.upperLimit = upperLimit; }
+	
+	public double getError() { return error; }
+	public void setError(double error) { this.error = error; }
+	
+	public String getAperture() { return aperture; }
+	public void setAperture(String aperture) { this.aperture = aperture; }
+	
+	
 }
