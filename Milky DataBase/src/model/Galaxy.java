@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 public class Galaxy {
 	
 	private String name;
@@ -7,14 +9,35 @@ public class Galaxy {
 	private Coordinates coordinates;
 	private double distance;
 	private String[] alternativeNames;
+	private List<Flux> fluxes;
 	/*
 	 * other parameters
 	 */
 	
+	public String getName() { return name; }
+	public void setName(String name) { this.name = name; }
+
+	public double getRedShift() { return redShift; }
+	public void setRedShift(double redShift) { this.redShift = redShift; }
+
+	public Coordinates getCoordinates() { return coordinates; }
+	public void setCoordinates(Coordinates coordinates) { 
+		this.coordinates = coordinates;
+	}
+
+	public double getDistance() { return distance; }
+	public void setDistance(double distance) { this.distance = distance; }
+
+	public String[] getAlternativeNames() { return alternativeNames; }
+	public void setAlternativeNames(String[] alternativeNames) {
+		this.alternativeNames = alternativeNames;
+	}
 	
-	
-	
+	public List<Flux> getFluxes() { return this.fluxes; }
+	public void addAll(List<Flux> fluxes) { this.fluxes.addAll(fluxes); }
+
 	public class Coordinates {
+		
 		private int rightAscensionHours;
 		private int rightAscensionMinutes;
 		private double rightAscensionSeconds;
