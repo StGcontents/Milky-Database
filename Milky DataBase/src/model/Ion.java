@@ -2,9 +2,13 @@ package model;
 
 public class Ion {
 	
+	private int id;
 	private String atom;
 	private int chargedState;
-	private int line;
+	private double line;
+	
+	public int getId() { return id; }
+	public void setId(int id) { this.id = id; }
 	
 	public String getAtom() { return atom; }
 	public void setAtom(String atom) { this.atom = atom; }
@@ -12,10 +16,11 @@ public class Ion {
 	public int getChargedState() { return chargedState; }
 	public void setChargedState(int chargedState) { this.chargedState = chargedState; }
 
-	public int getLine() { return line; }
-	public void setLine(int line) { this.line = line; }
+	public double getLine() { return line; }
+	public void setLine(double line) { this.line = line; }
 
-	protected Ion(String atom, int chargedState, int line) {
+	public Ion(int id, String atom, int chargedState, double line) {
+		setId(id);
 		setAtom(atom);
 		setChargedState(chargedState);
 		setLine(line);

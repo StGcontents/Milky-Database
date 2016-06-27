@@ -1,12 +1,15 @@
 package model;
 
+import java.util.List;
+
 public class Galaxy {
 	
 	private String name;
 	private double redShift;
 	private Coordinates coordinates;
 	private double distance;
-	private String[] alternativeNames;	
+	private String[] alternativeNames;
+	private List<Flux> fluxes;
 	/*
 	 * other parameters
 	 */
@@ -29,6 +32,9 @@ public class Galaxy {
 	public void setAlternativeNames(String[] alternativeNames) {
 		this.alternativeNames = alternativeNames;
 	}
+	
+	public List<Flux> getFluxes() { return this.fluxes; }
+	public void addAll(List<Flux> fluxes) { this.fluxes.addAll(fluxes); }
 
 	public class Coordinates {
 		

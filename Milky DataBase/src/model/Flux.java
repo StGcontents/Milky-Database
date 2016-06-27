@@ -4,7 +4,7 @@ public class Flux {
 	
 	private boolean isContinuous;
 	private Ion ion;
-	private double flux;
+	private double value;
 	private boolean upperLimit;
 	private double error;
 	private String aperture;
@@ -14,8 +14,8 @@ public class Flux {
 	public Ion getIon() { return ion; }
 	public void setIon(Ion ion) { this.ion = ion; }
 	
-	public double getFlux() { return flux; }
-	public void setFlux(double flux) { this.flux = flux; }
+	public double getValue() { return value; }
+	public void setValue(double value) { this.value = value; }
 	
 	public boolean isUpperLimit() { return upperLimit; }
 	public void setUpperLimit(boolean upperLimit) { this.upperLimit = upperLimit; }
