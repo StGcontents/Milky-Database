@@ -31,4 +31,5 @@ public class User {
 		setMail(mail);
 		setAdmin(isAdmin);
 	}
+	public User() { }
 }

@@ -10,12 +10,12 @@ import model.Galaxy;
 public class FluxRepository extends Repository {
 	
 	private static FluxRepository me;
-	protected FluxRepository() {
-		this.dataSource = new DataSource();
+	protected FluxRepository(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 	
-	public static synchronized FluxRepository instance() {
-		if (me == null) me = new FluxRepository();
+	public static synchronized FluxRepository instance(DataSource dataSource) {
+		if (me == null) me = new FluxRepository(dataSource);
 		return me;
 	}
 	

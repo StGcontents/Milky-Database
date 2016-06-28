@@ -16,13 +16,15 @@ import java.text.AttributedCharacterIterator;
 import javax.swing.SpringLayout;
 import javax.swing.text.html.ImageView;
 
-public class LoginView {
+import controller.LoginController;
 
-	public static void main(String[] args) {
-		generateView().setVisible(true);
-	}
+public class LoginView {
 	
-	private static Shape coolshapes() {
+	private TextField userField, passField;
+	private Button logBtn, exitBtn;
+	private Label label;
+	
+	private Shape coolshapes() {
 		Path2D path = new GeneralPath();
 		path.moveTo(0, 200);
 		path.curveTo(0, 200, 0, 0, 400, 0);
@@ -43,7 +45,7 @@ public class LoginView {
 	
 	static Point p;
 	
-	private static Frame generateView() {
+	public void generateView() {
 		final Frame frame = new Frame();
 		
 		SpringLayout layout = new SpringLayout(); 
@@ -77,24 +79,23 @@ public class LoginView {
 			}
 		});
 		
-		Label label = new Label("WELCOME.");
+		label = new Label("WELCOME.");
+		label.setAlignment(Label.CENTER);
 		label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 52));
 		label.setForeground(Color.WHITE);
 		
-		final TextField userField = new TextField("Insert user ID");
-		final TextField passField = new TextField("Insert password");
+		userField = new TextField("Insert user ID");
+		passField = new TextField("Insert password");
 	
-		Button button = new Button("LOG IN"), exitBtn = new Button("EXIT");
-		button.setSize(50, 25);
-		button.setForeground(Color.WHITE);
+		logBtn = new Button("LOG IN");
+		logBtn.setSize(50, 25);
+		logBtn.setForeground(Color.WHITE);
+		
+		exitBtn = new Button("EXIT");
 		exitBtn.setSize(50,  25);
 		exitBtn.setForeground(Color.WHITE);
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("USER ID: " + userField.getText() + ", PASSWORD: " + passField.getText());
-			}
-		});
+		
+		logBtn.addActionListener(new LogButtonListener());
 		exitBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -111,18 +112,32 @@ public class LoginView {
 		frame.add(passField);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, passField, 0, SpringLayout.HORIZONTAL_CENTER, frame);
 		layout.putConstraint(SpringLayout.VERTICAL_CENTER, passField, 25, SpringLayout.VERTICAL_CENTER, frame);
-		frame.add(button);
-		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, button, -50, SpringLayout.HORIZONTAL_CENTER, frame);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, button, 75, SpringLayout.VERTICAL_CENTER, frame);
+		frame.add(logBtn);
+		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, logBtn, -50, SpringLayout.HORIZONTAL_CENTER, frame);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, logBtn, 75, SpringLayout.VERTICAL_CENTER, frame);
 		frame.add(exitBtn);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, exitBtn, 50, SpringLayout.HORIZONTAL_CENTER, frame);
 		layout.putConstraint(SpringLayout.VERTICAL_CENTER, exitBtn, 75, SpringLayout.VERTICAL_CENTER, frame);
+		
 		frame.setUndecorated(true);
 		frame.setShape(coolshapes());
 		float[] hsb = new float[3];
 		Color.RGBtoHSB(7, 16, 31, hsb);
 		frame.setBackground(Color.getHSBColor(hsb[0], hsb[1], hsb[2]));
 		
-		return frame;
+		frame.setVisible(true);
+	}
+	
+	class LogButtonListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (LoginController.instance().log(userField.getText(), passField.getText())) {
+				//TODO log user in
+			}
+			else {
+				label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+				label.setText("Check credentials.");
+			}
+		}
 	}
 }

@@ -11,12 +11,12 @@ import model.Galaxy;
 public class GalaxyRepository extends Repository {
 	
 	private static GalaxyRepository me;
-	protected GalaxyRepository() {
-		this.dataSource = new DataSource();
+	protected GalaxyRepository(DataSource dataSource) {
+		this.dataSource = dataSource;
 	}
 	
-	public static synchronized GalaxyRepository instance() {
-		if (me == null) me = new GalaxyRepository();
+	public static synchronized GalaxyRepository instance(DataSource dataSource) {
+		if (me == null) me = new GalaxyRepository(dataSource);
 		return me;
 	}
 	
@@ -77,7 +77,7 @@ public class GalaxyRepository extends Repository {
 		release(connection, statement);
 	}
 	
-	public Galaxy retrieveGalaxy(String name, boolean force) throws Exception {
+	public Galaxy retrieveGalaxyByName(String name, boolean force) throws Exception {
 		Connection connection = dataSource.getConnection();
 		connection.setAutoCommit(false);
 		
@@ -103,11 +103,11 @@ public class GalaxyRepository extends Repository {
 			connection.commit();
 			release(alterStatement);
 			
-			FluxRepository.instance().retrieveGalaxyFluxes(galaxy);
+			FluxRepository.instance(dataSource).retrieveGalaxyFluxes(galaxy);
 		}
+		else connection.commit();
 		
 		release(connection, statement, set);
-		
 		return galaxy;
 	}
 }
