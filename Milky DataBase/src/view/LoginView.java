@@ -16,6 +16,7 @@ import java.text.AttributedCharacterIterator;
 import javax.swing.SpringLayout;
 import javax.swing.text.html.ImageView;
 
+import controller.DataSource;
 import controller.LoginController;
 
 public class LoginView {
@@ -131,9 +132,10 @@ public class LoginView {
 	class LogButtonListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (LoginController.instance().log(userField.getText(), passField.getText())) {
+			int i;
+			if ((i = LoginController.instance().log(userField.getText(), passField.getText())) > -1) {
 				label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-				label.setText("Welcome back.");
+				label.setText(i == DataSource.ADMIN ? "Welcome back." : "Oh, it's you.");
 			}
 			else {
 				label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));

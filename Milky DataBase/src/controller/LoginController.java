@@ -21,7 +21,7 @@ public class LoginController {
 		new LoginView().generateView();
 	}
 	
-	public boolean log(String userID, String password) {
+	public int log(String userID, String password) {
 		UserRepository repo = UserRepository.instance(DataSource.instance(DataSource.READONLY));
 		int priviledgeLevel;
 		try { priviledgeLevel = repo.logUser(userID, password); }
@@ -30,7 +30,7 @@ public class LoginController {
 			priviledgeLevel = DataSource.INVALID;
 		}
 		
-		return priviledgeLevel != DataSource.INVALID;
+		return priviledgeLevel;
 	}
 
 	public boolean login (String userName, String password)
