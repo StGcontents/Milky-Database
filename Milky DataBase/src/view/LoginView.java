@@ -132,7 +132,8 @@ public class LoginView {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			if (LoginController.instance().log(userField.getText(), passField.getText())) {
-				//TODO log user in
+				label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+				label.setText("Welcome back.");
 			}
 			else {
 				label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));

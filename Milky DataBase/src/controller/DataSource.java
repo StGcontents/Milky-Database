@@ -37,7 +37,7 @@ public abstract class DataSource {
 			return ReadOnlyDataSource.me;
 		}
 		
-		private static String user = "readonly", password = "readonly";
+		private static String user = "postgres", password = "postgres";
 		
 		@Override protected String getUser() { return ReadOnlyDataSource.user; }
 		@Override protected String getPassword() { return ReadOnlyDataSource.password; }
