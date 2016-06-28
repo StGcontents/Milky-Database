@@ -9,8 +9,12 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Path2D;
+import java.awt.image.ImageObserver;
+import java.text.AttributedCharacterIterator;
 
 import javax.swing.SpringLayout;
+import javax.swing.text.html.ImageView;
 
 public class LoginView {
 
@@ -19,7 +23,7 @@ public class LoginView {
 	}
 	
 	private static Shape coolshapes() {
-		GeneralPath path = new GeneralPath();
+		Path2D path = new GeneralPath();
 		path.moveTo(0, 200);
 		path.curveTo(0, 200, 0, 0, 400, 0);
 		path.curveTo(400, 0, 800, 0, 800, 200);
@@ -33,18 +37,19 @@ public class LoginView {
 		path.curveTo(550, 100, 750, 100, 750, 200);
 		path.curveTo(750, 200, 750, 100, 350, 100);
 		path.curveTo(350, 100, 0, 100, 0, 200);
-		
+
 		return path;
 	}
 	
 	static Point p;
 	
 	private static Frame generateView() {
-		final Frame frame = new Frame("Demo");
+		final Frame frame = new Frame();
 		
 		SpringLayout layout = new SpringLayout(); 
 		frame.setLayout(layout);
 		frame.setSize(950, 500);
+		frame.setLocation(208, 134);
 		
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -72,20 +77,22 @@ public class LoginView {
 			}
 		});
 		
-		final Label label = new Label("This is a label");
-		label.setAlignment(Label.CENTER);
-		label.setMinimumSize(new Dimension(500, 25));
+		Label label = new Label("WELCOME.");
+		label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 52));
+		label.setForeground(Color.WHITE);
+		
+		final TextField userField = new TextField("Insert user ID");
+		final TextField passField = new TextField("Insert password");
 	
-		Button button = new Button("Log in"), exitBtn = new Button("Exit");
+		Button button = new Button("LOG IN"), exitBtn = new Button("EXIT");
 		button.setSize(50, 25);
+		button.setForeground(Color.WHITE);
 		exitBtn.setSize(50,  25);
+		exitBtn.setForeground(Color.WHITE);
 		button.addActionListener(new ActionListener() {
-			boolean bool = true;
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (bool) label.setText("PUSH THE BUTTON");
-				else label.setText("MANGANESIO");
-				bool = !bool;
+				System.out.println("USER ID: " + userField.getText() + ", PASSWORD: " + passField.getText());
 			}
 		});
 		exitBtn.addActionListener(new ActionListener() {
@@ -97,20 +104,25 @@ public class LoginView {
 		
 		frame.add(label);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, label, 0, SpringLayout.HORIZONTAL_CENTER, frame);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, label, -50, SpringLayout.VERTICAL_CENTER, frame);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, label, -75, SpringLayout.VERTICAL_CENTER, frame);
+		frame.add(userField);
+		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, userField, 0, SpringLayout.HORIZONTAL_CENTER, frame);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, userField, -25, SpringLayout.VERTICAL_CENTER, frame);
+		frame.add(passField);
+		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, passField, 0, SpringLayout.HORIZONTAL_CENTER, frame);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, passField, 25, SpringLayout.VERTICAL_CENTER, frame);
 		frame.add(button);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, button, -50, SpringLayout.HORIZONTAL_CENTER, frame);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, button, 50, SpringLayout.VERTICAL_CENTER, frame);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, button, 75, SpringLayout.VERTICAL_CENTER, frame);
 		frame.add(exitBtn);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, exitBtn, 50, SpringLayout.HORIZONTAL_CENTER, frame);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, exitBtn, 50, SpringLayout.VERTICAL_CENTER, frame);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, exitBtn, 75, SpringLayout.VERTICAL_CENTER, frame);
 		frame.setUndecorated(true);
 		frame.setShape(coolshapes());
 		float[] hsb = new float[3];
-		Color.RGBtoHSB(12, 71, 118, hsb);
+		Color.RGBtoHSB(7, 16, 31, hsb);
 		frame.setBackground(Color.getHSBColor(hsb[0], hsb[1], hsb[2]));
 		
 		return frame;
 	}
-
 }
