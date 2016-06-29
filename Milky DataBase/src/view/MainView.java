@@ -1,8 +1,12 @@
 package view;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Label;
+import java.awt.Panel;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -25,6 +29,7 @@ public class MainView {
 	private Label label;
 	private JList<String> list;
 	private int priviledgeLevel;
+	private Panel panel;
 	
 	public void generateView(int level) {
 		priviledgeLevel = level;
@@ -40,8 +45,9 @@ public class MainView {
 	
 	private void generateBasicView() {
 		frame = new Frame("Logged in");
-		frame.setSize(400, 400);
-		frame.setLayout(new GridLayout(1, 1));
+		frame.setSize(1000, 700);
+		GridLayout layout = new GridLayout(1, 2);
+		frame.setLayout(layout);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -51,6 +57,7 @@ public class MainView {
 			}
 		});
 		list = new JList<>();
+		list.setMaximumSize(new Dimension(100, Integer.MAX_VALUE));
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setLayoutOrientation(JList.VERTICAL);
 		DefaultListModel<String> model = new DefaultListModel<>();
@@ -59,8 +66,10 @@ public class MainView {
 		list.addListSelectionListener(new BasicSelectionListener());
 		frame.add(list);
 		
+		panel = new Panel(new GridLayout(1, 1));
 		label = new Label(priviledgeLevel == DataSource.ADMIN ? "WELCOME ADMIN" : "WELCOME STRANGER");
-		frame.add(label);		
+		panel.add(label);
+		frame.add(panel);	
 	}
 	
 	private void decorateView() {
@@ -96,12 +105,21 @@ public class MainView {
 			}
 			
 			switch(index) {
+			case 0:
+				frame.remove(panel);
+				panel = new GalaxyPanel();
+				frame.add(panel);
+				frame.validate();
+				panel.validate();
+				break;
 			case 1:
 				if (priviledgeLevel == DataSource.COMMON) {
 					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 					MainController.instance(priviledgeLevel).exitToLogin();
 				}
-				else label.setText("You selected row #" + (index + 1));
+				else {
+					label.setText("You selected row #" + (index + 1));
+				}
 				break;
 			case 3:
 				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
