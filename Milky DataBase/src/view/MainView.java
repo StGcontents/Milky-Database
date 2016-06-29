@@ -11,16 +11,13 @@ import java.awt.event.WindowEvent;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import controller.DataSource;
 import controller.MainController;
-import model.Priviledge;
 
 public class MainView {
 	
-	protected static final int LAST_COMMON_INDEX = 2;
+	public static final int LAST_COMMON_INDEX = 2;
 	
 	private Frame frame;
 	private Label label;
@@ -63,7 +60,7 @@ public class MainView {
 		DefaultListModel<String> model = new DefaultListModel<>();
 		model.addElement("Find galaxy");
 		list.setModel(model);
-		list.addListSelectionListener(new BasicSelectionListener());
+		list.addListSelectionListener(MainController.instance());
 		frame.add(list);
 		
 		panel = new Panel(new GridLayout(1, 1));
@@ -77,56 +74,15 @@ public class MainView {
 		((DefaultListModel<String>) list.getModel()).addElement("Add user");
 	}
 	
-	private class BasicSelectionListener implements ListSelectionListener {
-
-		@Override
-		public void valueChanged(ListSelectionEvent e) {
-			ListSelectionModel model = ((JList) e.getSource()).getSelectionModel();
-			if (!model.isSelectionEmpty()) {
-				int min = model.getMinSelectionIndex();
-				int max = model.getMaxSelectionIndex();
-				int i;
-				for (i = min; i <= max; ++i) {
-					if (model.isSelectedIndex(i)) break;
-					else if (i == max) {
-						i = -1;
-						break;
-					}
-				}
-				
-				act(i);
-			}
-		}
-		
-		private void act(int index) {
-			if (priviledgeLevel == DataSource.COMMON && index > LAST_COMMON_INDEX) {
-				//TODO something, maybe nothing
-				return;
-			}
-			
-			switch(index) {
-			case 0:
-				frame.remove(panel);
-				panel = new GalaxyPanel();
-				frame.add(panel);
-				frame.validate();
-				panel.validate();
-				break;
-			case 1:
-				if (priviledgeLevel == DataSource.COMMON) {
-					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-					MainController.instance().exitToLogin();
-				}
-				else {
-					label.setText("You selected row #" + (index + 1));
-				}
-				break;
-			case 3:
-				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-				MainController.instance().exitToLogin();
-				break;
-			default: label.setText("You selected row #" + (index + 1));
-			}
-		}
-	}	
+	public void close() {
+		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+	}
+	
+	public void attachPanel(Panel panel) {
+		frame.remove(this.panel);
+		frame.validate();
+		this.panel = panel;
+		frame.add(this.panel);
+		frame.validate();
+	}
 }

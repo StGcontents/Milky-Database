@@ -6,5 +6,8 @@ public class GalaxySearchController {
 	private GalaxySearchController() {
 		
 	}
-
+	public static synchronized GalaxySearchController instance() {
+		if (me == null) me = new GalaxySearchController();
+		return me;
+	}
 }

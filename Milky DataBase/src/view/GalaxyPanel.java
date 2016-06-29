@@ -28,7 +28,7 @@ public class GalaxyPanel extends Panel {
 	private JList<String> results;
 	
 	public GalaxyPanel() {
-		setLayout(new FlowLayout());
+		setLayout(new GridLayout(1, 1));
 		setSize(400, 700);
 		
 		generateSearchPanel();
@@ -125,6 +125,8 @@ public class GalaxyPanel extends Panel {
 			layout.putConstraint(SpringLayout.NORTH, label, 25, SpringLayout.NORTH, searchBtn);
 			layout.putConstraint(SpringLayout.WEST, label, 25, SpringLayout.WEST, searchPanel);
 			layout.putConstraint(SpringLayout.EAST, label, -25, SpringLayout.HORIZONTAL_CENTER, searchPanel);
+			
+			searchPanel.setVisible(true);
 		}
 	}
 }
