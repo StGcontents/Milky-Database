@@ -1,29 +1,26 @@
 package view;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Panel;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
-import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import controller.DataSource;
 import controller.MainController;
+import model.Priviledge;
 
 public class MainView {
 	
-	protected int LAST_COMMON_INDEX = 2;
+	protected static final int LAST_COMMON_INDEX = 2;
 	
 	private Frame frame;
 	private Label label;
@@ -31,10 +28,13 @@ public class MainView {
 	private int priviledgeLevel;
 	private Panel panel;
 	
-	public void generateView(int level) {
-		priviledgeLevel = level;
-		
+	public MainView(int priviledgeLevel) {
+		this.priviledgeLevel = priviledgeLevel;
+	}
+	
+	public void generateView() {		
 		generateBasicView();
+		
 		if (priviledgeLevel == DataSource.ADMIN)
 			decorateView();
 		
@@ -115,7 +115,7 @@ public class MainView {
 			case 1:
 				if (priviledgeLevel == DataSource.COMMON) {
 					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-					MainController.instance(priviledgeLevel).exitToLogin();
+					MainController.instance().exitToLogin();
 				}
 				else {
 					label.setText("You selected row #" + (index + 1));
@@ -123,7 +123,7 @@ public class MainView {
 				break;
 			case 3:
 				frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-				MainController.instance(priviledgeLevel).exitToLogin();
+				MainController.instance().exitToLogin();
 				break;
 			default: label.setText("You selected row #" + (index + 1));
 			}

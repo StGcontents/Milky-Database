@@ -1,5 +1,6 @@
 package controller;
 
+import model.Priviledge;
 import view.MainView;
 
 public class MainController {
@@ -8,16 +9,19 @@ public class MainController {
 	private MainController(int priviledgeLevel) {
 		this.priviledgeLevel = priviledgeLevel;
 	}
-	public static synchronized MainController instance(int priviledgeLevel) {
-		if (me == null || me.priviledgeLevel != priviledgeLevel) 
-			me = new MainController(priviledgeLevel);
+	public static synchronized MainController instance() {
+		int level = Priviledge.instance().retrieveState();
+		if (me == null || me.priviledgeLevel != level) 
+			me = new MainController(level);
 		return me;
 	}
 	
 	private int priviledgeLevel;
+	private MainView view;
 	
 	public void callView() {
-		new MainView().generateView(priviledgeLevel);
+		view = new MainView(priviledgeLevel);
+		view.generateView();
 	}
 	
 	public void exitToLogin() {

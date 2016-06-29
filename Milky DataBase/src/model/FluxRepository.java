@@ -1,11 +1,11 @@
-package controller;
+package model;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import model.Flux;
-import model.Galaxy;
+import controller.DataSource;
+import controller.FluxFactory;
 
 public class FluxRepository extends Repository {
 	

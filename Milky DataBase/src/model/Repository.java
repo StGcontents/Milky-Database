@@ -1,4 +1,6 @@
-package controller;
+package model;
+
+import controller.DataSource;
 
 public abstract class Repository {
 	

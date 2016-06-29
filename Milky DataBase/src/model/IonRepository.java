@@ -1,6 +1,6 @@
-package controller;
+package model;
 
-import model.Ion;
+import controller.DataSource;
 
 public class IonRepository extends Repository {
 	

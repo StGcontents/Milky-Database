@@ -1,4 +1,4 @@
-package controller;
+package model;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,7 +6,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Galaxy;
+import controller.DataSource;
+import controller.GalaxyFactory;
 
 public class GalaxyRepository extends Repository {
 	

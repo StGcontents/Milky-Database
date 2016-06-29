@@ -13,9 +13,18 @@ import java.awt.geom.Path2D;
 
 import javax.swing.SpringLayout;
 
+import controller.DataSource;
 import controller.LoginController;
+import pattern.Observer;
 
-public class LoginView {
+public class LoginView extends Observer<Integer> {
+	
+	private static LoginView me;
+	private LoginView() { }
+	public static synchronized LoginView instance() {
+		if (me == null) me = new LoginView();
+		return me;
+	}
 	
 	private Frame frame;
 	private TextField userField, passField;
@@ -135,24 +144,34 @@ public class LoginView {
 		logBtn = null;
 	}
 	
+	@Override
+	public void stateChanged() {
+		int priviledgeLevel = getSubject().retrieveState();
+		
+		if (priviledgeLevel > DataSource.INVALID) {
+			frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+			purge();
+			LoginController.instance().onLoginExit(priviledgeLevel);	
+		}
+		else {
+			label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+			label.setText("Check credentials.");
+		}
+		
+	}
+	
 	class LogButtonListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			int priviledgeLevel;
-			if ((priviledgeLevel = LoginController.instance().log(userField.getText(), passField.getText())) > -1) {
-				if (frame == null) label.setText("WTF");
-				else {
-					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-					purge();
-					
-					LoginController.instance().onLoginExit(priviledgeLevel);
+			//LoginController.instance().log(userField.getText(), passField.getText());
+			
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					LoginController.instance().log(userField.getText(), passField.getText());
 				}
-				
-			}
-			else {
-				label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-				label.setText("Check credentials.");
-			}
+			}).start();
+			
 		}
 	}
 }
