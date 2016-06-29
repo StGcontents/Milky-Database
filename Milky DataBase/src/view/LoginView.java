@@ -10,17 +10,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
-import java.awt.image.ImageObserver;
-import java.text.AttributedCharacterIterator;
 
 import javax.swing.SpringLayout;
-import javax.swing.text.html.ImageView;
 
-import controller.DataSource;
 import controller.LoginController;
 
 public class LoginView {
 	
+	private Frame frame;
 	private TextField userField, passField;
 	private Button logBtn, exitBtn;
 	private Label label;
@@ -47,7 +44,7 @@ public class LoginView {
 	static Point p;
 	
 	public void generateView() {
-		final Frame frame = new Frame();
+		frame = new Frame();
 		
 		SpringLayout layout = new SpringLayout(); 
 		frame.setLayout(layout);
@@ -59,7 +56,7 @@ public class LoginView {
 			public void windowClosing(WindowEvent e) {
 				super.windowClosing(e);
 				System.out.println("exiting");
-				System.exit(0);
+				frame.dispose();
 			}
 		});
 		
@@ -129,13 +126,28 @@ public class LoginView {
 		frame.setVisible(true);
 	}
 	
+	private void purge() {
+		frame = null;
+		userField = null;
+		passField = null;
+		label = null;
+		exitBtn = null;
+		logBtn = null;
+	}
+	
 	class LogButtonListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			int i;
-			if ((i = LoginController.instance().log(userField.getText(), passField.getText())) > -1) {
-				label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-				label.setText(i == DataSource.ADMIN ? "Welcome back." : "Oh, it's you.");
+			int priviledgeLevel;
+			if ((priviledgeLevel = LoginController.instance().log(userField.getText(), passField.getText())) > -1) {
+				if (frame == null) label.setText("WTF");
+				else {
+					frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+					purge();
+					
+					LoginController.instance().onLoginExit(priviledgeLevel);
+				}
+				
 			}
 			else {
 				label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));

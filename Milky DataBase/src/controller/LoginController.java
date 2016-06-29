@@ -1,11 +1,5 @@
 package controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import Serializzatore.SerializzatoreUtente;
-import model.User;
 import view.LoginView;
 
 public class LoginController {
@@ -18,6 +12,10 @@ public class LoginController {
 	}
 	
 	public static void main(String[] args) {
+		instance().callView();
+	}
+	
+	public void callView() {
 		new LoginView().generateView();
 	}
 	
@@ -32,29 +30,8 @@ public class LoginController {
 		
 		return priviledgeLevel;
 	}
-
-	public boolean login (String userName, String password)
-	{
-		HashMap<String, User> utenti = SerializzatoreUtente.getUtenti();
-		
-		List<User> utentiUserNameList = new ArrayList<User>();
-		
-		for (String id : utenti.keySet()) {
-			utentiUserNameList.add(SerializzatoreUtente.getUtenteByUserName(userName));
-		}
-		
-		for(User u : utentiUserNameList){
-			if(u != null){
-				if(u.getPassword().equals(password)){
-					return true;
-				}
-			}
-		}
-		return false;
-	}
 	
-	public User getUtente(String userName){
-		return (SerializzatoreUtente.getUtenteByUserName(userName));
+	public void onLoginExit(int priviledgeLevel) {
+		MainController.instance(priviledgeLevel).callView();
 	}
-
 }
