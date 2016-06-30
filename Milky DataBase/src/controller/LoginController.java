@@ -8,7 +8,7 @@ public class LoginController {
 	
 	private static LoginController me;
 	private LoginController() { 
-		repo = new UserRepository(DataSource.instance(DataSource.READONLY)); 
+		repo = new UserRepository(DataSource.readOnly()); 
 		LoginView.instance().setSubject(Priviledge.instance());
 	}
 	public static synchronized LoginController instance() {

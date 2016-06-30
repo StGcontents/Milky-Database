@@ -65,7 +65,7 @@ public class MainController implements ListSelectionListener {
 		
 		switch(index) {
 		case 0:
-			view.attachPanel(new GalaxyPanel());
+			view.attachPanel(GalaxySearchController.instance().callView());
 			break;
 		case 1:
 			if (priviledgeLevel == DataSource.COMMON) {

@@ -3,6 +3,8 @@ package controller;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+import model.Priviledge;
+
 public abstract class DataSource {
 	
 	private static String URI = "jdbc:postgresql://localhost/galaxy";
@@ -17,6 +19,15 @@ public abstract class DataSource {
 		case 2: default:
 			return ReadOnlyDataSource.instance();
 		}
+	}
+	
+	public static DataSource byPriviledge() {
+		int priviledgeLevel = Priviledge.instance().retrieveState();
+		return instance(priviledgeLevel);
+	}
+	
+	public static DataSource readOnly() {
+		return instance(DataSource.READONLY);
 	}
 	
 	public Connection getConnection() throws Exception {
