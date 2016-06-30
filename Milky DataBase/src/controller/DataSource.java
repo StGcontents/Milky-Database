@@ -62,7 +62,7 @@ public abstract class DataSource {
 			return CommonDataSource.me;
 		}
 		
-		private static String user = "user", password = "password";
+		private static String user = "postgres", password = "postgres";
 		
 		@Override protected String getUser() { return CommonDataSource.user; }
 		@Override protected String getPassword() { return CommonDataSource.password; }
@@ -75,7 +75,7 @@ public abstract class DataSource {
 			return AdminDataSource.me;
 		}
 		
-		private static String user = "admin", password = "postgres";
+		private static String user = "postgres", password = "postgres";
 		
 		@Override protected String getUser() { return AdminDataSource.user; }
 		@Override protected String getPassword() { return AdminDataSource.password; }

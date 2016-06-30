@@ -10,7 +10,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import model.Priviledge;
-import view.GalaxyPanel;
 import view.MainView;
 
 public class MainController implements ListSelectionListener {

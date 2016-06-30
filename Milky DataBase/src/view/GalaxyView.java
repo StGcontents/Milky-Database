@@ -6,7 +6,6 @@ import java.awt.CheckboxGroup;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Panel;
 import java.awt.TextField;
@@ -25,13 +24,23 @@ import javax.swing.SpringLayout;
 
 import controller.GalaxySearchController;
 import model.Galaxy;
+import model.Priviledge;
 import pattern.Observer;
 
-@SuppressWarnings("serial")
-public class GalaxyPanel extends Panel {
+public class GalaxyView {
 	
-	private static Panel searchPanel;
-	private Panel resultPanel;
+	private static GalaxyView me;
+	public static synchronized GalaxyView instance() {
+		int currentPriviledgeLevel = Priviledge.instance().retrieveState();
+		if (me == null || me.lastPriviledgeLevel != currentPriviledgeLevel) {
+			me = new GalaxyView();
+			me.lastPriviledgeLevel = currentPriviledgeLevel;
+		}
+		return me;
+	}
+	private int lastPriviledgeLevel;
+	private Panel searchPanel;
+	private GalaxyPanel resultPanel;
 	private CheckboxGroup group;
 	private Checkbox nameBox, coordBox, redShiftBox;
 	private TextField nameField;
@@ -41,23 +50,15 @@ public class GalaxyPanel extends Panel {
 	private ListObserverAdapter listObserver;
 	private GalaxyObserverAdapter galaxyObserver;
 	
-	public GalaxyPanel() {
+	protected GalaxyView() {
 		listObserver = new ListObserverAdapter(this);
 		galaxyObserver = new GalaxyObserverAdapter(this);
-		
-		setLayout(new GridLayout(1, 1));
-		setSize(400, 700);
-		
-		generateSearchPanel();
-		add(searchPanel);
-		
-		setVisible(true);
 	}
 	
 	public Observer<List<String[]>> getListObserver() { return this.listObserver; }
 	public Observer<Galaxy> getGalaxyObserver() { return this.galaxyObserver; }
 	
-	private void generateSearchPanel() {
+	public Panel generateSearchPanel() {
 		if (searchPanel == null) {
 			
 			SpringLayout layout = new SpringLayout();
@@ -137,28 +138,26 @@ public class GalaxyPanel extends Panel {
 			results.addListSelectionListener(GalaxySearchController.instance());
 			
 			JScrollPane scrollPane = new JScrollPane(results);
-			scrollPane.setPreferredSize(new Dimension(WIDTH, 100));
+			scrollPane.setPreferredSize(new Dimension(Panel.WIDTH, 100));
 			searchPanel.add(scrollPane);
-			
-			resultPanel = new Panel(); //TODO resultPanel
 			
 			layout.putConstraint(SpringLayout.NORTH, nameBox, 25, SpringLayout.NORTH, searchPanel);
 			layout.putConstraint(SpringLayout.WEST, nameBox, 25, SpringLayout.WEST, searchPanel);
 			
-			layout.putConstraint(SpringLayout.NORTH, coordBox, 25, SpringLayout.NORTH, nameBox);
+			layout.putConstraint(SpringLayout.NORTH, coordBox, 10, SpringLayout.SOUTH, nameBox);
 			layout.putConstraint(SpringLayout.WEST, coordBox, 0, SpringLayout.WEST, nameBox);
 			
-			layout.putConstraint(SpringLayout.NORTH, redShiftBox, 25, SpringLayout.NORTH, coordBox);
+			layout.putConstraint(SpringLayout.NORTH, redShiftBox, 10, SpringLayout.SOUTH, coordBox);
 			layout.putConstraint(SpringLayout.WEST, redShiftBox, 0, SpringLayout.WEST, nameBox);
 			
 			layout.putConstraint(SpringLayout.NORTH, nameField, 0, SpringLayout.NORTH, nameBox);
 			layout.putConstraint(SpringLayout.WEST, nameField, 10, SpringLayout.EAST, redShiftBox);
 			layout.putConstraint(SpringLayout.EAST, nameField, -25, SpringLayout.EAST, searchPanel);
 			
-			layout.putConstraint(SpringLayout.NORTH, searchBtn, 25, SpringLayout.NORTH, redShiftBox);
+			layout.putConstraint(SpringLayout.NORTH, searchBtn, 20, SpringLayout.SOUTH, redShiftBox);
 			layout.putConstraint(SpringLayout.WEST, searchBtn, 25, SpringLayout.WEST, searchPanel);
 			
-			layout.putConstraint(SpringLayout.NORTH, scrollPane, 25, SpringLayout.NORTH, searchBtn);
+			layout.putConstraint(SpringLayout.NORTH, scrollPane, 20, SpringLayout.SOUTH, searchBtn);
 			layout.putConstraint(SpringLayout.WEST, scrollPane, 25, SpringLayout.WEST, searchPanel);
 			layout.putConstraint(SpringLayout.EAST, scrollPane, -25, SpringLayout.EAST, searchPanel);
 			
@@ -166,6 +165,8 @@ public class GalaxyPanel extends Panel {
 		}
 		
 		else reset();
+		
+		return searchPanel;
 	}
 	
 	private void reset() {
@@ -185,9 +186,44 @@ public class GalaxyPanel extends Panel {
 		if (names != null) for (String[] couple : names) model.addElement(couple);
 	}
 	
-	private void showGalaxy(Galaxy galaxy) {
-		if (galaxy == null) resultPanel.setVisible(false);
+	private void showGalaxy(Galaxy galaxy) { 
+		if (resultPanel == null) {
+			resultPanel = new GalaxyPanel(galaxy);
+			searchPanel.add(resultPanel);
+			SpringLayout layout = (SpringLayout) searchPanel.getLayout();
+			layout.putConstraint(SpringLayout.NORTH, resultPanel, 20, SpringLayout.SOUTH, results.getParent());
+			layout.putConstraint(SpringLayout.WEST, resultPanel, 25, SpringLayout.WEST, searchPanel);
+			layout.putConstraint(SpringLayout.EAST, resultPanel, -25, SpringLayout.EAST, searchPanel);
+			layout.putConstraint(SpringLayout.SOUTH, resultPanel, -25, SpringLayout.SOUTH, searchPanel);
+		}
 		
+		else resultPanel.setGalaxy(galaxy);
+	}
+	
+	class GalaxyPanel extends Panel {
+		
+		private Galaxy galaxy;
+		private Label nameLabel/*, coordLabel*/;
+		
+		protected GalaxyPanel(Galaxy galaxy) {
+			setPreferredSize(new Dimension(WIDTH, 300));
+			nameLabel = new Label();
+			//coordLabel = new Label();
+			setGalaxy(galaxy);
+		}
+		
+		protected void setGalaxy(Galaxy galaxy) {
+			this.galaxy = galaxy;
+			updateInformation();
+		}
+		
+		private void updateInformation() {
+			if (galaxy == null) setVisible(false);
+			else {
+				nameLabel.setText("Name: " + galaxy.getName());
+				//coordLabel.setText("Coordinates: " + galaxy.getCoordinates().toString());
+			}
+		}
 	}
 	
 	class AkaRenderer implements ListCellRenderer<String[]> {
@@ -206,37 +242,20 @@ public class GalaxyPanel extends Panel {
 			else {
 				label.setBackground(Color.WHITE);
 				label.setForeground(Color.BLACK);
-			}
-			
+			}	
 			return label;
-		}
-		
+		}	
 	}
 	
 	class ListObserverAdapter extends Observer<List<String[]>> {
-		
-		private GalaxyPanel adaptee;
-		
-		protected ListObserverAdapter(GalaxyPanel adaptee) {
-			this.adaptee = adaptee;
-		}
-
-		@Override
-		public void stateChanged() {
-			adaptee.populate(getSubject().retrieveState());
-		}
+		private GalaxyView adaptee;
+		protected ListObserverAdapter(GalaxyView adaptee) { this.adaptee = adaptee; } 
+		@Override public void stateChanged() { adaptee.populate(getSubject().retrieveState()); }
 	}
+	
 	class GalaxyObserverAdapter extends Observer<Galaxy> {
-		
-		private GalaxyPanel adaptee;
-		
-		protected GalaxyObserverAdapter(GalaxyPanel adaptee) {
-			this.adaptee = adaptee;
-		}
-
-		@Override
-		public void stateChanged() {
-			adaptee.showGalaxy(getSubject().retrieveState());
-		}
+		private GalaxyView adaptee;
+		protected GalaxyObserverAdapter(GalaxyView adaptee) { this.adaptee = adaptee; }
+		@Override public void stateChanged() { adaptee.showGalaxy(getSubject().retrieveState()); }
 	}
 }
