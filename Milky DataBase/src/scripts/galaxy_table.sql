@@ -8,9 +8,14 @@ CREATE TABLE galaxy (
 	arcmin INTEGER NOT NULL,
 	arcsec REAL NOT NULL,
 	redshift REAL NOT NULL,
-	distance REAL NOT NULL,
-	/*reference*/
+	distance INTEGER,
 	spectre VARCHAR(5) NOT NULL,
-	/*luminosity*/
-	/*metallicity*/
+	lum_nev_1 REAL,
+	lum_nev_1 BOOLEAN,
+	lum_nev_2 REAL,
+	lum_nev_2 BOOLEAN,
+	lum_oiv REAL,
+	lum_oiv BOOLEAN,
+	metallicity INTEGER,
+	metallicity_err INTEGER
 );

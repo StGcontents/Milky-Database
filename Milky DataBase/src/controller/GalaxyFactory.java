@@ -23,7 +23,7 @@ public class GalaxyFactory extends AbstractFactory<Galaxy> {
 				try {
 					Galaxy galaxy = new Galaxy();
 					galaxy.setName(set.getString(1));
-					//etc
+					
 					
 					galaxies.add(galaxy);
 				}
