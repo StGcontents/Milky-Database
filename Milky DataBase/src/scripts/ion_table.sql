@@ -1,8 +1,7 @@
-CREATE TABLE ion (
-	id INTEGER NOT NULL AUTO_INCREMENT,
+﻿CREATE TABLE ion (
+	id SERIAL PRIMARY KEY,
 	name VARCHAR(2) NOT NULL,
 	charges SMALLINT NOT NULL,
 	line REAL NOT NULL,
-	PRIMARY KEY (id),
 	UNIQUE (name, charges, line)
 );

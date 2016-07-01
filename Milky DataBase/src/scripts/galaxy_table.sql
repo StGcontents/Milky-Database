@@ -11,11 +11,11 @@ CREATE TABLE galaxy (
 	distance INTEGER,
 	spectre VARCHAR(5) NOT NULL,
 	lum_nev_1 REAL,
-	lum_nev_1 BOOLEAN,
+	lum_nev_1_flag BOOLEAN,
 	lum_nev_2 REAL,
-	lum_nev_2 BOOLEAN,
+	lum_nev_2_flag BOOLEAN,
 	lum_oiv REAL,
-	lum_oiv BOOLEAN,
+	lum_oiv_flag BOOLEAN,
 	metallicity INTEGER,
 	metallicity_err INTEGER
 );

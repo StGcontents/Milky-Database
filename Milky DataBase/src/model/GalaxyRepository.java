@@ -93,7 +93,9 @@ public class GalaxyRepository extends Repository {
 		ResultSet set = statement.executeQuery();
 		List<String[]> results = new ArrayList<>();
 		while (set.next()) {
-			results.add(new String[] { set.getString(1), set.getString(2) });
+			String str1 = set.getString(1), str2 = set.getString(2);
+			System.out.println(str1 + " " + str2);
+			results.add(new String[] { str1, str2 });
 		}
 		
 		release(connection, statement, set);
@@ -152,7 +154,7 @@ public class GalaxyRepository extends Repository {
 
 		@Override
 		public List<String[]> retrieveState() {
-			return new ArrayList<>(results);
+			return results;
 		}
 	}
 	

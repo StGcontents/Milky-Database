@@ -6,4 +6,4 @@ CREATE TABLE alternative_names(
 		FOREIGN KEY (name) REFERENCES galaxy(name)
 			ON DELETE CASCADE
 			ON UPDATE CASCADE
-); 
+);

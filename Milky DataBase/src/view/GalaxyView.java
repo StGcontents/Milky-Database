@@ -6,6 +6,7 @@ import java.awt.CheckboxGroup;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Panel;
 import java.awt.TextField;
@@ -45,7 +46,7 @@ public class GalaxyView {
 	private Checkbox nameBox, coordBox, redShiftBox;
 	private TextField nameField;
 	private Label label;
-	private JList<String[]> results;
+	private JList<String> results;
 	
 	private ListObserverAdapter listObserver;
 	private GalaxyObserverAdapter galaxyObserver;
@@ -130,9 +131,10 @@ public class GalaxyView {
 			searchPanel.add(label);
 			
 			results = new JList<>();
-			DefaultListModel<String[]> model = new DefaultListModel<>();
+			//DefaultListModel<String[]> model = new DefaultListModel<>();
+			DefaultListModel<String> model = new DefaultListModel<>();
 			results.setModel(model);
-			results.setCellRenderer(new AkaRenderer());
+			//results.setCellRenderer(new AkaRenderer());
 			results.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			results.setLayoutOrientation(JList.VERTICAL);
 			results.addListSelectionListener(GalaxySearchController.instance());
@@ -181,9 +183,9 @@ public class GalaxyView {
 	}
 	
 	private void populate(List<String[]> names) {
-		DefaultListModel<String[]> model = (DefaultListModel<String[]>) results.getModel(); 
+		DefaultListModel<String> model = (DefaultListModel<String>) results.getModel(); 
 		model.clear();
-		if (names != null) for (String[] couple : names) model.addElement(couple);
+		if (names != null) for (String[] couple : names) model.addElement(couple[0]);
 	}
 	
 	private void showGalaxy(Galaxy galaxy) { 
@@ -191,7 +193,7 @@ public class GalaxyView {
 			resultPanel = new GalaxyPanel(galaxy);
 			searchPanel.add(resultPanel);
 			SpringLayout layout = (SpringLayout) searchPanel.getLayout();
-			layout.putConstraint(SpringLayout.NORTH, resultPanel, 20, SpringLayout.SOUTH, results.getParent());
+			layout.putConstraint(SpringLayout.NORTH, resultPanel, 25, SpringLayout.SOUTH, results.getParent());
 			layout.putConstraint(SpringLayout.WEST, resultPanel, 25, SpringLayout.WEST, searchPanel);
 			layout.putConstraint(SpringLayout.EAST, resultPanel, -25, SpringLayout.EAST, searchPanel);
 			layout.putConstraint(SpringLayout.SOUTH, resultPanel, -25, SpringLayout.SOUTH, searchPanel);
@@ -207,7 +209,10 @@ public class GalaxyView {
 		
 		protected GalaxyPanel(Galaxy galaxy) {
 			setPreferredSize(new Dimension(WIDTH, 300));
+			setLayout(new GridLayout(1,1));
 			nameLabel = new Label();
+			nameLabel.setSize(200, 20);
+			this.add(nameLabel);
 			//coordLabel = new Label();
 			setGalaxy(galaxy);
 		}
@@ -222,6 +227,7 @@ public class GalaxyView {
 			else {
 				nameLabel.setText("Name: " + galaxy.getName());
 				//coordLabel.setText("Coordinates: " + galaxy.getCoordinates().toString());
+				setVisible(true);
 			}
 		}
 	}

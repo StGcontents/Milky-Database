@@ -48,7 +48,7 @@ public abstract class DataSource {
 			return ReadOnlyDataSource.me;
 		}
 		
-		private static String user = "postgres", password = "postgres";
+		private static String user = "rd_only", password = "login";
 		
 		@Override protected String getUser() { return ReadOnlyDataSource.user; }
 		@Override protected String getPassword() { return ReadOnlyDataSource.password; }
@@ -62,7 +62,7 @@ public abstract class DataSource {
 			return CommonDataSource.me;
 		}
 		
-		private static String user = "postgres", password = "postgres";
+		private static String user = "common", password = "user";
 		
 		@Override protected String getUser() { return CommonDataSource.user; }
 		@Override protected String getPassword() { return CommonDataSource.password; }
@@ -75,7 +75,7 @@ public abstract class DataSource {
 			return AdminDataSource.me;
 		}
 		
-		private static String user = "postgres", password = "postgres";
+		private static String user = "admin", password = "password";
 		
 		@Override protected String getUser() { return AdminDataSource.user; }
 		@Override protected String getPassword() { return AdminDataSource.password; }
