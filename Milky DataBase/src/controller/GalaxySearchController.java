@@ -41,7 +41,7 @@ public class GalaxySearchController implements ListSelectionListener {
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		@SuppressWarnings("unchecked")
-		JList<String> list = (JList<String>) e.getSource();
+		JList<String[]> list = (JList<String[]>) e.getSource();
 		ListSelectionModel listModel = list.getSelectionModel();
 		if (!listModel.isSelectionEmpty()) {
 			int min = listModel.getMinSelectionIndex();
@@ -57,10 +57,9 @@ public class GalaxySearchController implements ListSelectionListener {
 			
 			if (i == -1) return;
 			
-			//DefaultListModel<String[]> model = (DefaultListModel<String[]>) list.getModel();
-			DefaultListModel<String> model = (DefaultListModel<String>) list.getModel();
+			DefaultListModel<String[]> model = (DefaultListModel<String[]>) list.getModel();
 			
-			try { repo.retrieveGalaxyByName(model.get(i), false); } 
+			try { repo.retrieveGalaxyByName(model.get(i)[0], false); } 
 			catch (Exception e1) { e1.printStackTrace(); }
 		}
 	}

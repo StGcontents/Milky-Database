@@ -85,16 +85,17 @@ public class GalaxyRepository extends Repository {
 		
 		String query = "SELECT G.name, AN.alter_name "
 					 + "FROM galaxy G LEFT JOIN alternative_names AN ON (G.name LIKE AN.name) "
-					 + "WHERE G.name LIKE ? OR alter_name LIKE ?";
+					 + "WHERE G.name LIKE ? OR (G.name NOT LIKE ? AND alter_name LIKE ?) "
+					 + "ORDER BY G.name, AN.alter_name";
 		PreparedStatement statement = connection.prepareStatement(query);
 		statement.setString(1, "%" + partial + "%");
 		statement.setString(2, "%" + partial + "%");
+		statement.setString(3, "%" + partial + "%");
 		
 		ResultSet set = statement.executeQuery();
 		List<String[]> results = new ArrayList<>();
 		while (set.next()) {
 			String str1 = set.getString(1), str2 = set.getString(2);
-			System.out.println(str1 + " " + str2);
 			results.add(new String[] { str1, str2 });
 		}
 		
@@ -114,26 +115,23 @@ public class GalaxyRepository extends Repository {
 		ResultSet set = statement.executeQuery();
 		Galaxy galaxy = GalaxyFactory.instance().create(set).get(0);
 		
-		if (force) {
-			String alterQuery = "SELECT alter_name FROM alternative_names WHERE name LIKE ?";
-			PreparedStatement alterStatement = connection.prepareStatement(alterQuery, ResultSet.CLOSE_CURSORS_AT_COMMIT);
-			ResultSet alterSet = alterStatement.executeQuery();
-			String[] names = new String[alterSet.getFetchSize()];
-			int i = 0;
-			while (alterSet.next()) {
-				names[i] = alterSet.getString(1);
-				++i;
-			}
-			galaxy.setAlternativeNames(names);
-			
-			connection.commit();
-			release(alterStatement);
-			
-			FluxRepository.instance(dataSource).retrieveGalaxyFluxes(galaxy);
-		}
-		else connection.commit();
+		String alterQuery = "SELECT alter_name FROM alternative_names WHERE name LIKE ?";
+		PreparedStatement alterStatement = connection.prepareStatement(alterQuery, ResultSet.CLOSE_CURSORS_AT_COMMIT);
+		alterStatement.setString(1, name);
+		ResultSet alterSet = alterStatement.executeQuery();
+		List<String> names = new ArrayList<>();
+		while (alterSet.next()) 
+			names.add(alterSet.getString(1));
+	
+		galaxy.setAlternativeNames(names.toArray(new String[names.size()]));
 		
-		release(connection, statement, set);
+		connection.commit();
+		release(alterStatement, statement, set);
+		
+		if (force) 			
+			FluxRepository.instance(dataSource).retrieveGalaxyFluxes(galaxy);
+		
+		release(connection);
 		
 		galaxySubject.setState(galaxy);
 	}

@@ -6,8 +6,8 @@ import java.util.List;
 public class Galaxy {
 	
 	private String name;
-	private double redShift;
 	private Coordinates coordinates;
+	private double redShift;
 	private Integer distance;
 	private String spectre;
 	private Luminosity[] luminosities = new Luminosity[3];
