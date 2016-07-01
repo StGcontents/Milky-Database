@@ -11,6 +11,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpringLayout;
 
 import controller.DataSource;
 import controller.MainController;
@@ -43,7 +44,7 @@ public class MainView {
 	private void generateBasicView() {
 		frame = new Frame("Logged in");
 		frame.setSize(1000, 700);
-		GridLayout layout = new GridLayout(1, 2);
+		SpringLayout layout = new SpringLayout();
 		frame.setLayout(layout);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
@@ -66,7 +67,14 @@ public class MainView {
 		panel = new Panel(new GridLayout(1, 1));
 		label = new Label(priviledgeLevel == DataSource.ADMIN ? "WELCOME ADMIN" : "WELCOME STRANGER");
 		panel.add(label);
-		frame.add(panel);	
+		frame.add(panel);
+		
+		layout.putConstraint(SpringLayout.WEST, list, 0, SpringLayout.WEST, frame);
+		layout.putConstraint(SpringLayout.EAST, list, 175, SpringLayout.WEST, frame);
+		layout.putConstraint(SpringLayout.EAST, panel, 25, SpringLayout.EAST, frame);
+		layout.putConstraint(SpringLayout.NORTH, panel, 25, SpringLayout.NORTH, frame);
+		layout.putConstraint(SpringLayout.SOUTH, panel, -25, SpringLayout.SOUTH, frame);
+		layout.putConstraint(SpringLayout.WEST, panel, 200, SpringLayout.WEST, frame);
 	}
 	
 	private void decorateView() {
@@ -80,9 +88,16 @@ public class MainView {
 	
 	public void attachPanel(Panel panel) {
 		frame.remove(this.panel);
-		frame.validate();
 		this.panel = panel;
 		frame.add(this.panel);
+		
+		SpringLayout layout = (SpringLayout) frame.getLayout();
+		
+		layout.putConstraint(SpringLayout.EAST, this.panel, -25, SpringLayout.EAST, frame);
+		layout.putConstraint(SpringLayout.NORTH, this.panel, 25, SpringLayout.NORTH, frame);
+		layout.putConstraint(SpringLayout.SOUTH, this.panel, -25, SpringLayout.SOUTH, frame);
+		layout.putConstraint(SpringLayout.WEST, this.panel, 25, SpringLayout.EAST, list);
+		
 		frame.validate();
 	}
 }
