@@ -163,7 +163,6 @@ public class LoginView extends Observer<Integer> {
 	class LogButtonListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			//LoginController.instance().log(userField.getText(), passField.getText());
 			
 			new Thread(new Runnable() {
 				@Override
@@ -171,7 +170,6 @@ public class LoginView extends Observer<Integer> {
 					LoginController.instance().log(userField.getText(), passField.getText());
 				}
 			}).start();
-			
 		}
 	}
 }
