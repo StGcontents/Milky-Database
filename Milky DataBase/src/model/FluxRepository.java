@@ -3,6 +3,7 @@ package model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 
 import controller.DataSource;
 import controller.FluxFactory;
@@ -100,52 +101,91 @@ public class FluxRepository extends Repository {
 		Connection connection = dataSource.getConnection();
 		connection.setAutoCommit(false);
 		
-		String avgQuery = "SELECT avg(flux), stddev(flux), count(DISTINCT flux) FROM line_flux";
-		if (apertureSize != null) avgQuery +=" WHERE aperture LIKE ?";
-		PreparedStatement avgStatement = connection.prepareStatement(avgQuery);
-		if (apertureSize != null) avgStatement.setString(1, avgQuery);
+		String viewQuery = 
+				"CREATE TEMP VIEW group_galaxy AS "
+				+ "SELECT name "
+				+ "FROM galaxy "
+				+ "WHERE spectre LIKE '" + spectralGroup + "';"
+			  + "CREATE TEMP VIEW group_fluxes AS "
+			  	+ "SELECT galaxy, ion, aperture, flux "
+			  	+ "FROM line_flux F "
+			  	+ "WHERE EXISTS (SELECT * "
+			  				  + "FROM group_galaxy GG "
+			  				  + "WHERE GG.name LIKE F.galaxy);"
+			 + "CREATE TEMP VIEW flux_ratio AS "
+			 	+ "SELECT LF1.flux / LF2.flux as RATIO "
+			 	+ "FROM group_fluxes LF1, group_fluxes LF2 "
+			 	+ "WHERE ";
+		if (apertureSize != null) 
+			viewQuery += "LF1.aperture LIKE '" + apertureSize 
+				 + "' AND LF2.aperture LIKE '" + apertureSize + "' AND ";
+		viewQuery += "(LF1.galaxy <> LF2.galaxy OR LF1.ion <> LF2.ion OR LF1.aperture <> LF2.aperture);";
+
+		System.out.println(viewQuery);
+		Statement viewStatement = connection.createStatement();
+		viewStatement.execute(viewQuery);
+		release(viewStatement);
 		
-		String medQuery = "SELECT DISTINCT flux FROM line_flux ";
-		if (apertureSize != null) medQuery += "WHERE aperture LIKE ? ";
-		medQuery += "ORDER BY flux";
-		PreparedStatement medStatement = connection.prepareStatement(medQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-		if (apertureSize != null) medStatement.setString(1, medQuery);
+		String avgQuery = "SELECT avg(RATIO), stddev(RATIO), count(DISTINCT RATIO) FROM flux_ratio";
+		PreparedStatement avgStatement = connection.prepareStatement(avgQuery);
 		
 		ResultSet avgSet = avgStatement.executeQuery();
 		double avg, stddev;
 		int cnt;
-		if (avgSet.next()) {
-			System.out.println("YOU'RE NOT SUPPOSED TO BE HERE");
-			avg = avgSet.getDouble(1);
-			stddev = avgSet.getDouble(2);
-			cnt = avgSet.getInt(3);
-		}
-		else {
-			release(connection, avgStatement, avgSet, medStatement);
+		avgSet.next();
+		if ((cnt = avgSet.getInt(3)) == 0) {
+			release(connection, avgStatement, avgSet);
+			statSubject.setState(null);
 			return;
 		}
+		avg = avgSet.getDouble(1);
+		stddev = avgSet.getDouble(2);
+		release(avgStatement, avgSet);
 		
-		int row;
+		String medQuery = 
+				"SELECT RATIO "
+			  + "FROM (SELECT row_number() OVER (ORDER BY RATIO) AS ROW, RATIO "
+			  		+ "FROM flux_ratio "
+			  		+ "ORDER BY RATIO) AS RR "
+			  + "WHERE RR.ROW IN (?, ?)";
+		PreparedStatement medStatement = connection.prepareStatement(medQuery);
+		
+		boolean isOdd = cnt % 2 == 1; 
+		int row1 = isOdd ? (cnt + 1) / 2 : cnt / 2, row2 = isOdd ? row1 : row1 + 1;
+		medStatement.setInt(1, row1);
+		medStatement.setInt(2, row2);
 		double med;
 		ResultSet medSet = medStatement.executeQuery();
-		if (cnt == 0) med = 0; 
-		else if (cnt % 2 == 1) {
-			row = (cnt + 1) / 2;
-			medSet.absolute(row);
-			med = medSet.getDouble(1); 
-		}
-		else {
-			row = cnt / 2;
-			medSet.absolute(row); 
-			med = medSet.getDouble(1);
-			medSet.next();
-			med += medSet.getDouble(1);
-			med /= 2;
-		}
+		medSet.next();
+		med = medSet.getDouble(1);
+		if (medSet.next()) med = (med + medSet.getDouble(1)) / 2.0;
+		release(medStatement, medSet);
 		
-		statSubject.setState(new Statistics(avg, stddev, med));
+		String madQuery = 
+				"SELECT M.MAD FROM "
+				+ "(SELECT RA.MAD, row_number() OVER (ORDER BY RA.MAD) AS ROW "
+				+ "FROM (SELECT ABS(RATIO - ?) AS MAD FROM flux_ratio ORDER BY MAD) AS RA) AS M "
+			  + "WHERE M.ROW IN (?, ?)";
+		PreparedStatement madStatement = connection.prepareStatement(madQuery);
 		
-		release(connection, avgStatement, avgSet, medStatement, medSet);
+		madStatement.setDouble(1, med);
+		madStatement.setInt(2, row1);
+		madStatement.setInt(3, row2);
+		double mad;
+		ResultSet madSet = madStatement.executeQuery();
+		madSet.next();
+		mad = madSet.getDouble(1);
+		if (madSet.next()) mad = (mad + madSet.getDouble(1)) / 2.0;
+		release(madStatement, madSet);
+		
+		String drop = "DROP VIEW flux_ratio; DROP VIEW group_fluxes; DROP VIEW group_galaxy;";
+		Statement dropStatement = connection.createStatement();
+		dropStatement.execute(drop);
+		
+		connection.commit();		
+		release(connection);
+		
+		statSubject.setState(new Statistics(avg, stddev, med, mad));
 	}
 	
 	private PreparedStatement templateRetriever (Connection connection, String query, Galaxy galaxy) throws Exception {

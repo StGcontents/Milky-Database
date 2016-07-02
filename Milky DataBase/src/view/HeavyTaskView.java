@@ -32,7 +32,7 @@ public class HeavyTaskView {
 	private Panel taskPanel;
 	private Checkbox allBox, cBox, _3x3Box, _5x5Box, s1Box;
 	private CheckboxGroup spectralGroup;
-	private Label avgLabel, stddevLabel, medLabel;
+	private Label avgLabel, stddevLabel, medLabel, madLabel;
 	private StatisticsObserver observer;
 	
 	public Observer<Statistics> getObserver() { return observer; }
@@ -47,12 +47,14 @@ public class HeavyTaskView {
 			SpringLayout layout = new SpringLayout();
 			taskPanel.setLayout(layout);
 			
+			Label apertureLabel = new Label("Choose aperture size:");
 			CheckboxGroup apertureGroup = new CheckboxGroup();
 			allBox = new Checkbox("All", apertureGroup, true);
 			cBox = new Checkbox("c", apertureGroup, false);
 			_3x3Box = new Checkbox("3x3", apertureGroup, false);
 			_5x5Box = new Checkbox("5x5", apertureGroup, false);
 			
+			Label spectralLabel = new Label("Choose spectral group:"); 
 			spectralGroup = new CheckboxGroup();
 			s1Box = new Checkbox("S1", spectralGroup, true);
 			Checkbox s1_5Box = new Checkbox("S1.5", spectralGroup, false);
@@ -71,6 +73,7 @@ public class HeavyTaskView {
 					avgLabel.setText(null);
 					stddevLabel.setText(null);
 					medLabel.setText(null);
+					madLabel.setText(null);
 					
 					String apertureSize = null;
 					if (cBox.getState()) apertureSize = "c";
@@ -81,12 +84,15 @@ public class HeavyTaskView {
 			});
 			
 			avgLabel = new Label();
-			avgLabel.setPreferredSize(new Dimension(200, 20));
+			avgLabel.setPreferredSize(new Dimension(300, 20));
 			stddevLabel = new Label();
-			stddevLabel.setPreferredSize(new Dimension(200, 20));
+			stddevLabel.setPreferredSize(new Dimension(300, 20));
 			medLabel = new Label();
-			medLabel.setPreferredSize(new Dimension(200, 20));
+			medLabel.setPreferredSize(new Dimension(300, 20));
+			madLabel = new Label();
+			madLabel.setPreferredSize(new Dimension(300, 20));
 			
+			taskPanel.add(spectralLabel);
 			taskPanel.add(s1Box);
 			taskPanel.add(s1_5Box);
 			taskPanel.add(s1_8Box);
@@ -96,6 +102,7 @@ public class HeavyTaskView {
 			taskPanel.add(linBox);
 			taskPanel.add(dwarfBox);
 			
+			taskPanel.add(apertureLabel);
 			taskPanel.add(allBox);
 			taskPanel.add(cBox);
 			taskPanel.add(_3x3Box);
@@ -106,9 +113,13 @@ public class HeavyTaskView {
 			taskPanel.add(avgLabel);
 			taskPanel.add(stddevLabel);
 			taskPanel.add(medLabel);
+			taskPanel.add(madLabel);
 			
-			layout.putConstraint(SpringLayout.NORTH, s1Box, 25, SpringLayout.NORTH, taskPanel);
-			layout.putConstraint(SpringLayout.WEST, s1Box, 25, SpringLayout.WEST, taskPanel);
+			layout.putConstraint(SpringLayout.NORTH, spectralLabel, 25, SpringLayout.NORTH, taskPanel);
+			layout.putConstraint(SpringLayout.WEST, spectralLabel, 25, SpringLayout.WEST, taskPanel);
+			
+			layout.putConstraint(SpringLayout.NORTH, s1Box, 2, SpringLayout.SOUTH, spectralLabel);
+			layout.putConstraint(SpringLayout.WEST, s1Box, 0, SpringLayout.WEST, spectralLabel);
 			
 			layout.putConstraint(SpringLayout.NORTH, s1_5Box, 0, SpringLayout.NORTH, s1Box);
 			layout.putConstraint(SpringLayout.WEST, s1_5Box, 10, SpringLayout.EAST, s1Box);
@@ -131,7 +142,10 @@ public class HeavyTaskView {
 			layout.putConstraint(SpringLayout.NORTH, dwarfBox, 0, SpringLayout.NORTH, s1Box);
 			layout.putConstraint(SpringLayout.WEST, dwarfBox, 10, SpringLayout.EAST, linBox);
 			
-			layout.putConstraint(SpringLayout.NORTH, allBox, 10, SpringLayout.SOUTH, s1Box);
+			layout.putConstraint(SpringLayout.NORTH, apertureLabel, 15, SpringLayout.SOUTH, s1Box);
+			layout.putConstraint(SpringLayout.WEST, apertureLabel, 0, SpringLayout.WEST, s1Box);
+			
+			layout.putConstraint(SpringLayout.NORTH, allBox, 2, SpringLayout.SOUTH, apertureLabel);
 			layout.putConstraint(SpringLayout.WEST, allBox, 0, SpringLayout.WEST, s1Box);
 			
 			layout.putConstraint(SpringLayout.NORTH, cBox, 0, SpringLayout.NORTH, allBox);
@@ -154,6 +168,9 @@ public class HeavyTaskView {
 			
 			layout.putConstraint(SpringLayout.NORTH, medLabel, 10, SpringLayout.SOUTH, stddevLabel);
 			layout.putConstraint(SpringLayout.WEST, medLabel, 0, SpringLayout.WEST, avgLabel);
+			
+			layout.putConstraint(SpringLayout.NORTH, madLabel, 10, SpringLayout.SOUTH, medLabel);
+			layout.putConstraint(SpringLayout.WEST, madLabel, 0, SpringLayout.WEST, avgLabel);
 		}
 		else reset();
 		
@@ -167,12 +184,18 @@ public class HeavyTaskView {
 		avgLabel.setText(null);
 		stddevLabel.setText(null);
 		medLabel.setText(null);
+		madLabel.setText(null);
 	}
 	
 	private void update(Statistics stats) {
-		avgLabel.setText("Average: " + stats.getAvearge());
-		stddevLabel.setText("Standard deviation: " + stats.getStandardDeviation());
-		medLabel.setText("Median value: " + stats.getMedian());
+		if (stats == null) 
+			avgLabel.setText("No values found");
+		else {
+			avgLabel.setText("Average: " + stats.getAvearge());
+			stddevLabel.setText("Standard deviation: " + stats.getStandardDeviation());
+			medLabel.setText("Median value: " + stats.getMedian());
+			madLabel.setText("Median absolute deviation: " + stats.getMedianAbsoluteDev());
+		}
 	}
 	
 	protected class StatisticsObserver extends Observer<Statistics> {
