@@ -5,6 +5,7 @@ import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.Panel;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -43,7 +44,8 @@ public class MainView {
 	
 	private void generateBasicView() {
 		frame = new Frame("Logged in");
-		frame.setSize(1000, 700);
+		frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+		frame.setResizable(false);
 		SpringLayout layout = new SpringLayout();
 		frame.setLayout(layout);
 		frame.addWindowListener(new WindowAdapter() {
@@ -60,6 +62,7 @@ public class MainView {
 		list.setLayoutOrientation(JList.VERTICAL);
 		DefaultListModel<String> model = new DefaultListModel<>();
 		model.addElement("Find galaxy");
+		model.addElement("Line flux calculations");
 		list.setModel(model);
 		list.addListSelectionListener(MainController.instance());
 		frame.add(list);

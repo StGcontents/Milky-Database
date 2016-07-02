@@ -10,23 +10,28 @@ import javax.swing.event.ListSelectionListener;
 
 import model.Galaxy.Coordinates;
 import model.GalaxyRepository;
+import model.Priviledge;
 import view.GalaxyView;
 
 public class GalaxySearchController implements ListSelectionListener {
 	
 	private static GalaxySearchController me;
-	private GalaxySearchController() { }
+	private GalaxySearchController() { 
+		priviledgeLevel = Priviledge.instance().retrieveState();
+		repo = new GalaxyRepository(DataSource.byPriviledge());
+	}
 	public static synchronized GalaxySearchController instance() {
-		if (me == null) me = new GalaxySearchController();
+		if (me == null || me.priviledgeLevel != Priviledge.instance().retrieveState()) 
+			me = new GalaxySearchController();
 		return me;
 	}
 	
+	private int priviledgeLevel;
 	private GalaxyView view;
 	private GalaxyRepository repo;
 	
 	public Panel callView() {
 		view = GalaxyView.instance();
-		repo = new GalaxyRepository(DataSource.byPriviledge());
 		view.getListObserver().setSubject(repo.getNameSubject());
 		view.getGalaxyObserver().setSubject(repo.getGalaxySubject());
 		return view.generateSearchPanel();

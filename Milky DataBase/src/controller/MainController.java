@@ -39,7 +39,8 @@ public class MainController implements ListSelectionListener {
 	
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		ListSelectionModel model = ((JList) e.getSource()).getSelectionModel();
+		@SuppressWarnings("unchecked")
+		ListSelectionModel model = ((JList<String>) e.getSource()).getSelectionModel();
 		if (!model.isSelectionEmpty()) {
 			int min = model.getMinSelectionIndex();
 			int max = model.getMaxSelectionIndex();
@@ -57,16 +58,16 @@ public class MainController implements ListSelectionListener {
 	}
 	
 	private void act(int index) {
-		if (priviledgeLevel == DataSource.COMMON && index > MainView.LAST_COMMON_INDEX) {
-			//TODO something, maybe nothing
-			return;
-		}
+		if (priviledgeLevel == DataSource.COMMON && index > MainView.LAST_COMMON_INDEX) return;
 		
 		switch(index) {
 		case 0:
 			view.attachPanel(GalaxySearchController.instance().callView());
 			break;
 		case 1:
+			view.attachPanel(HeavyTaskController.instance().callView());
+			break;
+		case 2:
 			if (priviledgeLevel == DataSource.COMMON) {
 				view.close();
 				exitToLogin();
@@ -78,7 +79,7 @@ public class MainController implements ListSelectionListener {
 				view.attachPanel(panel);
 			}
 			break;
-		case 3:
+		case 4:
 			view.close();
 			exitToLogin();
 			break;

@@ -6,18 +6,22 @@ import java.sql.ResultSet;
 
 import controller.DataSource;
 import controller.FluxFactory;
+import pattern.Subject;
 
 public class FluxRepository extends Repository {
 	
 	private static FluxRepository me;
-	protected FluxRepository(DataSource dataSource) {
+	protected FluxRepository(DataSource dataSource) { 
 		this.dataSource = dataSource;
+		statSubject = new StatisticsSubject();
 	}
-	
 	public static synchronized FluxRepository instance(DataSource dataSource) {
 		if (me == null) me = new FluxRepository(dataSource);
 		return me;
 	}
+	
+	private StatisticsSubject statSubject;
+	public Subject<Statistics> getStatSubject() { return statSubject; }
 	
 	public void persist(Galaxy galaxy, Flux... fluxes) throws Exception {
 		
@@ -92,9 +96,75 @@ public class FluxRepository extends Repository {
 		release(conSet, conStatement, lineSet, lineStatement, connection);
 	}
 	
+	public void calculate(String spectralGroup, String apertureSize) throws Exception {
+		Connection connection = dataSource.getConnection();
+		connection.setAutoCommit(false);
+		
+		String avgQuery = "SELECT avg(flux), stddev(flux), count(DISTINCT flux) FROM line_flux";
+		if (apertureSize != null) avgQuery +=" WHERE aperture LIKE ?";
+		PreparedStatement avgStatement = connection.prepareStatement(avgQuery);
+		if (apertureSize != null) avgStatement.setString(1, avgQuery);
+		
+		String medQuery = "SELECT DISTINCT flux FROM line_flux ";
+		if (apertureSize != null) medQuery += "WHERE aperture LIKE ? ";
+		medQuery += "ORDER BY flux";
+		PreparedStatement medStatement = connection.prepareStatement(medQuery, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		if (apertureSize != null) medStatement.setString(1, medQuery);
+		
+		ResultSet avgSet = avgStatement.executeQuery();
+		double avg, stddev;
+		int cnt;
+		if (avgSet.next()) {
+			System.out.println("YOU'RE NOT SUPPOSED TO BE HERE");
+			avg = avgSet.getDouble(1);
+			stddev = avgSet.getDouble(2);
+			cnt = avgSet.getInt(3);
+		}
+		else {
+			release(connection, avgStatement, avgSet, medStatement);
+			return;
+		}
+		
+		int row;
+		double med;
+		ResultSet medSet = medStatement.executeQuery();
+		if (cnt == 0) med = 0; 
+		else if (cnt % 2 == 1) {
+			row = (cnt + 1) / 2;
+			medSet.absolute(row);
+			med = medSet.getDouble(1); 
+		}
+		else {
+			row = cnt / 2;
+			medSet.absolute(row); 
+			med = medSet.getDouble(1);
+			medSet.next();
+			med += medSet.getDouble(1);
+			med /= 2;
+		}
+		
+		statSubject.setState(new Statistics(avg, stddev, med));
+		
+		release(connection, avgStatement, avgSet, medStatement, medSet);
+	}
+	
 	private PreparedStatement templateRetriever (Connection connection, String query, Galaxy galaxy) throws Exception {
 		PreparedStatement statement = connection.prepareStatement(query);
 		statement.setString(1, galaxy.getName());
 		return statement;
+	}
+	
+	protected class StatisticsSubject extends Subject<Statistics> {
+
+		private Statistics stats;
+		protected void setState(Statistics stats) {
+			this.stats = stats;
+			notifyObservers();
+		}
+		
+		@Override
+		public Statistics retrieveState() {
+			return stats;
+		}
 	}
 }
