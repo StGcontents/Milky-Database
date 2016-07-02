@@ -43,10 +43,10 @@ public class GalaxyView {
 	private int lastPriviledgeLevel;
 	private Panel searchPanel;
 	private GalaxyPanel resultPanel;
-	private CheckboxGroup group;
-	private Checkbox nameBox, coordBox, redShiftBox;
+	private Checkbox nameBox, coordBox, redShiftBox, rsHigherBox, rsLowerBox;
 	private TextField nameField;
-	private Label label;
+	private DoubleTextField redshiftField;
+	private IntTextField rsLimitField;
 	private JList<String[]> results;
 	
 	private ListObserverAdapter listObserver;
@@ -67,7 +67,7 @@ public class GalaxyView {
 			searchPanel = new Panel();
 			searchPanel.setLayout(layout);
 			
-			group = new CheckboxGroup();
+			CheckboxGroup group = new CheckboxGroup();
 			nameBox = new Checkbox("Search by name", group, false);
 			nameBox.setName("name");
 			coordBox = new Checkbox("Search in range", group, false);
@@ -80,12 +80,36 @@ public class GalaxyView {
 			searchPanel.add(redShiftBox);
 			
 			nameField = new TextField();
+			nameField.setEnabled(false);
 			
+			redshiftField = new DoubleTextField();
+			redshiftField.setEnabled(false);
+			rsLimitField = new IntTextField();
+			rsLimitField.setEnabled(false);
+			CheckboxGroup highLowGroup = new CheckboxGroup();
+			rsHigherBox = new Checkbox(">=", highLowGroup, true);
+			rsLowerBox = new Checkbox("<=", highLowGroup, false);
+			rsHigherBox.setEnabled(false);
+			rsLowerBox.setEnabled(false);
+			Label rsValueLabel = new Label("value: ");
+			Label rsLimitLabel = new Label("limit: ");
+			
+			searchPanel.add(rsValueLabel);
+			searchPanel.add(redshiftField);
+			searchPanel.add(rsHigherBox);
+			searchPanel.add(rsLowerBox);
+			searchPanel.add(rsLimitLabel);
+			searchPanel.add(rsLimitField);
+						
 			nameBox.addItemListener(new ItemListener() {
 				@Override
 				public void itemStateChanged(ItemEvent e) {
 					boolean checked = e.getStateChange() == ItemEvent.SELECTED;
 					nameField.setEnabled(checked);
+					redshiftField.setEnabled(!checked);
+					rsLimitField.setEnabled(!checked);
+					rsHigherBox.setEnabled(!checked);
+					rsLowerBox.setEnabled(!checked);
 				}
 			});
 			coordBox.addItemListener(new ItemListener() {
@@ -93,6 +117,10 @@ public class GalaxyView {
 				public void itemStateChanged(ItemEvent e) {
 					boolean checked = e.getStateChange() == ItemEvent.SELECTED;
 					nameField.setEnabled(!checked);
+					redshiftField.setEnabled(!checked);
+					rsLimitField.setEnabled(!checked);
+					rsHigherBox.setEnabled(!checked);
+					rsLowerBox.setEnabled(!checked);
 				}
 			});
 			redShiftBox.addItemListener(new ItemListener() {
@@ -100,15 +128,16 @@ public class GalaxyView {
 				public void itemStateChanged(ItemEvent e) {
 					boolean checked = e.getStateChange() == ItemEvent.SELECTED;
 					nameField.setEnabled(!checked);
+					redshiftField.setEnabled(checked);
+					rsLimitField.setEnabled(checked);
+					rsHigherBox.setEnabled(checked);
+					rsLowerBox.setEnabled(checked);
 				}
 			});
 			
 			group.setSelectedCheckbox(null);
 			
 			searchPanel.add(nameField);
-			
-			label = new Label();
-			label.setSize(100, 20);
 			
 			Button searchBtn = new Button("Search");
 			searchBtn.addActionListener(new ActionListener() {		
@@ -122,12 +151,22 @@ public class GalaxyView {
 						
 					}
 					else if (redShiftBox.getState()) {
-						
+						Double redshift = redshiftField.getValue();
+						if (redshift == null) {
+							redshiftField.requestFocus();
+							return;
+						}
+						Integer limit = rsLimitField.getValue();
+						if (limit == null) {
+							rsLimitField.requestFocus();
+							return;
+						}
+						boolean higherThen = rsHigherBox.getState();
+						GalaxySearchController.instance().searchByRedshiftValue(redshift.doubleValue(), higherThen, limit.intValue());
 					}
 				}
 			});
 			searchPanel.add(searchBtn);
-			searchPanel.add(label);
 			
 			results = new JList<>();
 			DefaultListModel<String[]> model = new DefaultListModel<>();
@@ -151,7 +190,7 @@ public class GalaxyView {
 			layout.putConstraint(SpringLayout.WEST, redShiftBox, 0, SpringLayout.WEST, nameBox);
 			
 			layout.putConstraint(SpringLayout.NORTH, nameField, 0, SpringLayout.NORTH, nameBox);
-			layout.putConstraint(SpringLayout.WEST, nameField, 10, SpringLayout.EAST, redShiftBox);
+			layout.putConstraint(SpringLayout.WEST, nameField, 25, SpringLayout.EAST, redShiftBox);
 			layout.putConstraint(SpringLayout.EAST, nameField, -25, SpringLayout.EAST, searchPanel);
 			
 			layout.putConstraint(SpringLayout.NORTH, searchBtn, 20, SpringLayout.SOUTH, redShiftBox);
@@ -160,6 +199,25 @@ public class GalaxyView {
 			layout.putConstraint(SpringLayout.NORTH, scrollPane, 20, SpringLayout.SOUTH, searchBtn);
 			layout.putConstraint(SpringLayout.WEST, scrollPane, 25, SpringLayout.WEST, searchPanel);
 			layout.putConstraint(SpringLayout.EAST, scrollPane, -25, SpringLayout.EAST, searchPanel);
+			
+			layout.putConstraint(SpringLayout.NORTH, rsValueLabel, 0, SpringLayout.NORTH, redShiftBox);
+			layout.putConstraint(SpringLayout.WEST, rsValueLabel, 25, SpringLayout.EAST, redShiftBox);
+			
+			layout.putConstraint(SpringLayout.NORTH, redshiftField, 0, SpringLayout.NORTH, redShiftBox);
+			layout.putConstraint(SpringLayout.WEST, redshiftField, 10, SpringLayout.EAST, rsValueLabel);
+			layout.putConstraint(SpringLayout.EAST, redshiftField, 60, SpringLayout.WEST, redshiftField);
+			
+			layout.putConstraint(SpringLayout.NORTH, rsHigherBox, 0, SpringLayout.NORTH, redShiftBox);
+			layout.putConstraint(SpringLayout.WEST, rsHigherBox, 10, SpringLayout.EAST, redshiftField);
+			layout.putConstraint(SpringLayout.NORTH, rsLowerBox, 0, SpringLayout.NORTH, redShiftBox);
+			layout.putConstraint(SpringLayout.WEST, rsLowerBox, 10, SpringLayout.EAST, rsHigherBox);
+			
+			layout.putConstraint(SpringLayout.NORTH, rsLimitLabel, 0, SpringLayout.NORTH, redShiftBox);
+			layout.putConstraint(SpringLayout.WEST, rsLimitLabel, 10, SpringLayout.EAST, rsLowerBox);
+			
+			layout.putConstraint(SpringLayout.NORTH, rsLimitField, 0, SpringLayout.NORTH, redShiftBox);
+			layout.putConstraint(SpringLayout.WEST, rsLimitField, 10, SpringLayout.EAST, rsLimitLabel);
+			layout.putConstraint(SpringLayout.EAST, rsLimitField, 60, SpringLayout.WEST, rsLimitField);
 			
 			searchPanel.setVisible(true);
 		}
@@ -356,7 +414,11 @@ public class GalaxyView {
 			
 
 			String string = names[0];
-			if (names[1] != null && !"".equals(names[1])) string += " (aka " + names[1] + ")";
+			if (nameBox.getState()) {
+				if (names[1] != null && !"".equals(names[1])) 
+					string += " (aka " + names[1] + ")";
+			}
+			else if (redShiftBox.getState()) string += " (value: " + names[1] + ")";
 			
 			JLabel label = new JLabel(string);
 			label.setSize(new Dimension(Label.WIDTH, 10));

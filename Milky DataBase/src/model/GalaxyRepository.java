@@ -8,6 +8,7 @@ import java.util.List;
 
 import controller.DataSource;
 import controller.GalaxyFactory;
+import model.Galaxy.Coordinates;
 import pattern.Subject;
 
 public class GalaxyRepository extends Repository {
@@ -85,18 +86,35 @@ public class GalaxyRepository extends Repository {
 		
 		String query = "SELECT G.name, AN.alter_name "
 					 + "FROM galaxy G LEFT JOIN alternative_names AN ON (G.name LIKE AN.name) "
-					 + "WHERE G.name LIKE ? OR (G.name NOT LIKE ? AND alter_name LIKE ?) "
+					 + "WHERE G.name LIKE ? OR alter_name LIKE ? "
 					 + "ORDER BY G.name, AN.alter_name";
 		PreparedStatement statement = connection.prepareStatement(query);
 		statement.setString(1, "%" + partial + "%");
 		statement.setString(2, "%" + partial + "%");
-		statement.setString(3, "%" + partial + "%");
 		
 		ResultSet set = statement.executeQuery();
 		List<String[]> results = new ArrayList<>();
+		String last = "", str0, str1;
+		boolean match = false;
 		while (set.next()) {
-			String str1 = set.getString(1), str2 = set.getString(2);
-			results.add(new String[] { str1, str2 });
+			String[] couple = new String[2];
+			str0 = set.getString(1); 
+			str1 = set.getString(2);
+			if (last.equals(str0)) {
+				if (!match || str1.contains(partial)) {
+					couple[0] = str0;
+					couple[1] = str1;
+				}
+				else continue;
+			}
+			else {
+				last = str1;
+				match = last.contains(partial);
+				couple[0] = str0;
+				couple[1] = str1 != null && str1.contains(partial) ? str1 : null;
+			}
+			
+			results.add(couple);
 		}
 		
 		release(connection, statement, set);
@@ -134,6 +152,28 @@ public class GalaxyRepository extends Repository {
 		release(connection);
 		
 		galaxySubject.setState(galaxy);
+	}
+	
+	public void retrieveGalaxyInRange(Coordinates center, double range) throws Exception {
+		
+	}
+	
+	public void retrieveGalaxyByRedshiftValue(double redshift, boolean higherThen, int limit) throws Exception {
+		Connection connection = dataSource.getConnection();
+		
+		String query = "SELECT name, redshift FROM galaxy WHERE redshift ";
+		query += higherThen ? ">= " : "<= ";
+		query += "? ORDER BY redshift, name LIMIT ?";
+		PreparedStatement statement = connection.prepareStatement(query);
+		statement.setDouble(1, redshift);
+		statement.setInt(2, limit);
+		
+		ResultSet set = statement.executeQuery();
+		List<String[]> results = new ArrayList<>();
+		while (set.next()) 
+			results.add(new String[] { set.getString(1), String.valueOf(set.getDouble(2)) });
+	
+		nameSubject.setState(results);
 	}
 	
 	class GalaxyNameAdapter extends Subject<List<String[]>> {

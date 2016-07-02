@@ -38,6 +38,15 @@ public class GalaxySearchController implements ListSelectionListener {
 		catch (Exception e) { e.printStackTrace(); }
 	}
 	
+	public void searchByRedshiftValue(double redshift, boolean higherThen, int limit) {
+		try {
+			repo.retrieveGalaxyByRedshiftValue(redshift, higherThen, limit);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		@SuppressWarnings("unchecked")

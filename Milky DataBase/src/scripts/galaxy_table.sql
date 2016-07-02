@@ -3,7 +3,7 @@ CREATE TABLE galaxy (
 	hours INTEGER NOT NULL,
 	minutes INTEGER NOT NULL,
 	seconds REAL NOT NULL,
-	sign CHAR(1) NOT NULL,
+	sign INTEGER NOT NULL,
 	degrees INTEGER NOT NULL,
 	arcmin INTEGER NOT NULL,
 	arcsec REAL NOT NULL,
@@ -18,4 +18,5 @@ CREATE TABLE galaxy (
 	lum_oiv_flag BOOLEAN,
 	metallicity INTEGER,
 	metallicity_err INTEGER
+	CONSTRAINT chk_sign CHECK (sign = 1 OR sign = -1)
 );
