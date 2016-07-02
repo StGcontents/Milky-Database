@@ -154,8 +154,32 @@ public class GalaxyRepository extends Repository {
 		galaxySubject.setState(galaxy);
 	}
 	
-	public void retrieveGalaxyInRange(Coordinates center, double range) throws Exception {
+	public void retrieveGalaxyInRange(Coordinates center, double range, int limit) throws Exception {
+		Connection connection = dataSource.getConnection();
 		
+		double ra2 = 15 * (center.getRightAscensionHours() + center.getRightAscensionMinutes() / 60 + center.getRightAscensionSeconds() / 3600);
+		double dec2 = center.getDegrees() + center.getArcMinutes() / 60 + center.getArcSeconds() / 3600;
+		dec2 *= center.getSign() ? 1 : -1;
+		
+		String nestedQuery = "SELECT * FROM (SELECT name, (ACOS(SIN(15 * (hours + minutes / 60 + seconds / 3600)) * SIN(?) + COS(15 * (hours + minutes / 60 + seconds / 3600)) * COS(?) * COS(sign * (degrees + arcmin / 60 + arcsec / 3600) - ?))) AS EXP "
+				+ "FROM galaxy) AS GD WHERE GD.EXP < ? ORDER BY GD.exp LIMIT ?";
+		
+		PreparedStatement statement = connection.prepareStatement(nestedQuery);
+		statement.setDouble(1, ra2);
+		statement.setDouble(2, ra2);
+		statement.setDouble(3, dec2);
+		statement.setDouble(4, range);
+		statement.setInt(5, limit);
+		statement.executeQuery();		
+		
+		ResultSet set = statement.getResultSet();
+		List<String[]> results = new ArrayList<>();
+		while (set.next()) 
+			results.add(new String[] { set.getString(1), String.valueOf(set.getDouble(2)) });
+		
+		release(connection, statement, set);
+		
+		nameSubject.setState(results);
 	}
 	
 	public void retrieveGalaxyByRedshiftValue(double redshift, boolean higherThen, int limit) throws Exception {

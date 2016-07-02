@@ -8,6 +8,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import model.Galaxy.Coordinates;
 import model.GalaxyRepository;
 import view.GalaxyView;
 
@@ -39,12 +40,13 @@ public class GalaxySearchController implements ListSelectionListener {
 	}
 	
 	public void searchByRedshiftValue(double redshift, boolean higherThen, int limit) {
-		try {
-			repo.retrieveGalaxyByRedshiftValue(redshift, higherThen, limit);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		try { repo.retrieveGalaxyByRedshiftValue(redshift, higherThen, limit); }
+		catch (Exception e) { e.printStackTrace(); }
+	}
+	
+	public void searchInRange(Coordinates center, double range, int limit) {
+		try { repo.retrieveGalaxyInRange(center, range, limit); }
+		catch (Exception e) { e.printStackTrace(); }
 	}
 	
 	@Override
