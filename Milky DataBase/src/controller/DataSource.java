@@ -40,6 +40,15 @@ public abstract class DataSource {
 		return instance(DataSource.READONLY);
 	}
 	
+	/*************************************************************************************
+	 * @return Connection: a Connection object representing a new DB session.			 *
+	 * 																					 *
+	 * Session establishing is managed by this method; if a Connection is requested for	 *
+	 * the first time, it is simply created. If, on the other hand, a connection was	 *
+	 * previously requested and established, this method checks if it is still up before *
+	 * generating another one. This mechanism is also based on Connection implementation *
+	 * LazyConnection; see class description for further information. 					 *
+	 *************************************************************************************/
 	public Connection getConnection() throws Exception {
 		try {
 			synchronized (connection) {

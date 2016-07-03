@@ -19,6 +19,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+/********************************************************************************************************
+ * LazyConnection implements sql.Connection interface but is really nothing else than a					*
+ * Decorator pattern implementation; its purpose is to decorate the "close()" method in a way 			*
+ * that actual Connection closure is postponed and kept alive if a session it is still requested		*
+ * by the user. Every other native Connection method is simply forwarded to the decorated Connection	*
+ * object.																								*
+ * @author stg																							*
+ ********************************************************************************************************/
 public class LazyConnection implements Connection {
 
 	private Connection connection;
@@ -31,6 +39,10 @@ public class LazyConnection implements Connection {
 	
 	public void keepAlive() { countdown.nevermind(); }
 	
+	/*************************************************************************
+	 * Decorated method. It starts a CountdownThread, waiting a while before *
+	 * closing the Connection.												 *
+	 *************************************************************************/	
 	@Override
 	public void close() throws SQLException {
 		countdown.okGo();
