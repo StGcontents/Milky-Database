@@ -10,7 +10,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
+import javax.imageio.ImageIO;
 import javax.swing.SpringLayout;
 
 import controller.DataSource;
@@ -52,8 +55,23 @@ public class LoginView extends Observer<Integer> {
 	
 	static Point p;
 	
+	@SuppressWarnings("serial")
 	public void generateView() {
-		frame = new Frame();
+		frame = new Frame() {
+			@Override
+			public void paint(Graphics g) {
+				try {
+					BufferedImage im = ImageIO.read(new File("./res/stars.jpg"));
+					g.drawImage(im, 0, 0, null);
+					g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 52));
+					g.setColor(Color.WHITE);
+					g.drawString("WELCOME.", 325, 190);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+            }
+		};
 		
 		SpringLayout layout = new SpringLayout(); 
 		frame.setLayout(layout);
@@ -87,7 +105,7 @@ public class LoginView extends Observer<Integer> {
 		});
 		
 		label = new Label("WELCOME.");
-		label.setAlignment(Label.CENTER);
+		
 		label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 52));
 		label.setForeground(Color.WHITE);
 		
@@ -110,18 +128,24 @@ public class LoginView extends Observer<Integer> {
 			}
 		});
 		
+		/*
 		frame.add(label);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, label, 0, SpringLayout.HORIZONTAL_CENTER, frame);
 		layout.putConstraint(SpringLayout.VERTICAL_CENTER, label, -75, SpringLayout.VERTICAL_CENTER, frame);
+		*/
+		
 		frame.add(userField);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, userField, 0, SpringLayout.HORIZONTAL_CENTER, frame);
 		layout.putConstraint(SpringLayout.VERTICAL_CENTER, userField, -25, SpringLayout.VERTICAL_CENTER, frame);
+		
 		frame.add(passField);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, passField, 0, SpringLayout.HORIZONTAL_CENTER, frame);
 		layout.putConstraint(SpringLayout.VERTICAL_CENTER, passField, 25, SpringLayout.VERTICAL_CENTER, frame);
+		
 		frame.add(logBtn);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, logBtn, -50, SpringLayout.HORIZONTAL_CENTER, frame);
 		layout.putConstraint(SpringLayout.VERTICAL_CENTER, logBtn, 75, SpringLayout.VERTICAL_CENTER, frame);
+		
 		frame.add(exitBtn);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, exitBtn, 50, SpringLayout.HORIZONTAL_CENTER, frame);
 		layout.putConstraint(SpringLayout.VERTICAL_CENTER, exitBtn, 75, SpringLayout.VERTICAL_CENTER, frame);
@@ -171,5 +195,15 @@ public class LoginView extends Observer<Integer> {
 				}
 			}).start();
 		}
+	}
+	
+	private class ImageFrame extends Frame {
+
+		@Override
+		public Graphics getGraphics() {
+			// TODO Auto-generated method stub
+			return super.getGraphics();
+		}
+		
 	}
 }
