@@ -133,6 +133,12 @@ public class FluxRepository extends Repository {
 		int cnt;
 		avgSet.next();
 		if ((cnt = avgSet.getInt(3)) == 0) {
+			
+			String drop = "DROP VIEW flux_ratio; DROP VIEW group_fluxes; DROP VIEW group_galaxy;";
+			Statement dropStatement = connection.createStatement();
+			dropStatement.execute(drop);
+			release(dropStatement);
+			
 			release(connection, avgStatement, avgSet);
 			statSubject.setState(null);
 			return;
@@ -180,6 +186,7 @@ public class FluxRepository extends Repository {
 		String drop = "DROP VIEW flux_ratio; DROP VIEW group_fluxes; DROP VIEW group_galaxy;";
 		Statement dropStatement = connection.createStatement();
 		dropStatement.execute(drop);
+		release(dropStatement);
 		
 		connection.commit();		
 		release(connection);
