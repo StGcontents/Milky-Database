@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.imageio.ImageIO;
+import javax.swing.JLabel;
 import javax.swing.SpringLayout;
 
 import controller.DataSource;
@@ -32,7 +33,7 @@ public class LoginView extends Observer<Integer> {
 	private Frame frame;
 	private TextField userField, passField;
 	private Button logBtn, exitBtn;
-	private Label label;
+	private JLabel label;
 	
 	private Shape coolshapes() {
 		Path2D path = new GeneralPath();
@@ -58,19 +59,21 @@ public class LoginView extends Observer<Integer> {
 	@SuppressWarnings("serial")
 	public void generateView() {
 		frame = new Frame() {
+
 			@Override
 			public void paint(Graphics g) {
 				try {
 					BufferedImage im = ImageIO.read(new File("./res/stars.jpg"));
 					g.drawImage(im, 0, 0, null);
-					g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 52));
-					g.setColor(Color.WHITE);
-					g.drawString("WELCOME.", 325, 190);
-				}
+				}	
 				catch (Exception e) {
 					e.printStackTrace();
 				}
-            }
+			
+				g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 52));
+				g.setColor(Color.WHITE);
+				g.drawString("WELCOME.", 325, 190);
+			}			
 		};
 		
 		SpringLayout layout = new SpringLayout(); 
@@ -104,11 +107,6 @@ public class LoginView extends Observer<Integer> {
 			}
 		});
 		
-		label = new Label("WELCOME.");
-		
-		label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 52));
-		label.setForeground(Color.WHITE);
-		
 		userField = new TextField("Insert user ID");
 		passField = new TextField("Insert password");
 	
@@ -128,11 +126,11 @@ public class LoginView extends Observer<Integer> {
 			}
 		});
 		
-		/*
-		frame.add(label);
-		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, label, 0, SpringLayout.HORIZONTAL_CENTER, frame);
-		layout.putConstraint(SpringLayout.VERTICAL_CENTER, label, -75, SpringLayout.VERTICAL_CENTER, frame);
-		*/
+		label = new JLabel();
+		label.setSize(300, 20);
+		label.setOpaque(true);
+		label.setBackground(new Color(0, 0, 0, 0));
+		label.setForeground(Color.RED);
 		
 		frame.add(userField);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, userField, 0, SpringLayout.HORIZONTAL_CENTER, frame);
@@ -149,6 +147,10 @@ public class LoginView extends Observer<Integer> {
 		frame.add(exitBtn);
 		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, exitBtn, 50, SpringLayout.HORIZONTAL_CENTER, frame);
 		layout.putConstraint(SpringLayout.VERTICAL_CENTER, exitBtn, 75, SpringLayout.VERTICAL_CENTER, frame);
+		
+		frame.add(label);
+		layout.putConstraint(SpringLayout.HORIZONTAL_CENTER, label, 0, SpringLayout.HORIZONTAL_CENTER, frame);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, label, 100, SpringLayout.VERTICAL_CENTER, frame);
 		
 		frame.setUndecorated(true);
 		frame.setShape(coolshapes());
@@ -178,10 +180,8 @@ public class LoginView extends Observer<Integer> {
 			LoginController.instance().onLoginExit(priviledgeLevel);	
 		}
 		else {
-			label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
 			label.setText("Check credentials.");
 		}
-		
 	}
 	
 	class LogButtonListener implements ActionListener {
@@ -195,15 +195,5 @@ public class LoginView extends Observer<Integer> {
 				}
 			}).start();
 		}
-	}
-	
-	private class ImageFrame extends Frame {
-
-		@Override
-		public Graphics getGraphics() {
-			// TODO Auto-generated method stub
-			return super.getGraphics();
-		}
-		
 	}
 }

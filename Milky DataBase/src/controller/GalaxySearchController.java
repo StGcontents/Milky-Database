@@ -9,6 +9,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import model.Galaxy.Coordinates;
+import model.AdaptableValue;
 import model.GalaxyRepository;
 import model.Priviledge;
 import view.GalaxyView;
@@ -54,10 +55,11 @@ public class GalaxySearchController implements ListSelectionListener {
 		catch (Exception e) { e.printStackTrace(); }
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		@SuppressWarnings("unchecked")
-		JList<String[]> list = (JList<String[]>) e.getSource();
+		JList<AdaptableValue> list = (JList<AdaptableValue>) e.getSource();
 		ListSelectionModel listModel = list.getSelectionModel();
 		if (!listModel.isSelectionEmpty()) {
 			int min = listModel.getMinSelectionIndex();
@@ -73,9 +75,9 @@ public class GalaxySearchController implements ListSelectionListener {
 			
 			if (i == -1) return;
 			
-			DefaultListModel<String[]> model = (DefaultListModel<String[]>) list.getModel();
+			DefaultListModel<AdaptableValue> model = (DefaultListModel<AdaptableValue>) list.getModel();
 			
-			try { repo.retrieveGalaxyByName(model.get(i)[0], false); } 
+			try { repo.retrieveGalaxyByName(model.get(i).getName(), false); } 
 			catch (Exception e1) { e1.printStackTrace(); }
 		}
 	}
