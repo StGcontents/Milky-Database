@@ -11,6 +11,7 @@ import controller.GalaxyFactory;
 import model.Galaxy.Coordinates;
 import pattern.Subject;
 
+@SuppressWarnings("rawtypes")
 public class GalaxyRepository extends Repository {
 	
 	private GalaxyNameAdapter nameSubject;
@@ -21,7 +22,7 @@ public class GalaxyRepository extends Repository {
 		galaxySubject = new GalaxyAdapter();
 	}
 	
-	public Subject<List<String[]>> getNameSubject() { return this.nameSubject; }
+	public Subject<List<AdaptableValue>> getNameSubject() { return this.nameSubject; }
 	public Subject<Galaxy> getGalaxySubject() { return this.galaxySubject; }
 	
 	public void persist(Galaxy galaxy) throws Exception {
@@ -81,47 +82,6 @@ public class GalaxyRepository extends Repository {
 		release(connection, statement);
 	}
 	
-	public void retrieveGalaxyNames(String partial) throws Exception {
-		Connection connection = dataSource.getConnection();
-		
-		String query = "SELECT G.name, AN.alter_name "
-					 + "FROM galaxy G LEFT JOIN alternative_names AN ON (G.name LIKE AN.name) "
-					 + "WHERE G.name LIKE ? OR alter_name LIKE ? "
-					 + "ORDER BY G.name, AN.alter_name";
-		PreparedStatement statement = connection.prepareStatement(query);
-		statement.setString(1, "%" + partial + "%");
-		statement.setString(2, "%" + partial + "%");
-		
-		ResultSet set = statement.executeQuery();
-		List<String[]> results = new ArrayList<>();
-		String last = "", str0, str1;
-		boolean match = false;
-		while (set.next()) {
-			String[] couple = new String[2];
-			str0 = set.getString(1); 
-			str1 = set.getString(2);
-			if (last.equals(str0)) {
-				if (!match || str1.contains(partial)) {
-					couple[0] = str0;
-					couple[1] = str1;
-				}
-				else continue;
-			}
-			else {
-				last = str1;
-				match = last.contains(partial);
-				couple[0] = str0;
-				couple[1] = str1 != null && str1.contains(partial) ? str1 : null;
-			}
-			
-			results.add(couple);
-		}
-		
-		release(connection, statement, set);
-		
-		nameSubject.setState(results);
-	}
-	
 	public void retrieveGalaxyByName(String name, boolean force) throws Exception {
 		Connection connection = dataSource.getConnection();
 		connection.setAutoCommit(false);
@@ -154,6 +114,41 @@ public class GalaxyRepository extends Repository {
 		galaxySubject.setState(galaxy);
 	}
 	
+	public void retrieveGalaxyNames(String partial) throws Exception {
+		Connection connection = dataSource.getConnection();
+		
+		String query = "SELECT G.name, AN.alter_name "
+					 + "FROM galaxy G LEFT JOIN alternative_names AN ON (G.name LIKE AN.name) "
+					 + "WHERE G.name LIKE ? OR alter_name LIKE ? "
+					 + "ORDER BY G.name, AN.alter_name";
+		PreparedStatement statement = connection.prepareStatement(query);
+		statement.setString(1, "%" + partial + "%");
+		statement.setString(2, "%" + partial + "%");
+		
+		ResultSet set = statement.executeQuery();
+		List<AdaptableValue> results = new ArrayList<>();
+		String last = "", str0, str1;
+		boolean match = false;
+		while (set.next()) {
+			str0 = set.getString(1);
+			str1 = set.getString(2);
+			if (last.equals(str0)) {
+				if (!match || str1.contains(partial)) 
+					results.add(AdaptableValue.getNameValue(str0, str1));
+				else continue;
+			}
+			else {
+				last = str1;
+				match = last.contains(partial);
+				results.add(AdaptableValue.getNameValue(str0, str1 != null && str1.contains(partial) ? str1 : null));
+			}
+		}
+		
+		release(connection, statement, set);
+		
+		nameSubject.setState(results);
+	}
+	
 	public void retrieveGalaxyInRange(Coordinates center, double range, int limit) throws Exception {
 		Connection connection = dataSource.getConnection();
 		
@@ -173,9 +168,9 @@ public class GalaxyRepository extends Repository {
 		statement.executeQuery();		
 		
 		ResultSet set = statement.getResultSet();
-		List<String[]> results = new ArrayList<>();
+		List<AdaptableValue> results = new ArrayList<>();
 		while (set.next()) 
-			results.add(new String[] { set.getString(1), String.valueOf(set.getDouble(2)) });
+			results.add(AdaptableValue.getDistanceValue(set.getString(1), set.getDouble(2)));
 		
 		release(connection, statement, set);
 		
@@ -193,29 +188,29 @@ public class GalaxyRepository extends Repository {
 		statement.setInt(2, limit);
 		
 		ResultSet set = statement.executeQuery();
-		List<String[]> results = new ArrayList<>();
+		List<AdaptableValue> results = new ArrayList<>();
 		while (set.next()) 
-			results.add(new String[] { set.getString(1), String.valueOf(set.getDouble(2)) });
+			results.add(AdaptableValue.getRedshiftValue(set.getString(1), set.getDouble(2)));
 	
 		nameSubject.setState(results);
 	}
 	
-	class GalaxyNameAdapter extends Subject<List<String[]>> {
+	class GalaxyNameAdapter extends Subject<List<AdaptableValue>> {
 		
-		List<String[]> results;
+		List<AdaptableValue> results;
 		
 		protected GalaxyNameAdapter() {
 			results = new ArrayList<>();
 		}
 		
-		protected void setState(List<String[]> results) {
+		protected void setState(List<AdaptableValue> results) {
 			this.results.clear();
 			this.results.addAll(results);
 			notifyObservers();
 		}
 
 		@Override
-		public List<String[]> retrieveState() {
+		public List<AdaptableValue> retrieveState() {
 			return results;
 		}
 	}

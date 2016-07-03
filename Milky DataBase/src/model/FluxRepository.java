@@ -121,7 +121,6 @@ public class FluxRepository extends Repository {
 				 + "' AND LF2.aperture LIKE '" + apertureSize + "' AND ";
 		viewQuery += "(LF1.galaxy <> LF2.galaxy OR LF1.ion <> LF2.ion OR LF1.aperture <> LF2.aperture);";
 
-		System.out.println(viewQuery);
 		Statement viewStatement = connection.createStatement();
 		viewStatement.execute(viewQuery);
 		release(viewStatement);

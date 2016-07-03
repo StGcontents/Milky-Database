@@ -24,12 +24,14 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 
 import controller.GalaxySearchController;
+import model.AdaptableValue;
 import model.Galaxy;
 import model.Galaxy.Coordinates;
 import model.Galaxy.Luminosity;
 import model.Priviledge;
 import pattern.Observer;
 
+@SuppressWarnings("rawtypes")
 public class GalaxyView {
 	
 	private static GalaxyView me;
@@ -48,7 +50,7 @@ public class GalaxyView {
 	private TextField nameField;
 	private DoubleTextField redshiftField, secondsField, arcsecField, rangeField;
 	private IntTextField rsLimitField, dLimitField, hoursField, minField, degreesField, arcminField;
-	private JList<String[]> results;
+	private JList<AdaptableValue> results;
 	
 	private ListObserverAdapter listObserver;
 	private GalaxyObserverAdapter galaxyObserver;
@@ -58,7 +60,7 @@ public class GalaxyView {
 		galaxyObserver = new GalaxyObserverAdapter(this);
 	}
 	
-	public Observer<List<String[]>> getListObserver() { return this.listObserver; }
+	public Observer<List<AdaptableValue>> getListObserver() { return this.listObserver; }
 	public Observer<Galaxy> getGalaxyObserver() { return this.galaxyObserver; }
 	
 	public Panel generateSearchPanel() {
@@ -271,7 +273,7 @@ public class GalaxyView {
 			searchPanel.add(searchBtn);
 			
 			results = new JList<>();
-			DefaultListModel<String[]> model = new DefaultListModel<>();
+			DefaultListModel<AdaptableValue> model = new DefaultListModel<>();
 			results.setModel(model);
 			results.setCellRenderer(new AkaRenderer());
 			results.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -417,10 +419,10 @@ public class GalaxyView {
 		showGalaxy(null);
 	}
 	
-	private void populate(List<String[]> names) {
-		DefaultListModel<String[]> model = (DefaultListModel<String[]>) results.getModel(); 
+	private void populate(List<AdaptableValue> values) {
+		DefaultListModel<AdaptableValue> model = (DefaultListModel<AdaptableValue>) results.getModel(); 
 		model.clear();
-		if (names != null) for (String[] couple : names) model.addElement(couple);
+		if (values != null) for (AdaptableValue value : values) model.addElement(value);
 	}
 	
 	private void showGalaxy(Galaxy galaxy) { 
@@ -568,10 +570,10 @@ public class GalaxyView {
 		}
 	}
 	
-	class AkaRenderer implements ListCellRenderer<String[]> {
+	class AkaRenderer implements ListCellRenderer<AdaptableValue> {
 
 		@Override
-		public Component getListCellRendererComponent(JList<? extends String[]> list, String[] values, int index,
+		public Component getListCellRendererComponent(JList<? extends AdaptableValue> list, AdaptableValue value, int index,
 				boolean isSelected, boolean cellHasFocus) {
 			
 			JList.DropLocation location = list.getDropLocation();
@@ -591,14 +593,7 @@ public class GalaxyView {
 	            foreground = Color.BLACK;
 			}	
 			
-
-			String string = values[0];
-			if (nameBox.getState()) {
-				if (values[1] != null && !"".equals(values[1])) 
-					string += " (aka " + values[1] + ")";
-			}
-			else if (coordBox.getState()) string += " (distance from center: " + values[1] + ")";
-			else if (redShiftBox.getState()) string += " (value: " + values[1] + ")";
+			String string = value.getDescription();
 			
 			JLabel label = new JLabel(string);
 			label.setSize(new Dimension(Label.WIDTH, 10));
@@ -611,7 +606,7 @@ public class GalaxyView {
 		
 	}
 	
-	class ListObserverAdapter extends Observer<List<String[]>> {
+	class ListObserverAdapter extends Observer<List<AdaptableValue>> {
 		private GalaxyView adaptee;
 		protected ListObserverAdapter(GalaxyView adaptee) { this.adaptee = adaptee; } 
 		@Override public void stateChanged() { adaptee.populate(getSubject().retrieveState()); }
