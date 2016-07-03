@@ -10,7 +10,13 @@ public abstract class DataSource {
 	private static String URI = "jdbc:postgresql://localhost/galaxy";
 	public static final int ADMIN = 0, COMMON = 1, READONLY = 2, INVALID = -1;
 	
-	public static DataSource instance(int priviledgeLevel) {
+	public static synchronized DataSource instance(int priviledgeLevel) {
+		try { loadDriver(); } 
+		catch (Exception e) { 
+			e.printStackTrace();
+			return null;
+		}
+		
 		switch (priviledgeLevel) {
 		case 0: //Administrator
 			return AdminDataSource.instance();
@@ -21,21 +27,34 @@ public abstract class DataSource {
 		}
 	}
 	
-	public static DataSource byPriviledge() {
+	public static synchronized DataSource byPriviledge() {
 		int priviledgeLevel = Priviledge.instance().retrieveState();
 		return instance(priviledgeLevel);
 	}
+	
+	private static void loadDriver() throws Exception { Class.forName("org.postgresql.Driver"); }
+	
+	private LazyConnection connection;
 	
 	public static DataSource readOnly() {
 		return instance(DataSource.READONLY);
 	}
 	
 	public Connection getConnection() throws Exception {
-		loadDriver();
-		return DriverManager.getConnection(URI, getUser(), getPassword());
+		try {
+			synchronized (connection) {
+				if (connection.isClosed()) {
+					connection = new LazyConnection(DriverManager.getConnection(URI, getUser(), getPassword()));
+				}
+				else connection.keepAlive(); 
+			}
+		}
+		catch (Exception e) {
+			connection = new LazyConnection(DriverManager.getConnection(URI, getUser(), getPassword()));
+		}
+		
+		return connection;
 	}
-	
-	private void loadDriver() throws Exception { Class.forName("org.postgresql.Driver"); }
 	
 	protected abstract String getUser() ;
 	protected abstract String getPassword() ;
@@ -67,6 +86,7 @@ public abstract class DataSource {
 		@Override protected String getUser() { return CommonDataSource.user; }
 		@Override protected String getPassword() { return CommonDataSource.password; }
 	}
+	
 	private static class AdminDataSource extends DataSource {
 		private static AdminDataSource me;
 		private AdminDataSource() { }

@@ -15,13 +15,16 @@ public class UserRepository extends Repository {
 	
 	public User retrieveUserById(String userID) throws Exception {
 		Connection connection = dataSource.getConnection();
+		connection.setAutoCommit(false);
 		
 		String query = "SELECT * FROM user_admin WHERE id LIKE ?";
-		PreparedStatement statement = connection.prepareStatement(query);
+		PreparedStatement statement = connection.prepareStatement(query, ResultSet.FETCH_FORWARD, ResultSet.CONCUR_READ_ONLY);
 		statement.setString(1, userID);
 		
 		ResultSet set = statement.executeQuery();
 		User user = UserFactory.instance().create(set).get(0);
+		
+		connection.commit();
 		
 		release(connection, statement, set);
 		return user;
