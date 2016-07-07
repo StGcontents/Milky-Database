@@ -14,6 +14,13 @@ import view.MainView;
 
 public class MainController implements ListSelectionListener {
 	
+	public static void main (String args []){
+		
+		instance().callView();
+		
+		
+	}
+	
 	private static MainController me;
 	private MainController(int priviledgeLevel) {
 		this.priviledgeLevel = priviledgeLevel;
@@ -78,6 +85,12 @@ public class MainController implements ListSelectionListener {
 				panel.add(label);
 				view.attachPanel(panel);
 			}
+			break;
+		case 3:
+			
+			view.attachPanel(AddUserController.instance().generateView());
+			
+			
 			break;
 		case 4:
 			view.close();

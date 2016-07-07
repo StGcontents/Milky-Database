@@ -54,4 +54,20 @@ public class UserRepository extends Repository {
 		
 		Priviledge.instance().setPriviledge(result);
 	}
+	
+	private void persistUser(Connection connection, User utente) throws Exception {
+		String insert = "INSERT INTO user_admin(id , password , name , surname , mail) "
+				+ "values (?, ?, ?, ?, ?)";
+		PreparedStatement statement = connection.prepareStatement(insert);
+		
+		statement.setString(1, utente.getId());
+		statement.setString(2, utente.getPassword());
+		statement.setString(3, utente.getName());
+		statement.setString(4, utente.getSurname());
+		statement.setString(5, utente.getMail());
+	
+		
+		statement.executeUpdate();
+		release(statement);
+	}
 }
