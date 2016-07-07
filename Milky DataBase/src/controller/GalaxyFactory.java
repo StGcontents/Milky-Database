@@ -43,8 +43,8 @@ public class GalaxyFactory extends AbstractFactory<Galaxy> {
 					galaxy.setCoordinates(coordinates);
 					
 					galaxy.setRedShift(set.getDouble(9));
-					int distance = set.getInt(10);
-					if (!set.wasNull()) galaxy.setDistance(new Integer(distance));
+					double distance = set.getDouble(10);
+					if (!set.wasNull()) galaxy.setDistance(new Double(distance));
 					
 					galaxy.setSpectre(set.getString(11));
 					
@@ -54,10 +54,10 @@ public class GalaxyFactory extends AbstractFactory<Galaxy> {
 							galaxy.setLuminosity(new Luminosity(lum, set.getBoolean(12 + 2 * i + 1)), i);
 					}
 					
-					int metallicity = set.getInt(18);
-					if (!set.wasNull()) galaxy.setMetallicity(new Integer(metallicity));
-					int metallicityError = set.getInt(19);
-					if (!set.wasNull()) galaxy.setMetallicity(new Integer(metallicityError));
+					double metallicity = set.getDouble(18);
+					if (!set.wasNull()) galaxy.setMetallicity(new Double(metallicity));
+					double metallicityError = set.getDouble(19);
+					if (!set.wasNull()) galaxy.setMetallicity(new Double(metallicityError));
 					
 					galaxies.add(galaxy);
 				}

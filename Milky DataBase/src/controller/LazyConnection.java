@@ -1,5 +1,6 @@
 package controller;
 
+import java.lang.Thread.State;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.CallableStatement;
@@ -30,11 +31,12 @@ import java.util.concurrent.Executor;
 public class LazyConnection implements Connection {
 
 	private Connection connection;
-	private CountdownThread countdown;
+	private CountdownRunnable countdown;
+	private Thread thread;
 	
 	public LazyConnection(Connection connection) {
 		this.connection = connection;
-		this.countdown = new CountdownThread(this.connection);
+		this.countdown = new CountdownRunnable(this);
 	}
 	
 	public void keepAlive() { countdown.nevermind(); }
@@ -45,7 +47,13 @@ public class LazyConnection implements Connection {
 	 *************************************************************************/	
 	@Override
 	public void close() throws SQLException {
-		countdown.okGo();
+		synchronized (connection) {
+			if (thread == null || thread.getState().equals(State.TERMINATED)) {
+				thread = new Thread(countdown);
+				thread.start();
+			}
+			else countdown.okGo();
+		}
 	}
 	
 	@Override

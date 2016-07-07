@@ -34,6 +34,7 @@ public class HeavyTaskView {
 	private CheckboxGroup spectralGroup;
 	private Label avgLabel, stddevLabel, medLabel, madLabel;
 	private StatisticsObserver observer;
+	private Button taskBtn;
 	
 	public Observer<Statistics> getObserver() { return observer; }
 
@@ -65,7 +66,7 @@ public class HeavyTaskView {
 			Checkbox linBox = new Checkbox("LIN", spectralGroup, false);
 			Checkbox dwarfBox = new Checkbox("DWARF", spectralGroup, false);
 			
-			Button taskBtn = new Button("Calculate");
+			taskBtn = new Button("Calculate");
 			taskBtn.addActionListener(new ActionListener() {
 				
 				@Override
@@ -74,6 +75,8 @@ public class HeavyTaskView {
 					stddevLabel.setText(null);
 					medLabel.setText(null);
 					madLabel.setText(null);
+					
+					taskBtn.setEnabled(false);
 					
 					String apertureSize = null;
 					if (cBox.getState()) apertureSize = "c";
@@ -196,6 +199,8 @@ public class HeavyTaskView {
 			medLabel.setText("Median value: " + stats.getMedian());
 			madLabel.setText("Median absolute deviation: " + stats.getMedianAbsoluteDev());
 		}
+		
+		taskBtn.setEnabled(true);
 	}
 	
 	protected class StatisticsObserver extends Observer<Statistics> {

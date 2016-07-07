@@ -8,7 +8,7 @@ CREATE TABLE galaxy (
 	arcmin INTEGER NOT NULL,
 	arcsec REAL NOT NULL,
 	redshift REAL NOT NULL,
-	distance INTEGER,
+	distance REAL,
 	spectre VARCHAR(5) NOT NULL,
 	lum_nev_1 REAL,
 	lum_nev_1_flag BOOLEAN,
@@ -16,7 +16,7 @@ CREATE TABLE galaxy (
 	lum_nev_2_flag BOOLEAN,
 	lum_oiv REAL,
 	lum_oiv_flag BOOLEAN,
-	metallicity INTEGER,
-	metallicity_err INTEGER
+	metallicity REAL,
+	metallicity_err REAL
 	CONSTRAINT chk_sign CHECK (sign = 1 OR sign = -1)
 );

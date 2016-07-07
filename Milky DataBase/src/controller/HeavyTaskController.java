@@ -4,7 +4,6 @@ import java.awt.Panel;
 
 import model.FluxRepository;
 import model.Priviledge;
-import view.GalaxyView;
 import view.HeavyTaskView;
 
 public class HeavyTaskController {
@@ -12,7 +11,7 @@ public class HeavyTaskController {
 	private static HeavyTaskController me;
 	private HeavyTaskController() {
 		priviledgeLevel = Priviledge.instance().retrieveState();
-		repo = FluxRepository.instance(DataSource.byPriviledge());
+		repo = new FluxRepository(DataSource.byPriviledge());
 	}
 	public static synchronized HeavyTaskController instance() {
 		if (me == null || me.priviledgeLevel != Priviledge.instance().retrieveState()) 
@@ -31,8 +30,14 @@ public class HeavyTaskController {
 	}
 	
 	public void calculate(String spectralGroup, String apertureSize) {
-		try { repo.calculate(spectralGroup, apertureSize); }
-		catch (Exception e) { e.printStackTrace(); }
-		
+		final String param0 = spectralGroup;
+		final String param1 = apertureSize;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try { repo.calculate(param0, param1); }
+				catch (Exception e) { e.printStackTrace(); }	
+			}
+		}).start();
 	}
 }

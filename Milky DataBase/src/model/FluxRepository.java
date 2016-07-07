@@ -11,18 +11,17 @@ import pattern.Subject;
 
 public class FluxRepository extends Repository {
 	
-	private static FluxRepository me;
-	protected FluxRepository(DataSource dataSource) { 
+	public FluxRepository(DataSource dataSource) { 
 		this.dataSource = dataSource;
 		statSubject = new StatisticsSubject();
-	}
-	public static synchronized FluxRepository instance(DataSource dataSource) {
-		if (me == null) me = new FluxRepository(dataSource);
-		return me;
+		fillerSubject = new FillerSubject();
 	}
 	
 	private StatisticsSubject statSubject;
+	private FillerSubject fillerSubject;
+	
 	public Subject<Statistics> getStatSubject() { return statSubject; }
+	public Subject<Void> getFillerSubject() { return fillerSubject; }
 	
 	public void persist(Galaxy galaxy, Flux... fluxes) throws Exception {
 		
@@ -50,51 +49,35 @@ public class FluxRepository extends Repository {
 		release(statement);
 	}
 	
+	public void retrieveGalaxyFluxes(Galaxy galaxy) throws Exception {
+		retrieveLineFluxes(galaxy);
+		retrieveContinuousFluxes(galaxy);
+	}
+	
 	public void retrieveLineFluxes(Galaxy galaxy) throws Exception {
 		Connection connection = dataSource.getConnection();
-		String query = "SELECT CF.value, CF.error, CF.aperture, I.id, I.name, I.charges, I.line "
+		String query = "SELECT CF.flux, CF.error, CF.aperture, I.id, I.name, I.charges, I.line "
 			    + "FROM line_flux CF JOIN ion I ON (CF.ion = I.id) "
 			    + "WHERE CF.galaxy LIKE ?";
 		PreparedStatement statement = templateRetriever(connection, query, galaxy);
 		ResultSet set = statement.executeQuery();
-		galaxy.addAll(FluxFactory.getFactoryByType(true).create(set));
+		galaxy.addAll(FluxFactory.getFactoryByType(false).create(set));
+		fillerSubject.notifyObservers();
 		
 		release(set, statement, connection);
 	}
 	
 	public void retrieveContinuousFluxes(Galaxy galaxy) throws Exception {
 		Connection connection = dataSource.getConnection();
-		String query = "SELECT CF.value, CF.error, CF.aperture, I.id, I.name, I.charges, I.line "
+		String query = "SELECT CF.flux, CF.error, CF.aperture, I.id, I.name, I.charges, I.line "
 			    + "FROM continuous_flux CF JOIN ion I ON (CF.ion = I.id) "
 			    + "WHERE CF.galaxy LIKE ?";
 		PreparedStatement statement = templateRetriever(connection, query, galaxy);
 		ResultSet set = statement.executeQuery();
 		galaxy.addAll(FluxFactory.getFactoryByType(true).create(set));
+		fillerSubject.notifyObservers();
 		
 		release(set, statement, connection);
-	}
-	
-	public void retrieveGalaxyFluxes(Galaxy galaxy) throws Exception {
-		Connection connection = dataSource.getConnection();
-		connection.setAutoCommit(false);
-		
-		String conQuery = "SELECT CF.value, CF.error, CF.aperture, I.id, I.name, I.charges, I.line "
-					    + "FROM continuous_flux CF JOIN ion I ON (CF.ion = I.id) "
-					    + "WHERE CF.galaxy LIKE '" + galaxy.getName() + "'",
-			  lineQuery = "SELECT CF.value, CF.error, CF.aperture, I.id, I.name, I.charges, I.line "
-					    + "FROM line_flux CF JOIN ion I ON (CF.ion = I.id) "
-					    + "WHERE CF.galaxy LIKE '" + galaxy.getName() + "'";
-		
-		PreparedStatement conStatement = templateRetriever(connection, conQuery, galaxy); 
-		ResultSet conSet = conStatement.executeQuery();
-		galaxy.addAll(FluxFactory.getFactoryByType(true).create(conSet));
-		
-		PreparedStatement lineStatement = templateRetriever(connection, lineQuery, galaxy); 
-		ResultSet lineSet = lineStatement.executeQuery();
-		galaxy.addAll(FluxFactory.getFactoryByType(false).create(lineSet));
-		
-		connection.commit();
-		release(conSet, conStatement, lineSet, lineStatement, connection);
 	}
 	
 	public void calculate(String spectralGroup, String apertureSize) throws Exception {
@@ -212,5 +195,9 @@ public class FluxRepository extends Repository {
 		public Statistics retrieveState() {
 			return stats;
 		}
+	}
+	
+	protected class FillerSubject extends Subject<Void> {
+		@Override public Void retrieveState() { return null; }
 	}
 }

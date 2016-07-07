@@ -23,7 +23,9 @@ public class LoginController {
 	public void callView() { LoginView.instance().generateView(); }
 	
 	public void log(String userID, String password) {
-		repo.logUser(userID, password);
+		final String param0 = userID;
+		final String param1 = password;
+		new Thread(new Runnable() { @Override public void run() { repo.logUser(param0, param1); } }).start();
 	}
 	
 	public void onLoginExit(int priviledgeLevel) {

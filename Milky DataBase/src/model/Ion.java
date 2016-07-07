@@ -25,4 +25,8 @@ public class Ion {
 		setChargedState(chargedState);
 		setLine(line);
 	}
+	@Override
+	public String toString() {
+		return getAtom() + getChargedState() + " " + getLine();
+	}
 }

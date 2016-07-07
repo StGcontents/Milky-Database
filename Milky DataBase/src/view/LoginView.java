@@ -181,19 +181,16 @@ public class LoginView extends Observer<Integer> {
 		}
 		else {
 			label.setText("Check credentials.");
+			logBtn.setEnabled(true);
 		}
 	}
 	
 	class LogButtonListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					LoginController.instance().log(userField.getText(), passField.getText());
-				}
-			}).start();
+			logBtn.setEnabled(false);
+			label.setText(null);
+			LoginController.instance().log(userField.getText(), passField.getText());
 		}
 	}
 }

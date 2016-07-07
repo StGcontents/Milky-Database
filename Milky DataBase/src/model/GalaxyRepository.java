@@ -107,7 +107,7 @@ public class GalaxyRepository extends Repository {
 		release(alterStatement, statement, set);
 		
 		if (force) 			
-			FluxRepository.instance(dataSource).retrieveGalaxyFluxes(galaxy);
+			new FluxRepository(dataSource).retrieveGalaxyFluxes(galaxy);
 		
 		release(connection);
 		

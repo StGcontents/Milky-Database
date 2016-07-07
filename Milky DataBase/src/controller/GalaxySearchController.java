@@ -38,21 +38,41 @@ public class GalaxySearchController implements ListSelectionListener {
 		return view.generateSearchPanel();
 	}
 	
-	public void searchNames(String partial) {
-		if (partial == null || "".equals(partial)) return;
-		
-		try { repo.retrieveGalaxyNames(partial); }
-		catch (Exception e) { e.printStackTrace(); }
+	public void searchNames(String partial) {		
+		final String param0 = partial;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try { repo.retrieveGalaxyNames(param0); }
+				catch (Exception e) { e.printStackTrace(); }
+			}
+		}).start();
 	}
 	
 	public void searchByRedshiftValue(double redshift, boolean higherThen, int limit) {
-		try { repo.retrieveGalaxyByRedshiftValue(redshift, higherThen, limit); }
-		catch (Exception e) { e.printStackTrace(); }
+		final double param0 = redshift;
+		final boolean param1 = higherThen;
+		final int param2 = limit;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try { repo.retrieveGalaxyByRedshiftValue(param0, param1, param2); }
+				catch (Exception e) { e.printStackTrace(); }
+			}
+		}).start();
 	}
 	
 	public void searchInRange(Coordinates center, double range, int limit) {
-		try { repo.retrieveGalaxyInRange(center, range, limit); }
-		catch (Exception e) { e.printStackTrace(); }
+		final Coordinates param0 = center;
+		final double param1 = range;
+		final int param2 = limit;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try { repo.retrieveGalaxyInRange(param0, param1, param2); }
+				catch (Exception e) { e.printStackTrace(); }
+			}
+		}).start();
 	}
 	
 	@SuppressWarnings("rawtypes")
