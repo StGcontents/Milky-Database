@@ -78,7 +78,10 @@ public class GalaxySearchController implements ListSelectionListener {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
-		@SuppressWarnings("unchecked")
+	
+		if (e.getValueIsAdjusting()) return;
+		
+		@SuppressWarnings("unchecked")	
 		JList<AdaptableValue> list = (JList<AdaptableValue>) e.getSource();
 		ListSelectionModel listModel = list.getSelectionModel();
 		if (!listModel.isSelectionEmpty()) {

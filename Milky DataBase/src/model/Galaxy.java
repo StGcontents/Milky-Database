@@ -1,9 +1,11 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Galaxy {
+	private static final long EXPIRATION = 600000l;
 	
 	private String name;
 	private Coordinates coordinates;
@@ -16,6 +18,8 @@ public class Galaxy {
 	
 	private boolean filled = false;
 	private List<Flux> fluxes = new ArrayList<>();
+	
+	private Date timestamp = new Date();
 	
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
@@ -119,6 +123,11 @@ public class Galaxy {
 			this.value = value;
 			this.limit = limit;
 		}
+	}
+	
+	public boolean isExpired() {
+		long thisInstant = new Date().getTime();
+		return thisInstant - timestamp.getTime() > EXPIRATION; 
 	}
 }
  

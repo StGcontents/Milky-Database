@@ -14,14 +14,12 @@ class CountdownRunnable implements Runnable {
 	
 	public void nevermind() { 
 		synchronized (connection) {
-			System.out.println("LOCK INCREMENTED");
 			stillUsed += 1; 
 		}
 	}
 	
 	public void okGo() { 
 		synchronized (connection) {
-			System.out.println("LOCK DECREMENTED");
 			if (stillUsed > 0) 
 				stillUsed -= 1; 
 		}
@@ -36,12 +34,8 @@ class CountdownRunnable implements Runnable {
 		catch (InterruptedException e) { e.printStackTrace(); }
 		
 		synchronized(connection) {
-			if (stillUsed == 0) try {
-				System.out.println("CLOSED");
-				connection.close(); 
-			}
+			if (stillUsed == 0) try { connection.close(); }
 			catch (Exception e) { e.printStackTrace(); }
-			else System.out.println("KEPT ALIVE");
 		}
 	}
 }
