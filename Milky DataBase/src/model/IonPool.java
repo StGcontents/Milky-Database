@@ -25,6 +25,17 @@ public class IonPool extends HashMap<Integer, Ion> {
 		return me.get(id);
 	}
 	
+	public static Ion getByInfo(String name, int chargedState, double line) {
+		initialize();
+		List<Ion> ions = getIonList();
+		for (Ion ion : ions) {
+			if (ion.matches(name, chargedState, line)) 
+				return ion;
+		}
+		System.out.println("NOT FOUND");
+		return null;
+	}
+	
 	public static List<Ion> getIonList() {
 		initialize();
 		try {

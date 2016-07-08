@@ -29,4 +29,10 @@ public class Ion {
 	public String toString() {
 		return getAtom() + getChargedState() + " " + getLine();
 	}
+	
+	public boolean matches(String atom, int chargedState, double line) {
+		return getAtom().equals(atom) 
+				&& getChargedState() == chargedState 
+				&& Math.abs(getLine() - line) < 1;
+	}
 }

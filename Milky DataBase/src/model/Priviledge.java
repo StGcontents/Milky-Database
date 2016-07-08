@@ -1,6 +1,5 @@
 package model;
 
-import controller.DataSource;
 import pattern.Subject;
 
 public class Priviledge extends Subject<Integer> {
@@ -14,7 +13,7 @@ public class Priviledge extends Subject<Integer> {
 	
 	private int priviledgeLevel;
 	
-	private int getPriviledge() { return DataSource.ADMIN; }
+	private int getPriviledge() { return priviledgeLevel; }
 	public void setPriviledge(int priviledgeLevel) {
 		this.priviledgeLevel = priviledgeLevel;
 		notifyObservers();

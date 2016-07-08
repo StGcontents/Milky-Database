@@ -15,9 +15,17 @@ public abstract class FluxFactory extends AbstractFactory<Flux> {
 		else return LineFluxFactory.instance();
 	}
 	
+	public static FluxFactory getLineFluxFactory() {
+		return getFactoryByType(false);
+	}
+	
+	public static FluxFactory getContinuousFluxFactory() {
+		return getFactoryByType(true);
+	}
+	
 	@Override
 	public List<Flux> create(ResultSet set) {
-		
+		//TODO
 		List<Flux> fluxes = new ArrayList<>();
 		
 		try {
@@ -51,6 +59,18 @@ public abstract class FluxFactory extends AbstractFactory<Flux> {
 		}
 		
 		return fluxes;
+	}
+	
+	public Flux create(Ion ion, double value, boolean upperLimit, Double error, String aperture) {
+		
+		Flux flux = newInstance();
+		
+		flux.setIon(ion);
+		flux.setValue(value);
+		flux.setUpperLimit(upperLimit);
+		flux.setError(error);
+		flux.setAperture(aperture);
+		return flux;
 	}
 	
 	protected abstract Flux newInstance() ;

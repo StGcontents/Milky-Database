@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.Types;
+import java.util.List;
 
 import controller.DataSource;
 import controller.FluxFactory;
@@ -23,8 +25,11 @@ public class FluxRepository extends Repository {
 	public Subject<Statistics> getStatSubject() { return statSubject; }
 	public Subject<Void> getFillerSubject() { return fillerSubject; }
 	
-	public void persist(Galaxy galaxy, Flux... fluxes) throws Exception {
-		
+	public void persist(Galaxy galaxy) throws Exception {
+		persist(galaxy, galaxy.getFluxes());
+	}
+	
+	public void persist(Galaxy galaxy, List<Flux> fluxes) throws Exception {
 		Connection connection = dataSource.getConnection();
 		
 		for (Flux flux : fluxes) 
@@ -34,19 +39,50 @@ public class FluxRepository extends Repository {
 	}
 	
 	private void persistSingleFlux(Connection connection, Galaxy galaxy, Flux flux) throws Exception {
-		String insert = "INSERT INTO ?(galaxy, ion, aperture, flux, error) "
-				+ "values (?, ?, ?, ?, ?)";
-		PreparedStatement statement = connection.prepareStatement(insert);
+		String table = flux.isContinuous() ? "continuous_flux" : "line_flux";
+		String query = "SELECT count(*) FROM " + table + " WHERE galaxy LIKE ? AND ion = ? AND aperture LIKE ?";
+		String insert = "INSERT INTO " + table + "(galaxy, ion, aperture, flux, error) VALUES (?, ?, ?, ?, ?)";
+		String update = "UPDATE " + table + " SET flux = ?, error = ? WHERE galaxy LIKE ? AND ion = ? AND aperture LIKE ?";
 		
-		statement.setString(1, flux.isContinuous() ? "countinuous_flux" : "line_flux");
-		statement.setString(2, galaxy.getName());
-		statement.setInt(3, flux.getIon().getId());
-		statement.setString(4, flux.getAperture());
-		statement.setDouble(5, flux.getValue());
-		statement.setDouble(6, flux.isUpperLimit() ? null : flux.getError());
+		PreparedStatement queryStatement = connection.prepareStatement(query);
+		queryStatement.setString(1, galaxy.getName());
+		queryStatement.setInt(2, flux.getIon().getId());
+		queryStatement.setString(3, flux.getAperture());
+		ResultSet set = queryStatement.executeQuery();
+		set.next();
+		int i = set.getInt(1);
 		
-		statement.executeUpdate();
-		release(statement);
+		PreparedStatement statement;
+		if (i == 0) {
+			statement = connection.prepareStatement(insert);
+		
+			statement.setString(1, galaxy.getName());
+			statement.setInt(2, flux.getIon().getId());
+			statement.setString(3, flux.getAperture());
+		
+			statement.setDouble(4, flux.getValue());
+			if (flux.isUpperLimit())
+				statement.setNull(5,Types.REAL);
+			else statement.setDouble(5, flux.getError());		
+		
+			statement.executeUpdate();
+		}
+		else {
+			statement = connection.prepareStatement(update);
+			
+			statement.setDouble(1, flux.getValue());
+			if (flux.isUpperLimit())
+				statement.setNull(2,Types.REAL);
+			else statement.setDouble(2, flux.getError());
+			
+			statement.setString(3, galaxy.getName());
+			statement.setInt(4, flux.getIon().getId());
+			statement.setString(5, flux.getAperture());		
+		
+			statement.executeUpdate();
+		}
+		
+		release(queryStatement, set, statement);
 	}
 	
 	public void retrieveGalaxyFluxes(Galaxy galaxy) throws Exception {
