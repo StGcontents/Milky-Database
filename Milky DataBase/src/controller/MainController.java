@@ -87,10 +87,7 @@ public class MainController implements ListSelectionListener {
 			}
 			break;
 		case 3:
-			
-			view.attachPanel(AddUserController.instance().generateView());
-			
-			
+			view.attachPanel(AddUserController.instance().callView());
 			break;
 		case 4:
 			view.close();

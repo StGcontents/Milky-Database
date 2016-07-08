@@ -55,19 +55,22 @@ public class UserRepository extends Repository {
 		Priviledge.instance().setPriviledge(result);
 	}
 	
-	private void persistUser(Connection connection, User utente) throws Exception {
-		String insert = "INSERT INTO user_admin(id , password , name , surname , mail) "
-				+ "values (?, ?, ?, ?, ?)";
+	public void persistUser(User user) throws Exception {
+		
+		Connection connection = dataSource.getConnection();
+		
+		String insert = "INSERT INTO user_admin(id , password , name , surname , mail,is_admin) "
+				+ "values (?, ?, ?, ?, ?, ?)";
 		PreparedStatement statement = connection.prepareStatement(insert);
 		
-		statement.setString(1, utente.getId());
-		statement.setString(2, utente.getPassword());
-		statement.setString(3, utente.getName());
-		statement.setString(4, utente.getSurname());
-		statement.setString(5, utente.getMail());
+		statement.setString(1, user.getId());
+		statement.setString(2, user.getPassword());
+		statement.setString(3, user.getName());
+		statement.setString(4, user.getSurname());
+		statement.setString(5, user.getMail());
+		statement.setBoolean(6, user.isAdmin());
 	
-		
 		statement.executeUpdate();
-		release(statement);
+		release(connection, statement);
 	}
 }
