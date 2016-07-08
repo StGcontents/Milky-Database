@@ -48,8 +48,9 @@ public class Galaxy {
 	public void setMetallicityError(Double metallicityError) { this.metallicityError = metallicityError; }
 
 	public String[] getAlternativeNames() { return alternativeNames; }
-	public void setAlternativeNames(String[] alternativeNames) { 
-		this.alternativeNames = alternativeNames;
+	public void setAlternativeNames(String[] alternativeNames) {
+		if (alternativeNames == null) setAlternativeNames(new String[] {});
+		else this.alternativeNames = alternativeNames;
 	}
 	
 	public boolean isFilled() { return this.filled; }
@@ -64,6 +65,16 @@ public class Galaxy {
 		if (!fluxes.contains(flux)) fluxes.add(flux);
 	}
 	
+	public boolean isExpired() {
+		long thisInstant = new Date().getTime();
+		return thisInstant - timestamp.getTime() > EXPIRATION; 
+	}
+	
+	@Override
+	public String toString() {
+		return getName() + " " + getRedShift() + " " + getSpectre();
+	}
+
 	public static class Coordinates {
 		
 		private int rightAscensionHours;
@@ -124,10 +135,4 @@ public class Galaxy {
 			this.limit = limit;
 		}
 	}
-	
-	public boolean isExpired() {
-		long thisInstant = new Date().getTime();
-		return thisInstant - timestamp.getTime() > EXPIRATION; 
-	}
 }
- 

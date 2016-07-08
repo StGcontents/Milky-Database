@@ -3,12 +3,14 @@ package model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 import controller.DataSource;
 import controller.GalaxyFactory;
 import model.Galaxy.Coordinates;
+import model.Galaxy.Luminosity;
 import pattern.Subject;
 
 @SuppressWarnings("rawtypes")
@@ -41,19 +43,53 @@ public class GalaxyRepository extends Repository {
 		
 		if (result) {
 			String insert = "INSERT INTO galaxy(name, hours, minutes, seconds, "
-					+ "sign, degress, arcmin, arcsec, redshift, distance, spectre) "
-					+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+					+ "sign, degrees, arcmin, arcsec, redshift, distance, spectre, "
+					+ "lum_nev_1, lum_nev_1_flag, lum_nev_2, lum_nev_2_flag, "
+					+ "lum_oiv, lum_oiv_flag, metallicity, metallicity_err) "
+					+ "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 				
 			PreparedStatement statement = connection.prepareStatement(insert);
 			statement.setString(1, galaxy.getName());
+			
 			statement.setInt(2, galaxy.getCoordinates().getRightAscensionHours());
 			statement.setInt(3, galaxy.getCoordinates().getRightAscensionMinutes());
 			statement.setDouble(4, galaxy.getCoordinates().getRightAscensionSeconds());
-			statement.setString(5, galaxy.getCoordinates().getSign() ? "+" : "-");
+			statement.setInt(5, galaxy.getCoordinates().getSign() ? 1 : -1);
 			statement.setInt(6, galaxy.getCoordinates().getDegrees());
 			statement.setInt(7, galaxy.getCoordinates().getArcMinutes());
 			statement.setDouble(8, galaxy.getCoordinates().getArcSeconds());
-			//etc
+			
+			statement.setDouble(9, galaxy.getRedShift());
+			
+			if (galaxy.getDistance() == null)
+				statement.setNull(10, Types.REAL);
+			else statement.setDouble(10, galaxy.getDistance());
+			
+			statement.setString(11, galaxy.getSpectre());
+			
+			for (int i = 0; i < 3; ++i) {
+				Luminosity lum = galaxy.getLuminosities()[i];
+				if (lum == null) {
+					statement.setNull(12 + i * 2, Types.REAL);
+					statement.setNull(13 + i * 2, Types.BOOLEAN);
+				}
+				else {
+					statement.setDouble(12 + i * 2, lum.getValue());
+					statement.setBoolean(13 + i * 2, lum.isLimit());
+				}
+			}
+			
+			if (galaxy.getMetallicity() == null) {
+				statement.setNull(18, Types.REAL);
+				statement.setNull(19, Types.REAL);
+			}
+			else {
+				statement.setDouble(18, galaxy.getMetallicity());
+				if (galaxy.getMetallicityError() == null)
+					statement.setNull(19, Types.REAL);
+				else statement.setDouble(19, galaxy.getMetallicityError());
+			}
+			
 			statement.executeUpdate();
 			releaseQueue.add(statement);
 			
@@ -68,7 +104,8 @@ public class GalaxyRepository extends Repository {
 		}
 		
 		connection.commit();
-		release((AutoCloseable[]) releaseQueue.toArray());
+		for (AutoCloseable ac : releaseQueue)
+			release(ac);
 		release(connection);
 	}
 	
@@ -86,10 +123,9 @@ public class GalaxyRepository extends Repository {
 		Galaxy galaxy = GalaxyPool.getByName(name);
 		if (galaxy != null && !galaxy.isExpired()) {
 			galaxySubject.setState(galaxy);
-			System.out.println("FROM POOL");
 			return;
 		}
-		System.out.println("BRAND NEW");
+		
 		Connection connection = dataSource.getConnection();
 		connection.setAutoCommit(false);
 		
@@ -147,14 +183,14 @@ public class GalaxyRepository extends Repository {
 				else continue;
 			}
 			else {
-				last = str1;
+				last = str1 == null ? str0 : str1;
 				match = last.contains(partial);
 				results.add(AdaptableValue.getNameValue(str0, str1 != null && str1.contains(partial) ? str1 : null));
 			}
 		}
 		
 		release(connection, statement, set);
-		
+		System.out.println(results);
 		nameSubject.setState(results);
 	}
 	
