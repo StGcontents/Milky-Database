@@ -1,6 +1,11 @@
 package model;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import controller.DataSource;
+import controller.IonFactory;
 
 public class IonRepository extends Repository {
 	
@@ -15,5 +20,14 @@ public class IonRepository extends Repository {
 	
 	public void persist(Ion ion) throws Exception {
 		
+	}
+	
+	public void retrieveIons() throws Exception {
+		Connection connection = dataSource.getConnection();
+		String query = "SELECT * FROM ion";
+		Statement statement = connection.createStatement();
+		ResultSet set = statement.executeQuery(query);
+		IonFactory.instance().create(set);
+		release(connection, statement, set);
 	}
 }

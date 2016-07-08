@@ -3,6 +3,7 @@ package pattern;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("rawtypes")
 public abstract class Subject<T> {
 	private List<Observer> observers = new ArrayList<>();
 	

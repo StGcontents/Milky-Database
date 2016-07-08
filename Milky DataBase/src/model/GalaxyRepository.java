@@ -83,6 +83,13 @@ public class GalaxyRepository extends Repository {
 	}
 	
 	public void retrieveGalaxyByName(String name, boolean force) throws Exception {
+		Galaxy galaxy = GalaxyPool.getByName(name);
+		if (galaxy != null && !galaxy.isExpired()) {
+			galaxySubject.setState(galaxy);
+			System.out.println("FROM POOL");
+			return;
+		}
+		System.out.println("BRAND NEW");
 		Connection connection = dataSource.getConnection();
 		connection.setAutoCommit(false);
 		
@@ -91,7 +98,7 @@ public class GalaxyRepository extends Repository {
 		statement.setString(1, name);
 		
 		ResultSet set = statement.executeQuery();
-		Galaxy galaxy = GalaxyFactory.instance().create(set).get(0);
+		galaxy = GalaxyFactory.instance().create(set).get(0);
 		
 		String alterQuery = "SELECT alter_name FROM alternative_names WHERE name LIKE ?";
 		PreparedStatement alterStatement = connection.prepareStatement(alterQuery, ResultSet.CLOSE_CURSORS_AT_COMMIT);
@@ -107,9 +114,11 @@ public class GalaxyRepository extends Repository {
 		release(alterStatement, statement, set);
 		
 		if (force) 			
-			FluxRepository.instance(dataSource).retrieveGalaxyFluxes(galaxy);
+			new FluxRepository(dataSource).retrieveGalaxyFluxes(galaxy);
 		
 		release(connection);
+		
+		GalaxyPool.insert(galaxy);
 		
 		galaxySubject.setState(galaxy);
 	}

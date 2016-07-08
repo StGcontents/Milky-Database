@@ -1,6 +1,10 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
+import controller.DataSource;
 
 @SuppressWarnings("serial")
 public class IonPool extends HashMap<Integer, Ion> {
@@ -20,5 +24,14 @@ public class IonPool extends HashMap<Integer, Ion> {
 		initialize();
 		return me.get(id);
 	}
-
+	
+	public static List<Ion> getIonList() {
+		initialize();
+		try {
+			IonRepository.instance(DataSource.byPriviledge()).retrieveIons();
+			return new ArrayList<>(me.values());
+		}
+		catch (Exception e) { e.printStackTrace(); }
+		return new ArrayList<>();
+	}
 }

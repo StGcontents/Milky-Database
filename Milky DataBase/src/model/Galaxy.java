@@ -1,21 +1,25 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Galaxy {
+	private static final long EXPIRATION = 600000l;
 	
 	private String name;
 	private Coordinates coordinates;
 	private double redShift;
-	private Integer distance;
+	private Double distance, metallicity, metallicityError;
 	private String spectre;
 	private Luminosity[] luminosities = new Luminosity[3];
-	private Integer metallicity, metallicityError;
 	
 	private String[] alternativeNames;
+	
+	private boolean filled = false;
 	private List<Flux> fluxes = new ArrayList<>();
 	
+	private Date timestamp = new Date();
 	
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
@@ -28,8 +32,8 @@ public class Galaxy {
 		this.coordinates = coordinates;
 	}
 
-	public Integer getDistance() { return distance; }
-	public void setDistance(Integer distance) { this.distance = distance; }
+	public Double getDistance() { return distance; }
+	public void setDistance(Double distance) { this.distance = distance; }
 	
 	public String getSpectre() { return spectre; }
 	public void setSpectre(String spectre) { this.spectre = spectre; }
@@ -37,19 +41,28 @@ public class Galaxy {
 	public Luminosity[] getLuminosities() { return luminosities; }
 	public void setLuminosity(Luminosity luminosity, int position) { luminosities[position] = luminosity; }
 	
-	public Integer getMetallicity() { return metallicity; }
-	public void setMetallicity(Integer metallicity) { this.metallicity = metallicity; }
+	public Double getMetallicity() { return metallicity; }
+	public void setMetallicity(Double metallicity) { this.metallicity = metallicity; }
 	
-	public Integer getMetallicityError() { return metallicityError; }
-	public void setMetallicityError(Integer metallicityError) { this.metallicityError = metallicityError; }
+	public Double getMetallicityError() { return metallicityError; }
+	public void setMetallicityError(Double metallicityError) { this.metallicityError = metallicityError; }
 
 	public String[] getAlternativeNames() { return alternativeNames; }
 	public void setAlternativeNames(String[] alternativeNames) { 
 		this.alternativeNames = alternativeNames;
 	}
 	
+	public boolean isFilled() { return this.filled; }
+	
 	public List<Flux> getFluxes() { return this.fluxes; }
-	public void addAll(List<Flux> fluxes) { this.fluxes.addAll(fluxes); }
+	public void addAll(List<Flux> fluxes) { 
+		for (Flux flux : fluxes) 
+			addFlux(flux); 
+		filled = true;
+	}
+	public void addFlux(Flux flux) {
+		if (!fluxes.contains(flux)) fluxes.add(flux);
+	}
 	
 	public static class Coordinates {
 		
@@ -110,6 +123,11 @@ public class Galaxy {
 			this.value = value;
 			this.limit = limit;
 		}
+	}
+	
+	public boolean isExpired() {
+		long thisInstant = new Date().getTime();
+		return thisInstant - timestamp.getTime() > EXPIRATION; 
 	}
 }
  

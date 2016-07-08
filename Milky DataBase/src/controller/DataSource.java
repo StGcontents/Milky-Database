@@ -35,6 +35,7 @@ public abstract class DataSource {
 	private static void loadDriver() throws Exception { Class.forName("org.postgresql.Driver"); }
 	
 	private LazyConnection connection;
+	private Connection actualConnection;
 	
 	public static DataSource readOnly() {
 		return instance(DataSource.READONLY);
@@ -51,15 +52,17 @@ public abstract class DataSource {
 	 *************************************************************************************/
 	public Connection getConnection() throws Exception {
 		try {
-			synchronized (connection) {
+			synchronized (actualConnection) {
 				if (connection.isClosed()) {
-					connection = new LazyConnection(DriverManager.getConnection(URI, getUser(), getPassword()));
+					actualConnection = DriverManager.getConnection(URI, getUser(), getPassword());
+					connection = new LazyConnection(actualConnection);
 				}
 				else connection.keepAlive(); 
 			}
 		}
 		catch (Exception e) {
-			connection = new LazyConnection(DriverManager.getConnection(URI, getUser(), getPassword()));
+			actualConnection = DriverManager.getConnection(URI, getUser(), getPassword());
+			connection = new LazyConnection(actualConnection);
 		}
 		
 		return connection;

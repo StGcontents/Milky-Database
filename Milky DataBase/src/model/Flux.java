@@ -2,6 +2,7 @@ package model;
 
 public class Flux {
 	
+	private boolean valid = true;
 	private boolean isContinuous;
 	private Ion ion;
 	private double value;
@@ -26,5 +27,11 @@ public class Flux {
 	public String getAperture() { return aperture; }
 	public void setAperture(String aperture) { this.aperture = aperture; }
 	
+	public boolean isValid() { return this.valid; }
 	
+	public static Flux invalidInstance() {
+		Flux invalidFlux = new Flux();
+		invalidFlux.valid = false;
+		return invalidFlux;
+	}
 }
