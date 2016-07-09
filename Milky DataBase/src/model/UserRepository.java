@@ -24,7 +24,7 @@ public class UserRepository extends Repository {
 		connection.setAutoCommit(false);
 		
 		String query = "SELECT * FROM user_admin WHERE id LIKE ?";
-		PreparedStatement statement = connection.prepareStatement(query, ResultSet.FETCH_FORWARD, ResultSet.CONCUR_READ_ONLY);
+		PreparedStatement statement = connection.prepareStatement(query);
 		statement.setString(1, userID);
 		
 		ResultSet set = statement.executeQuery();
@@ -36,27 +36,21 @@ public class UserRepository extends Repository {
 		return user;
 	}
 	
-	public void logUser(String userID, String password) {
+	public void logUser(String userID, String password) throws Exception {
+		Connection connection = dataSource.getConnection();
+			
 		int result;
-		try {
-			Connection connection = dataSource.getConnection();
+		String query = "SELECT is_admin FROM user_admin WHERE id LIKE ? AND password LIKE ?";
+		PreparedStatement statement = connection.prepareStatement(query);
+		statement.setString(1, userID);
+		statement.setString(2, password);
 			
-			String query = "SELECT is_admin FROM user_admin WHERE id LIKE ? AND password LIKE ?";
-			PreparedStatement statement = connection.prepareStatement(query);
-			statement.setString(1, userID);
-			statement.setString(2, password);
+		ResultSet set = statement.executeQuery();
+		if (set.next()) 
+			result = set.getBoolean(1) ? DataSource.ADMIN : DataSource.COMMON;
+		else result = DataSource.INVALID;
 			
-			ResultSet set = statement.executeQuery();
-			if (set.next()) 
-				result = set.getBoolean(1) ? DataSource.ADMIN : DataSource.COMMON;
-			else result = DataSource.INVALID;
-			
-			release(connection, statement, set);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			result = DataSource.INVALID;
-		}
+		release(connection, statement, set);
 		
 		Priviledge.instance().setPriviledge(result);
 	}
@@ -86,12 +80,14 @@ public class UserRepository extends Repository {
 	
 			statement.executeUpdate();
 			
-			release(statement);
+			release(connection, qStatement, set, statement);
 		}
-		else throw new UserExistsException();
+		else {
+			release(connection, qStatement, set);
+			throw new UserExistsException();
+		}
 		
 		connection.commit();
-		release(connection, qStatement, set);
 		
 		subject.setState(null);
 	}

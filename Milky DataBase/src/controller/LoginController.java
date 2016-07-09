@@ -2,15 +2,18 @@ package controller;
 
 import model.Priviledge;
 import model.UserRepository;
+import pattern.ExceptionObserverAdapter;
+import pattern.ExceptionSubject;
 import pattern.LogObserverAdapter;
 import view.LoginView;
 
-public class LoginController {
+public class LoginController extends ExceptionSubject {
 	
 	private static LoginController me;
 	private LoginController() { 
 		repo = new UserRepository(DataSource.readOnly()); 
 		new LogObserverAdapter(LoginView.instance()).setSubject(Priviledge.instance());
+		new ExceptionObserverAdapter(LoginView.instance()).setSubject(this);
 	}
 	public static synchronized LoginController instance() {
 		if (me == null) me = new LoginController();
@@ -29,7 +32,8 @@ public class LoginController {
 		new Thread(new Runnable() { 
 			@Override 
 			public void run() { 
-				repo.logUser(param0, param1); 
+				try { repo.logUser(param0, param1); }
+				catch (Exception e) { setState(e); }
 			} 
 		}).start();
 	}

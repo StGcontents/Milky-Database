@@ -21,6 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
+import javax.swing.SwingUtilities;
 
 import controller.GalaxySearchController;
 import model.AdaptableValue;
@@ -97,19 +98,25 @@ public class GalaxyView extends View {
 	}
 	
 	public void populate(List<AdaptableValue> values) {
-		DefaultListModel<AdaptableValue> model = (DefaultListModel<AdaptableValue>) results.getModel(); 
-		model.clear();
-		if (values != null) 
-			for (AdaptableValue value : values) model.addElement(value);
-		
-		searchBtn.setEnabled(true);
+		final List<AdaptableValue> arg0 = values; 
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+		    	results.clearSelection();
+		    	DefaultListModel<AdaptableValue> model = (DefaultListModel<AdaptableValue>) results.getModel();
+		        model.clear();
+		        if (arg0 != null) 
+					for (AdaptableValue value : arg0) 
+						model.addElement(value);
+		        searchBtn.setEnabled(true);
+		    }
+		});
 	}
 	
 	private void initResultPanel() { 
 		resultPanel = (JPanel) GalaxyInfoView.instance().generateView();
 		searchPanel.add(resultPanel);
 		SpringLayout layout = (SpringLayout) searchPanel.getLayout();
-		layout.putConstraint(SpringLayout.NORTH, resultPanel, 150, SpringLayout.SOUTH, results.getParent());
+		layout.putConstraint(SpringLayout.NORTH, resultPanel, 0, SpringLayout.SOUTH, scrollPane);
 		layout.putConstraint(SpringLayout.WEST, resultPanel, 25, SpringLayout.WEST, searchPanel);
 		layout.putConstraint(SpringLayout.EAST, resultPanel, -25, SpringLayout.EAST, searchPanel);
 		layout.putConstraint(SpringLayout.SOUTH, resultPanel, -25, SpringLayout.SOUTH, searchPanel);

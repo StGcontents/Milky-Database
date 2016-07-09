@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -11,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
@@ -65,6 +67,16 @@ public class MainView {
 		model.addElement("Line flux calculations");
 		list.setModel(model);
 		list.addListSelectionListener(MainController.instance());
+		list.setCellRenderer(new NicerCellRenderer<String>() {
+			@Override
+			public Component getListCellRendererComponent(JList<? extends String> arg0, String arg1, int arg2,
+					boolean arg3, boolean arg4) {
+				// TODO Auto-generated method stub
+				JLabel label = (JLabel) super.getListCellRendererComponent(arg0, arg1, arg2, arg3, arg4);
+				label.setText(arg1);
+				return label;
+			}
+		});
 		frame.add(list);
 		
 		panel = new Panel(new GridLayout(1, 1));

@@ -1,5 +1,10 @@
 package controller;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
@@ -7,7 +12,7 @@ import model.Priviledge;
 
 public abstract class DataSource {
 	
-	private static String URI = "jdbc:postgresql://localhost/galaxy";
+	private static String URI;// = "jdbc:postgresql://localhost/galaxy";
 	public static final int ADMIN = 0, COMMON = 1, READONLY = 2, INVALID = -1;
 	
 	public static synchronized DataSource instance(int priviledgeLevel) {
@@ -17,12 +22,28 @@ public abstract class DataSource {
 			return null;
 		}
 		
+		try {
+			if (URI == null) {
+				BufferedReader reader = new BufferedReader(new FileReader(new File("./res/config.txt")));
+				URI = reader.readLine();
+				reader.close();
+			}
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
 		switch (priviledgeLevel) {
-		case 0: //Administrator
+		case ADMIN: //Administrator
 			return AdminDataSource.instance();
-		case 1: //Common user
+		case COMMON: //Common user
 			return CommonDataSource.instance();
-		case 2: default:
+		case READONLY: default:
 			return ReadOnlyDataSource.instance();
 		}
 	}

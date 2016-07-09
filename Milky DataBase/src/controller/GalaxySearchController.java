@@ -91,6 +91,7 @@ public class GalaxySearchController extends ExceptionSubject implements ListSele
 		ListSelectionModel listModel = list.getSelectionModel();
 		if (!listModel.isSelectionEmpty()) {
 			int min = listModel.getMinSelectionIndex();
+			if (min < 0) return;
 			int max = listModel.getMaxSelectionIndex();
 			int i;
 			for (i = min; i <= max; ++i) {

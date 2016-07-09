@@ -20,6 +20,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.sql.SQLException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
@@ -201,8 +202,12 @@ public class LoginView extends View {
 
 	@Override
 	public void showError(Exception e) {
-		// TODO Auto-generated method stub
+		if (e instanceof SQLException)
+			label.setText("Cannot reach server.");
+		else 
+			label.setText("An error occurred.");
 	}
+	
 	@Override
 	protected void reset() {
 		// TODO Auto-generated method stub
