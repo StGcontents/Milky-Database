@@ -26,7 +26,7 @@ public abstract class NicerCellRenderer<E> implements ListCellRenderer<E> {
 		};
 		
 		label.setBorder(new EmptyBorder(new Insets(5, 5, 5, 5)));
-		label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 14));
+		label.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 12));
 		label.setOpaque(true);
 		
 		JList.DropLocation location = arg0.getDropLocation();

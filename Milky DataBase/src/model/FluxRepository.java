@@ -10,6 +10,7 @@ import java.util.List;
 import controller.DataSource;
 import controller.FluxFactory;
 import pattern.Subject;
+import pattern.ViewSubject;
 
 public class FluxRepository extends Repository {
 	
@@ -221,7 +222,7 @@ public class FluxRepository extends Repository {
 		return statement;
 	}
 	
-	protected class StatisticsSubject extends Subject<Statistics> {
+	protected class StatisticsSubject extends ViewSubject<Statistics> {
 
 		private Statistics stats;
 		protected void setState(Statistics stats) {
@@ -235,7 +236,7 @@ public class FluxRepository extends Repository {
 		}
 	}
 	
-	protected class FillerSubject extends Subject<Void> {
+	protected class FillerSubject extends ViewSubject<Void> {
 		@Override public Void retrieveState() { return null; }
 	}
 }

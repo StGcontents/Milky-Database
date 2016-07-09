@@ -21,7 +21,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
-import javax.swing.SwingUtilities;
 
 import controller.GalaxySearchController;
 import model.AdaptableValue;
@@ -98,18 +97,15 @@ public class GalaxyView extends View {
 	}
 	
 	public void populate(List<AdaptableValue> values) {
-		final List<AdaptableValue> arg0 = values; 
-		SwingUtilities.invokeLater(new Runnable() {
-		    public void run() {
-		    	results.clearSelection();
-		    	DefaultListModel<AdaptableValue> model = (DefaultListModel<AdaptableValue>) results.getModel();
-		        model.clear();
-		        if (arg0 != null) 
-					for (AdaptableValue value : arg0) 
-						model.addElement(value);
-		        searchBtn.setEnabled(true);
-		    }
-		});
+		results.clearSelection();
+		DefaultListModel<AdaptableValue> model = (DefaultListModel<AdaptableValue>) results.getModel();
+		
+		model.clear();
+		if (values != null) 
+			for (AdaptableValue value : values) 
+				model.addElement(value);
+		
+		searchBtn.setEnabled(true);
 	}
 	
 	private void initResultPanel() { 

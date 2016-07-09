@@ -1,6 +1,6 @@
 package pattern;
 
-public class ExceptionSubject extends Subject<Exception> {
+public class ExceptionSubject extends ViewSubject<Exception> {
 	
 	private Exception state;
 	

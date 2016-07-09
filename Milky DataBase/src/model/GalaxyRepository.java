@@ -12,16 +12,17 @@ import controller.GalaxyFactory;
 import model.Galaxy.Coordinates;
 import model.Galaxy.Luminosity;
 import pattern.Subject;
+import pattern.ViewSubject;
 
 @SuppressWarnings("rawtypes")
 public class GalaxyRepository extends Repository {
 	
-	private GalaxyNameAdapter nameSubject;
-	private GalaxyAdapter galaxySubject;
+	private GalaxyNameSubjectAdapter nameSubject;
+	private GalaxySubjectAdapter galaxySubject;
 	public GalaxyRepository(DataSource dataSource) {
 		this.dataSource = dataSource;
-		nameSubject = new GalaxyNameAdapter();
-		galaxySubject = new GalaxyAdapter();
+		nameSubject = new GalaxyNameSubjectAdapter();
+		galaxySubject = new GalaxySubjectAdapter();
 	}
 	
 	public Subject<List<AdaptableValue>> getNameSubject() { return this.nameSubject; }
@@ -240,11 +241,11 @@ public class GalaxyRepository extends Repository {
 		nameSubject.setState(results);
 	}
 	
-	class GalaxyNameAdapter extends Subject<List<AdaptableValue>> {
+	class GalaxyNameSubjectAdapter extends ViewSubject<List<AdaptableValue>> {
 		
 		List<AdaptableValue> results;
 		
-		protected GalaxyNameAdapter() {
+		protected GalaxyNameSubjectAdapter() {
 			results = new ArrayList<>();
 		}
 		
@@ -260,7 +261,7 @@ public class GalaxyRepository extends Repository {
 		}
 	}
 	
-	class GalaxyAdapter extends Subject<Galaxy> {
+	class GalaxySubjectAdapter extends ViewSubject<Galaxy> {
 		
 		Galaxy result;
 		

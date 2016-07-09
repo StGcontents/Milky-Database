@@ -1,10 +1,12 @@
 package view;
 
+import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Label;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,43 +14,33 @@ import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SpringLayout;
 
 import controller.HeavyTaskController;
-import model.Priviledge;
 import model.Statistics;
-import pattern.Observer;
 
-public class HeavyTaskView {
+public class HeavyTaskView extends View {
 	
 	private static HeavyTaskView me;
+	private HeavyTaskView() { }
 	public static synchronized HeavyTaskView instance() {
-		int currentPriviledgeLevel = Priviledge.instance().retrieveState();
-		if (me == null || me.lastPriviledgeLevel != currentPriviledgeLevel) {
+		if (me == null) 
 			me = new HeavyTaskView();
-			me.lastPriviledgeLevel = currentPriviledgeLevel;
-		}
 		return me;
 	}
 	
-	private int lastPriviledgeLevel;
-	private Panel taskPanel;
+	private JPanel taskPanel;
 	private JRadioButton allBox, cBox, _3x3Box, _5x5Box, s1Box;
 	private SpectreGroup spectralGroup;
 	private JLabel avgLabel, stddevLabel, medLabel, madLabel;
-	private StatisticsObserver observer;
 	private JButton taskBtn;
 	
-	public Observer<Statistics> getObserver() { return observer; }
-
-	public HeavyTaskView() {
-		observer = new StatisticsObserver(this);
-	}
-	
-	public Panel generatePanel() {
+	@Override
+	public Container generateView() {
 		if (taskPanel == null) {
-			taskPanel = new Panel();
+			taskPanel = new JPanel();
 			SpringLayout layout = new SpringLayout();
 			taskPanel.setLayout(layout);
 			
@@ -196,17 +188,19 @@ public class HeavyTaskView {
 		return taskPanel;
 	}
 	
-	private void reset() {
+	@Override
+	protected void reset() {
 		s1Box.setSelected(true);
 		allBox.setSelected(true);
 		
 		avgLabel.setText(null);
+		avgLabel.setForeground(stddevLabel.getBackground());
 		stddevLabel.setText(null);
 		medLabel.setText(null);
 		madLabel.setText(null);
 	}
 	
-	private void update(Statistics stats) {
+	public void update(Statistics stats) {
 		if (stats == null) 
 			avgLabel.setText("No values found");
 		else {
@@ -217,18 +211,6 @@ public class HeavyTaskView {
 		}
 		
 		taskBtn.setEnabled(true);
-	}
-	
-	protected class StatisticsObserver extends Observer<Statistics> {
-		private HeavyTaskView adaptee;
-		protected StatisticsObserver(HeavyTaskView adaptee) {
-			this.adaptee = adaptee;
-		}
-		
-		@Override
-		public void stateChanged() {
-			adaptee.update(subject.retrieveState());
-		}
 	}
 	
 	@SuppressWarnings("serial")
@@ -247,5 +229,14 @@ public class HeavyTaskView {
 					return b.getText();
 			return null;
 		}
+	}
+
+	@Override
+	public void showError(Exception e) {
+		avgLabel.setForeground(Color.RED);
+		if (e instanceof SQLException)
+			avgLabel.setText("Cannot reach server.");
+		else 
+			avgLabel.setText("An error occurred.");
 	}
 }

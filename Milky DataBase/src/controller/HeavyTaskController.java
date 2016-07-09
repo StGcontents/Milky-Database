@@ -1,32 +1,32 @@
 package controller;
 
-import java.awt.Panel;
+import java.awt.Container;
 
 import model.FluxRepository;
-import model.Priviledge;
+import pattern.ExceptionObserverAdapter;
+import pattern.ExceptionSubject;
+import pattern.StatisticsObserverAdapter;
 import view.HeavyTaskView;
 
-public class HeavyTaskController {
+public class HeavyTaskController extends ExceptionSubject {
 	
 	private static HeavyTaskController me;
 	private HeavyTaskController() {
-		priviledgeLevel = Priviledge.instance().retrieveState();
 		repo = new FluxRepository(DataSource.byPriviledge());
+		view = HeavyTaskView.instance();
+		new StatisticsObserverAdapter(view).setSubject(repo.getStatSubject());
+		new ExceptionObserverAdapter(view).setSubject(this);
 	}
 	public static synchronized HeavyTaskController instance() {
-		if (me == null || me.priviledgeLevel != Priviledge.instance().retrieveState()) 
-			me = new HeavyTaskController();
+		if (me == null) me = new HeavyTaskController();
 		return me;
 	}
 	
-	private int priviledgeLevel;
 	private HeavyTaskView view;
 	private FluxRepository repo;
 	
-	public Panel callView() {
-		view = HeavyTaskView.instance();
-		view.getObserver().setSubject(repo.getStatSubject());
-		return view.generatePanel();
+	public Container callView() {
+		return view.generateView();
 	}
 	
 	public void calculate(String spectralGroup, String apertureSize) {
