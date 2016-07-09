@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
@@ -25,7 +26,7 @@ public class MainView {
 	private Label label;
 	private JList<String> list;
 	private int priviledgeLevel;
-	private Panel panel;
+	private Container panel;
 	
 	public MainView(int priviledgeLevel) {
 		this.priviledgeLevel = priviledgeLevel;
@@ -89,17 +90,17 @@ public class MainView {
 		frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 	}
 	
-	public void attachPanel(Panel panel) {
+	public void attachPanel(Container panel) {
 		frame.remove(this.panel);
 		this.panel = panel;
 		frame.add(this.panel);
 		
 		SpringLayout layout = (SpringLayout) frame.getLayout();
 		
-		layout.putConstraint(SpringLayout.EAST, this.panel, -25, SpringLayout.EAST, frame);
-		layout.putConstraint(SpringLayout.NORTH, this.panel, 25, SpringLayout.NORTH, frame);
-		layout.putConstraint(SpringLayout.SOUTH, this.panel, -25, SpringLayout.SOUTH, frame);
-		layout.putConstraint(SpringLayout.WEST, this.panel, 25, SpringLayout.EAST, list);
+		layout.putConstraint(SpringLayout.EAST, this.panel, 0, SpringLayout.EAST, frame);
+		layout.putConstraint(SpringLayout.NORTH, this.panel, 0, SpringLayout.NORTH, frame);
+		layout.putConstraint(SpringLayout.SOUTH, this.panel, 0, SpringLayout.SOUTH, frame);
+		layout.putConstraint(SpringLayout.WEST, this.panel, 0, SpringLayout.EAST, list);
 		
 		frame.validate();
 	}

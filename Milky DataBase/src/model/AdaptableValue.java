@@ -43,19 +43,26 @@ public abstract class AdaptableValue<T> {
 	
 	protected static abstract class DoubleValue extends AdaptableValue<Double> {
 		protected DoubleValue(String name, double parameter) { super(name, parameter); }
+		protected double precision;
 		protected double truncatedValue() {
 			double d = Math.floor(parameter); 
-			return d + Math.floor((parameter - d) * 100) / 100.0;
+			return d + Math.floor((parameter - d) * precision) / precision;
 		}
 	}
 	
 	private static class DistanceValue extends DoubleValue {
-		protected DistanceValue(String name, double distance) { super(name, distance); }
+		protected DistanceValue(String name, double distance) { 
+			super(name, distance);
+			precision = 10000.0;
+		}
 		@Override protected String parseParameter() { return " (distance from center: " + truncatedValue() + ")"; }
 	}
 	
 	private static class RedshiftValue extends DoubleValue {
-		protected RedshiftValue(String name, double redshift) { super(name, redshift); }
+		protected RedshiftValue(String name, double redshift) { 
+			super(name, redshift);
+			precision = 1000000.0;
+		}
 		@Override protected String parseParameter() { return " (redshift value: " + truncatedValue() + ")"; }
 	}
 }

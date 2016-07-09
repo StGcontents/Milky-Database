@@ -119,7 +119,7 @@ public class FluxRepository extends Repository {
 	public void calculate(String spectralGroup, String apertureSize) throws Exception {
 		Connection connection = dataSource.getConnection();
 		connection.setAutoCommit(false);
-		
+		System.out.println("CIAO");
 		String viewQuery = 
 				"CREATE TEMP VIEW group_galaxy AS "
 				+ "SELECT name "
@@ -138,15 +138,19 @@ public class FluxRepository extends Repository {
 		if (apertureSize != null) 
 			viewQuery += "LF1.aperture LIKE '" + apertureSize 
 				 + "' AND LF2.aperture LIKE '" + apertureSize + "' AND ";
+		else 
+			viewQuery += "(LF1.aperture LIKE 'c' OR LF1.aperture LIKE '3x3' OR LF1.aperture LIKE '5x5') AND " 
+			 + "(LF2.aperture LIKE 'c' OR LF2.aperture LIKE '3x3' OR LF2.aperture LIKE '5x5') AND ";
 		viewQuery += "(LF1.galaxy <> LF2.galaxy OR LF1.ion <> LF2.ion OR LF1.aperture <> LF2.aperture);";
 
 		Statement viewStatement = connection.createStatement();
 		viewStatement.execute(viewQuery);
 		release(viewStatement);
 		
+		System.out.println("CIAONE");
+		
 		String avgQuery = "SELECT avg(RATIO), stddev(RATIO), count(DISTINCT RATIO) FROM flux_ratio";
 		PreparedStatement avgStatement = connection.prepareStatement(avgQuery);
-		
 		ResultSet avgSet = avgStatement.executeQuery();
 		double avg, stddev;
 		int cnt;
@@ -165,7 +169,7 @@ public class FluxRepository extends Repository {
 		avg = avgSet.getDouble(1);
 		stddev = avgSet.getDouble(2);
 		release(avgStatement, avgSet);
-		
+		System.out.println("CIAO PAOLO");
 		String medQuery = 
 				"SELECT RATIO "
 			  + "FROM (SELECT row_number() OVER (ORDER BY RATIO) AS ROW, RATIO "
@@ -184,7 +188,7 @@ public class FluxRepository extends Repository {
 		med = medSet.getDouble(1);
 		if (medSet.next()) med = (med + medSet.getDouble(1)) / 2.0;
 		release(medStatement, medSet);
-		
+		System.out.println("CIAO MAMMA");
 		String madQuery = 
 				"SELECT M.MAD FROM "
 				+ "(SELECT RA.MAD, row_number() OVER (ORDER BY RA.MAD) AS ROW "
@@ -206,10 +210,10 @@ public class FluxRepository extends Repository {
 		Statement dropStatement = connection.createStatement();
 		dropStatement.execute(drop);
 		release(dropStatement);
-		
+		System.out.println("CIAO CIAO");
 		connection.commit();		
 		release(connection);
-		
+		System.out.println("CIAO ME NE VADO");
 		statSubject.setState(new Statistics(avg, stddev, med, mad));
 	}
 	

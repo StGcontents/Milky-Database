@@ -1,11 +1,12 @@
 package view;
 
-import java.awt.TextField;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.JTextArea;
+
 @SuppressWarnings("serial")
-public abstract class NumericTextField<T extends Number> extends TextField {
+public abstract class NumericTextField<T extends Number> extends JTextArea {
 	protected String values;
 	public abstract T getValue() ;
 	protected void addListener() {
@@ -13,7 +14,10 @@ public abstract class NumericTextField<T extends Number> extends TextField {
 			
 			@Override
 			public void keyTyped(KeyEvent e) {
+				
 				e.consume();
+				
+				if (e.isActionKey()) return;
 				
 				Character c = e.getKeyChar();
 				

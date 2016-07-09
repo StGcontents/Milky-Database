@@ -1,14 +1,18 @@
 package view;
 
-import java.awt.Button;
-import java.awt.Checkbox;
-import java.awt.CheckboxGroup;
 import java.awt.Dimension;
 import java.awt.Label;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 import javax.swing.SpringLayout;
 
 import controller.HeavyTaskController;
@@ -30,11 +34,11 @@ public class HeavyTaskView {
 	
 	private int lastPriviledgeLevel;
 	private Panel taskPanel;
-	private Checkbox allBox, cBox, _3x3Box, _5x5Box, s1Box;
-	private CheckboxGroup spectralGroup;
-	private Label avgLabel, stddevLabel, medLabel, madLabel;
+	private JRadioButton allBox, cBox, _3x3Box, _5x5Box, s1Box;
+	private SpectreGroup spectralGroup;
+	private JLabel avgLabel, stddevLabel, medLabel, madLabel;
 	private StatisticsObserver observer;
-	private Button taskBtn;
+	private JButton taskBtn;
 	
 	public Observer<Statistics> getObserver() { return observer; }
 
@@ -49,24 +53,36 @@ public class HeavyTaskView {
 			taskPanel.setLayout(layout);
 			
 			Label apertureLabel = new Label("Choose aperture size:");
-			CheckboxGroup apertureGroup = new CheckboxGroup();
-			allBox = new Checkbox("All", apertureGroup, true);
-			cBox = new Checkbox("c", apertureGroup, false);
-			_3x3Box = new Checkbox("3x3", apertureGroup, false);
-			_5x5Box = new Checkbox("5x5", apertureGroup, false);
+			ButtonGroup apertureGroup = new ButtonGroup();
+			allBox = new JRadioButton("All", true);
+			cBox = new JRadioButton("c", false);
+			_3x3Box = new JRadioButton("3x3", false);
+			_5x5Box = new JRadioButton("5x5", false);
+			apertureGroup.add(allBox);
+			apertureGroup.add(cBox);
+			apertureGroup.add(_3x3Box);
+			apertureGroup.add(_5x5Box);
 			
-			Label spectralLabel = new Label("Choose spectral group:"); 
-			spectralGroup = new CheckboxGroup();
-			s1Box = new Checkbox("S1", spectralGroup, true);
-			Checkbox s1_5Box = new Checkbox("S1.5", spectralGroup, false);
-			Checkbox s1_8Box = new Checkbox("S1.8", spectralGroup, false);
-			Checkbox s1_9Box = new Checkbox("S1.9", spectralGroup, false);
-			Checkbox s1hBox = new Checkbox("S1h", spectralGroup, false);
-			Checkbox s2Box = new Checkbox("S2", spectralGroup, false);
-			Checkbox linBox = new Checkbox("LIN", spectralGroup, false);
-			Checkbox dwarfBox = new Checkbox("DWARF", spectralGroup, false);
+			JLabel spectralLabel = new JLabel("Choose spectral group:"); 
+			spectralGroup = new SpectreGroup();
+			s1Box = new JRadioButton("S1", true);
+			JRadioButton s1_5Box = new JRadioButton("S1.5", false);
+			JRadioButton s1_8Box = new JRadioButton("S1.8", false);
+			JRadioButton s1_9Box = new JRadioButton("S1.9", false);
+			JRadioButton s1hBox = new JRadioButton("S1h", false);
+			JRadioButton s2Box = new JRadioButton("S2", false);
+			JRadioButton linBox = new JRadioButton("LIN", false);
+			JRadioButton dwarfBox = new JRadioButton("DWARF", false);
+			spectralGroup.add(s1Box);
+			spectralGroup.add(s1_5Box);
+			spectralGroup.add(s1_8Box);
+			spectralGroup.add(s1_9Box);
+			spectralGroup.add(s1hBox);
+			spectralGroup.add(s2Box);
+			spectralGroup.add(linBox);
+			spectralGroup.add(dwarfBox);
 			
-			taskBtn = new Button("Calculate");
+			taskBtn = new JButton("Calculate");
 			taskBtn.addActionListener(new ActionListener() {
 				
 				@Override
@@ -79,20 +95,20 @@ public class HeavyTaskView {
 					taskBtn.setEnabled(false);
 					
 					String apertureSize = null;
-					if (cBox.getState()) apertureSize = "c";
-					if (_3x3Box.getState()) apertureSize = "3x3";
-					if (_5x5Box.getState()) apertureSize = "5x5";
-					HeavyTaskController.instance().calculate(spectralGroup.getSelectedCheckbox().getLabel(), apertureSize);
+					if (cBox.isSelected()) apertureSize = "c";
+					if (_3x3Box.isSelected()) apertureSize = "3x3";
+					if (_5x5Box.isSelected()) apertureSize = "5x5";
+					HeavyTaskController.instance().calculate(spectralGroup.getSelectedText(), apertureSize);
 				}
 			});
 			
-			avgLabel = new Label();
+			avgLabel = new JLabel();
 			avgLabel.setPreferredSize(new Dimension(300, 20));
-			stddevLabel = new Label();
+			stddevLabel = new JLabel();
 			stddevLabel.setPreferredSize(new Dimension(300, 20));
-			medLabel = new Label();
+			medLabel = new JLabel();
 			medLabel.setPreferredSize(new Dimension(300, 20));
-			madLabel = new Label();
+			madLabel = new JLabel();
 			madLabel.setPreferredSize(new Dimension(300, 20));
 			
 			taskPanel.add(spectralLabel);
@@ -181,8 +197,8 @@ public class HeavyTaskView {
 	}
 	
 	private void reset() {
-		s1Box.setState(true);
-		allBox.setState(true);
+		s1Box.setSelected(true);
+		allBox.setSelected(true);
 		
 		avgLabel.setText(null);
 		stddevLabel.setText(null);
@@ -212,6 +228,24 @@ public class HeavyTaskView {
 		@Override
 		public void stateChanged() {
 			adaptee.update(subject.retrieveState());
+		}
+	}
+	
+	@SuppressWarnings("serial")
+	private class SpectreGroup extends ButtonGroup {
+		private List<AbstractButton> buttons = new ArrayList<>();
+
+		@Override
+		public void add(AbstractButton b) {
+			super.add(b);
+			buttons.add(b);
+		}
+		
+		public String getSelectedText() {
+			for (AbstractButton b : buttons) 
+				if (b.isSelected())
+					return b.getText();
+			return null;
 		}
 	}
 }

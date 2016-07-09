@@ -13,7 +13,8 @@ public class AddUserController {
 	
 	private AddUserController() { 
 		repo = new UserRepository(DataSource.byPriviledge());
-		view = new AddUserView();
+		view = AddUserView.instance();
+		view.getExceptionObserver().setSubject(repo.getExceptionSubject());
 	}
 	
 	public static synchronized AddUserController instance() {
@@ -27,11 +28,16 @@ public class AddUserController {
 		return view.generateView();
 	}
 	
-	public void addUser(String userID, String password, String name, String surname, String mail) throws Exception {
+	public void addUser(String userID, String password, String name, String surname, String mail) {
 		
-		User user = new User(userID, password, name, surname, mail, false);
-		
-		repo.persistUser(user);
-
+		final String param0 = userID, param1 = password, param2 = name, param3 = surname, param4 = mail;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				User user = UserFactory.instance().create(param0, param1, param2, param3, param4);
+				try { repo.persistUser(user); }
+				catch (Exception e) { repo.getExceptionSubject().setState(e); }
+			}
+		}).start();
 	}
 }

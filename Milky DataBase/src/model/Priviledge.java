@@ -20,5 +20,4 @@ public class Priviledge extends Subject<Integer> {
 	}
 
 	@Override public Integer retrieveState() { return getPriviledge(); }
-
 }

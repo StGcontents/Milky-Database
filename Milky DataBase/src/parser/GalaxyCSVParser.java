@@ -41,8 +41,8 @@ public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 						spectre = parseName(nextLine[11]);
 				List<Integer> intValues = new ArrayList<>();
 				List<Double> doubleValues = new ArrayList<>();
-				boolean sign = parseSimbol(nextLine[4], "+"), 
-						upper = false;
+				boolean sign = parseSimbol(nextLine[4], "+");
+				Double lum = null;
 				Luminosity[] luminosities = new Luminosity[3];
 				String[] alternativeNames = parseAlterNames(nextLine[25]);
 
@@ -55,12 +55,12 @@ public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 					else if (DOUBLE_ENUM.contains(i)) 
 						doubleValues.add(parseDouble(s));
 					else if (i >= 16 && i <= 21) {
-						if (i % 2 == 0) 
-							upper = parseSimbol(s, "<");
+						if (i % 2 == 0) {
+							lum = parseDouble(s);
+						}
 						else {
-							Double d = parseDouble(s);
-							if (d == null) continue;
-							else luminosities[(i - 17) / 2] = new Luminosity(d, upper);
+							if (lum == null) continue;
+							else luminosities[(i - 17) / 2] = new Luminosity(lum, parseSimbol(s, "<"));
 						}
 					}
 				}

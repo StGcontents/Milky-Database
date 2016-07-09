@@ -1,8 +1,5 @@
 package view;
 
-import java.awt.Button;
-import java.awt.Checkbox;
-import java.awt.CheckboxGroup;
 import java.awt.Dimension;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
@@ -13,7 +10,11 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerListModel;
 import javax.swing.SpringLayout;
@@ -34,9 +35,10 @@ public class GalaxyPanel extends Panel {
 	private JLabel nameLabel, rightAscLabel, declinationLabel, distanceLabel, 
 				   redShiftLabel, spectreLabel, lumLabel, metallicityLabel,
 				   spinnerLabel, lineLabel, continuousLabel, conRatioLabel, lineRatioLabel;
-	private Button fluxBtn;
+	private JButton fluxBtn;
 	private JSpinner searchSpinner, ratioSpinner;
-	private Checkbox cBox, _3x3Box, _5x5Box, hrBox, lrBox, conRatioBox, lineRatioBox, isConBox;
+	private JRadioButton cBox, _3x3Box, _5x5Box, hrBox, lrBox;
+	private JCheckBox conRatioBox, lineRatioBox, isConBox;
 	private SpinnerListModel model, differentModel;
 	
 	protected GalaxyPanel(Galaxy galaxy) {
@@ -85,7 +87,7 @@ public class GalaxyPanel extends Panel {
 			
 			redShiftLabel.setText("Redshift: " + galaxy.getRedShift());
 			distanceLabel.setText("Distance: " + 
-				(galaxy.getDistance() == null ? "/" : galaxy.getDistance().intValue()));
+				(galaxy.getDistance() == null ? "/" : galaxy.getDistance().intValue() + " Mpc"));
 			spectreLabel.setText("Spectral group: " + galaxy.getSpectre());
 			
 			String luminosity = "<html>Luminosity:";
@@ -98,9 +100,9 @@ public class GalaxyPanel extends Panel {
 				
 				if (valueExists) luminosity += ",";
 				else valueExists = true;
-				luminosity += "<br>&#32;&#32;&#32;&#45;&#32;" + ions[i] + " " + lums[i].getValue() + (lums[i].isLimit() ? "[limit]" : "");
+				luminosity += "<br>&#32;&#32;&#32;&#45;&#32;" + ions[i] + " " + lums[i].getValue() + " keV " + (lums[i].isLimit() ? "[limit]" : "");
 			}
-			if (!valueExists) luminosity += "/";
+			if (!valueExists) luminosity += " /";
 			lumLabel.setText(luminosity + "</html>");
 			
 			String metallicity = "Metallicity: ";
@@ -131,15 +133,15 @@ public class GalaxyPanel extends Panel {
 		boolean foundOne = false, 
 				foundDifferent = false, 
 				foundBoth = false,
-				isRequested = lineRatioBox.getState(),
-				isContinuous = isConBox.getState();
+				isRequested = lineRatioBox.isSelected(),
+				isContinuous = isConBox.isSelected();
 		
 		String aperture;
-		if (cBox.getState()) aperture = "c";
-		else if (_3x3Box.getState()) aperture = "3x3";
-		else if (_5x5Box.getState()) aperture = "5x5";
-		else if (hrBox.getState()) aperture = "HR";
-		else if (lrBox.getState()) aperture = "LR";
+		if (cBox.isSelected()) aperture = "c";
+		else if (_3x3Box.isSelected()) aperture = "3x3";
+		else if (_5x5Box.isSelected()) aperture = "5x5";
+		else if (hrBox.isSelected()) aperture = "HR";
+		else if (lrBox.isSelected()) aperture = "LR";
 		else aperture = "HR+LR";
 		
 		while(iterator.hasNext()) {
@@ -164,7 +166,7 @@ public class GalaxyPanel extends Panel {
 		updateFluxLabel(lineLabel, fluxes[0], "Line flux: ");
 		updateFluxLabel(continuousLabel, fluxes[1], "Continuous flux: ");
 		
-		if (conRatioBox.getState()) 
+		if (conRatioBox.isSelected()) 
 			updateContinuousRatioLabel(fluxes[0], fluxes[1]);
 		else conRatioLabel.setText("Line flux/Continuous flux ratio: not requested");
 		
@@ -172,7 +174,7 @@ public class GalaxyPanel extends Panel {
 				otherIon = (Ion) ratioSpinner.getValue(); 
 		String ratioString = ion.toString() + "/" + otherIon.toString() + " flux ratio: ";
 		lineRatioLabel.setText(ratioString);
-		if (lineRatioBox.getState()) 
+		if (lineRatioBox.isSelected()) 
 			updateLineRatioLabel(fluxes[0], ratioFlux);
 		else lineRatioLabel.setText(lineRatioLabel.getText() + " not requested");
 		
@@ -258,7 +260,7 @@ public class GalaxyPanel extends Panel {
 		this.add(metallicityLabel);
 		layout.putConstraint(SpringLayout.WEST, metallicityLabel, 0, SpringLayout.WEST, this);
 		layout.putConstraint(SpringLayout.NORTH, metallicityLabel, 10, SpringLayout.SOUTH, lumLabel);
-		layout.putConstraint(SpringLayout.EAST, metallicityLabel, 25, SpringLayout.HORIZONTAL_CENTER, this);
+		layout.putConstraint(SpringLayout.EAST, metallicityLabel, -25, SpringLayout.HORIZONTAL_CENTER, this);
 	}
 	
 	private void initBasicOptions(SpringLayout layout) {
@@ -277,13 +279,20 @@ public class GalaxyPanel extends Panel {
 		layout.putConstraint(SpringLayout.EAST, searchSpinner, -25, SpringLayout.EAST, this);
 		
 		JLabel apertureLabel = new JLabel("Aperture size/resolution: ");
-		CheckboxGroup apertureGroup = new CheckboxGroup();
-		cBox = new Checkbox("c", apertureGroup, true);
-		_3x3Box = new Checkbox("3x3", apertureGroup, false);
-		_5x5Box = new Checkbox("5x5", apertureGroup, false);
-		hrBox = new Checkbox("HR", apertureGroup, false);
-		lrBox = new Checkbox("LR", apertureGroup, false);
-		Checkbox hrlrBox = new Checkbox("HR+LR", apertureGroup, false);
+		ButtonGroup apertureGroup = new ButtonGroup();
+		cBox = new JRadioButton("c", true);
+		_3x3Box = new JRadioButton("3x3", false);
+		_5x5Box = new JRadioButton("5x5", false);
+		hrBox = new JRadioButton("HR", false);
+		lrBox = new JRadioButton("LR", false);
+		JRadioButton hrlrBox = new JRadioButton("HR+LR", false);
+		apertureGroup.add(cBox);
+		apertureGroup.add(_3x3Box);
+		apertureGroup.add(_5x5Box);
+		apertureGroup.add(hrBox);
+		apertureGroup.add(lrBox);
+		apertureGroup.add(hrlrBox);
+		
 		this.add(apertureLabel);
 		this.add(cBox);
 		this.add(_3x3Box);
@@ -291,6 +300,7 @@ public class GalaxyPanel extends Panel {
 		this.add(hrBox);
 		this.add(lrBox);
 		this.add(hrlrBox);
+		
 		layout.putConstraint(SpringLayout.WEST, apertureLabel, 0, SpringLayout.WEST, spinnerLabel);
 		layout.putConstraint(SpringLayout.NORTH, apertureLabel, 10, SpringLayout.SOUTH, searchSpinner);
 		layout.putConstraint(SpringLayout.WEST, cBox, 0, SpringLayout.WEST, apertureLabel);
@@ -308,12 +318,12 @@ public class GalaxyPanel extends Panel {
 	}
 	
 	private void initRatioOptions(SpringLayout layout) {
-		conRatioBox = new Checkbox("Show line flux / continuous flux ratio");
+		conRatioBox = new JCheckBox("Show line flux / continuous flux ratio");
 		this.add(conRatioBox);
 		layout.putConstraint(SpringLayout.WEST, conRatioBox, 0, SpringLayout.WEST, cBox);
 		layout.putConstraint(SpringLayout.NORTH, conRatioBox, 10, SpringLayout.SOUTH, cBox);
 		
-		lineRatioBox = new Checkbox("Show line flux / line flux ratio (pick a different line)");
+		lineRatioBox = new JCheckBox("Show line flux / line flux ratio (pick a different line)");
 		lineRatioBox.addMouseListener(new MouseListener() {
 			@Override public void mouseReleased(MouseEvent e) { }
 			@Override public void mousePressed(MouseEvent e) { }
@@ -321,8 +331,8 @@ public class GalaxyPanel extends Panel {
 			@Override public void mouseEntered(MouseEvent e) { }
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ratioSpinner.setEnabled(lineRatioBox.getState());
-				isConBox.setEnabled(lineRatioBox.getState());
+				ratioSpinner.setEnabled(lineRatioBox.isSelected());
+				isConBox.setEnabled(lineRatioBox.isSelected());
 			}
 		});
 		this.add(lineRatioBox);
@@ -340,7 +350,7 @@ public class GalaxyPanel extends Panel {
 		layout.putConstraint(SpringLayout.NORTH, ratioSpinner, 0, SpringLayout.NORTH, lineRatioBox);
 		layout.putConstraint(SpringLayout.EAST, ratioSpinner, -25, SpringLayout.EAST, this);
 		
-		isConBox = new Checkbox("Select for continuous flux ratio", false);
+		isConBox = new JCheckBox("Select for continuous flux ratio", false);
 		isConBox.setEnabled(false);
 		this.add(isConBox);
 		layout.putConstraint(SpringLayout.WEST, isConBox, 10, SpringLayout.WEST, lineRatioBox);
@@ -348,7 +358,7 @@ public class GalaxyPanel extends Panel {
 	}
 	
 	private void initButton(SpringLayout layout) {
-		fluxBtn = new Button("Search");
+		fluxBtn = new JButton("Search");
 		fluxBtn.addActionListener(new ActionListener() {
 			
 			@Override

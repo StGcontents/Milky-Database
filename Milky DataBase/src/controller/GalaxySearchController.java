@@ -1,9 +1,8 @@
 package controller;
 
-import java.awt.Panel;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -31,11 +30,11 @@ public class GalaxySearchController implements ListSelectionListener {
 	private GalaxyView view;
 	private GalaxyRepository repo;
 	
-	public Panel callView() {
+	public JPanel callView() {
 		view = GalaxyView.instance();
 		view.getListObserver().setSubject(repo.getNameSubject());
 		view.getGalaxyObserver().setSubject(repo.getGalaxySubject());
-		return view.generateSearchPanel();
+		return view.generateView();
 	}
 	
 	public void searchNames(String partial) {		

@@ -6,11 +6,17 @@ import java.sql.ResultSet;
 
 import controller.DataSource;
 import controller.UserFactory;
+import exception.UserExistsException;
+import pattern.ExceptionSubject;
 
 public class UserRepository extends Repository {
 	
+	private ExceptionSubject subject;
+	public ExceptionSubject getExceptionSubject() { return this.subject; }
+	
 	public UserRepository(DataSource dataSource) {
 		this.dataSource = dataSource;
+		subject = new ExceptionSubject();
 	}	
 	
 	public User retrieveUserById(String userID) throws Exception {
@@ -56,21 +62,37 @@ public class UserRepository extends Repository {
 	}
 	
 	public void persistUser(User user) throws Exception {
-		
 		Connection connection = dataSource.getConnection();
+		connection.setAutoCommit(false);
 		
-		String insert = "INSERT INTO user_admin(id , password , name , surname , mail,is_admin) "
-				+ "values (?, ?, ?, ?, ?, ?)";
-		PreparedStatement statement = connection.prepareStatement(insert);
+		String check = "SELECT count(*) FROM user_admin WHERE id LIKE ?";
 		
-		statement.setString(1, user.getId());
-		statement.setString(2, user.getPassword());
-		statement.setString(3, user.getName());
-		statement.setString(4, user.getSurname());
-		statement.setString(5, user.getMail());
-		statement.setBoolean(6, user.isAdmin());
+		PreparedStatement qStatement = connection.prepareStatement(check);
+		qStatement.setString(1, user.getId());
+		ResultSet set = qStatement.executeQuery();
+		
+		set.next();
+		if (set.getInt(1) == 0) {
+			String insert = "INSERT INTO user_admin(id , password , name , surname , mail,is_admin) "
+					+ "values (?, ?, ?, ?, ?, ?)";
+			PreparedStatement statement = connection.prepareStatement(insert);
+		
+			statement.setString(1, user.getId());
+			statement.setString(2, user.getPassword());
+			statement.setString(3, user.getName());
+			statement.setString(4, user.getSurname());
+			statement.setString(5, user.getMail());
+			statement.setBoolean(6, user.isAdmin());
 	
-		statement.executeUpdate();
-		release(connection, statement);
+			statement.executeUpdate();
+			
+			release(statement);
+		}
+		else throw new UserExistsException();
+		
+		connection.commit();
+		release(connection, qStatement, set);
+		
+		subject.setState(null);
 	}
 }

@@ -1,48 +1,49 @@
 package controller;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import model.User;
 
 public class UserFactory extends AbstractFactory<User> {
-	
+
 	private static UserFactory me;
-	private UserFactory() { }
+
+	private UserFactory() {
+	}
+
 	public static synchronized UserFactory instance() {
-		if (me == null) me = new UserFactory();
+		if (me == null)
+			me = new UserFactory();
 		return me;
 	}
 
 	@Override
-	public List<User> create(ResultSet set) {
+	public List<User> create(ResultSet set) throws SQLException {
 		List<User> users = new ArrayList<>();
-		try {
-			while (set.next()) {
-				try {
-					User user = new User();
-					user.setId(set.getString(1));
-					user.setName(set.getString(2));
-					user.setSurname(set.getString(3));
-					user.setPassword(set.getString(4));
-					user.setMail(set.getString(5));
-					user.setAdmin(set.getBoolean(6));
-					
-					users.add(user);
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-					continue;
-				}
-			}
+		while (set.next()) {
+			String id = set.getString(1), name = set.getString(2), surname = set.getString(3),
+					password = set.getString(4), mail = set.getString(5);
+
+			User user = create(id, password, name, surname, mail);
+			users.add(user);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+
 		return users;
 	}
-	
 
+	public User create(String id, String password, String name, String surname, String mail) {
+		User user = new User();
+
+		user.setId(id);
+		user.setPassword(password);
+		user.setName(name);
+		user.setSurname(surname);
+		user.setMail(mail);
+		user.setAdmin(false);
+
+		return user;
+	}
 }

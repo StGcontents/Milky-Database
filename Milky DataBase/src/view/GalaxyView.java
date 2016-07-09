@@ -1,21 +1,22 @@
 package view;
 
-import java.awt.Button;
-import java.awt.Checkbox;
-import java.awt.CheckboxGroup;
 import java.awt.Dimension;
-import java.awt.Label;
 import java.awt.Panel;
-import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
 
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpringLayout;
 
@@ -27,7 +28,7 @@ import model.Priviledge;
 import pattern.Observer;
 
 @SuppressWarnings("rawtypes")
-public class GalaxyView {
+public class GalaxyView extends View {
 	
 	private static GalaxyView me;
 	public static synchronized GalaxyView instance() {
@@ -39,15 +40,15 @@ public class GalaxyView {
 		return me;
 	}
 	private int lastPriviledgeLevel;
-	private Panel searchPanel;
+	private JPanel searchPanel, distancePanel, redshiftPanel;
 	private GalaxyPanel resultPanel;
-	private Checkbox nameBox, coordBox, redShiftBox, rsHigherBox, rsLowerBox, plusBox, minusBox;
-	private TextField nameField;
+	private JRadioButton nameBox, coordBox, redshiftBox, rsHigherBox, rsLowerBox, plusBox, minusBox;
+	private JTextArea nameField;
 	private DoubleTextField redshiftField, secondsField, arcsecField, rangeField;
 	private IntTextField rsLimitField, dLimitField, hoursField, minField, degreesField, arcminField;
 	private JList<AdaptableValue> results;
 	private JScrollPane scrollPane;
-	private Button searchBtn;
+	private JButton searchBtn;
 	
 	private ListObserverAdapter listObserver;
 	private GalaxyObserverAdapter galaxyObserver;
@@ -63,10 +64,11 @@ public class GalaxyView {
 	public Observer<Galaxy> getGalaxyObserver() { return this.galaxyObserver; }
 	public Observer<Void> getFluxObserver() { return this.fluxObserver; }
 	
-	public Panel generateSearchPanel() {
+	@Override
+	public JPanel generateView() {
 		if (searchPanel == null) {
 			SpringLayout layout = new SpringLayout();
-			searchPanel = new Panel();
+			searchPanel = new JPanel();
 			searchPanel.setLayout(layout);
 			
 			initCheckboxes(layout);
@@ -84,18 +86,19 @@ public class GalaxyView {
 		return searchPanel;
 	}
 	
-	private void reset() {
-		nameBox.setState(false);
-		coordBox.setState(false);
-		redShiftBox.setState(false);
+	@Override
+	protected void reset() {
+		nameBox.setSelected(false);
+		coordBox.setSelected(false);
+		redshiftBox.setSelected(false);
 		
 		nameField.setText(null);
 		
 		hoursField.setText(null);
 		minField.setText(null);
 		secondsField.setText(null);
-		plusBox.setState(true);
-		minusBox.setState(false);
+		plusBox.setSelected(true);
+		minusBox.setSelected(false);
 		degreesField.setText(null);
 		arcminField.setText(null);
 		arcsecField.setText(null);
@@ -131,23 +134,25 @@ public class GalaxyView {
 	public boolean updateFluxes() { return resultPanel.updateFluxes(); }
 	
 	private void initCheckboxes(SpringLayout layout) {
-		CheckboxGroup group = new CheckboxGroup();
-		nameBox = new Checkbox("Search by name", group, false);
+		ButtonGroup group = new ButtonGroup();
+		nameBox = new JRadioButton("Search by name", false);
 		nameBox.setName("name");
-		coordBox = new Checkbox("Search in range", group, false);
+		coordBox = new JRadioButton("Search in range", false);
 		coordBox.setName("coord");
-		redShiftBox = new Checkbox("Search by red shift value", group, false);
-		redShiftBox.setName("redshift");
+		redshiftBox = new JRadioButton("Search by red shift value", false);
+		redshiftBox.setName("redshift");
+		
+		group.add(nameBox);
+		group.add(coordBox);
+		group.add(redshiftBox);
 		
 		nameBox.addItemListener(new OptionCheckListener(0));
 		coordBox.addItemListener(new OptionCheckListener(1));
-		redShiftBox.addItemListener(new OptionCheckListener(2));
-		
-		group.setSelectedCheckbox(null);
+		redshiftBox.addItemListener(new OptionCheckListener(2));
 		
 		searchPanel.add(nameBox);
 		searchPanel.add(coordBox);
-		searchPanel.add(redShiftBox);
+		searchPanel.add(redshiftBox);
 		
 		layout.putConstraint(SpringLayout.NORTH, nameBox, 25, SpringLayout.NORTH, searchPanel);
 		layout.putConstraint(SpringLayout.WEST, nameBox, 25, SpringLayout.WEST, searchPanel);
@@ -155,89 +160,107 @@ public class GalaxyView {
 		layout.putConstraint(SpringLayout.NORTH, coordBox, 10, SpringLayout.SOUTH, nameBox);
 		layout.putConstraint(SpringLayout.WEST, coordBox, 0, SpringLayout.WEST, nameBox);
 		
-		layout.putConstraint(SpringLayout.NORTH, redShiftBox, 10, SpringLayout.SOUTH, coordBox);
-		layout.putConstraint(SpringLayout.WEST, redShiftBox, 0, SpringLayout.WEST, nameBox);
+		layout.putConstraint(SpringLayout.NORTH, redshiftBox, 10, SpringLayout.SOUTH, coordBox);
+		layout.putConstraint(SpringLayout.WEST, redshiftBox, 0, SpringLayout.WEST, nameBox);
 	}
 	
 	private void initSearchByName(SpringLayout layout) {
-		nameField = new TextField();
+		nameField = new JTextArea();
 		nameField.setEnabled(false);
 		searchPanel.add(nameField);
-		layout.putConstraint(SpringLayout.NORTH, nameField, 0, SpringLayout.NORTH, nameBox);
-		layout.putConstraint(SpringLayout.WEST, nameField, 25, SpringLayout.EAST, redShiftBox);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, nameField, 0, SpringLayout.VERTICAL_CENTER, nameBox);
+		layout.putConstraint(SpringLayout.WEST, nameField, 25, SpringLayout.EAST, redshiftBox);
 		layout.putConstraint(SpringLayout.EAST, nameField, -25, SpringLayout.EAST, searchPanel);
 	}
 	
-	private void initSearchByDistance(SpringLayout layout) {
-		Label hLabel = new Label("h");
+	private void initSearchByDistance(SpringLayout extLayout) {
+		
+		distancePanel = new JPanel();
+		SpringLayout layout = new SpringLayout();
+		
+		JLabel hLabel = new JLabel("h");
 		hoursField = new IntTextField();
 		hoursField.setEnabled(false);
-		Label minLabel = new Label("m");
+		hoursField.setPreferredSize(new Dimension(50, 15));
+		JLabel minLabel = new JLabel("m");
 		minField = new IntTextField();
 		minField.setEnabled(false);
-		Label secLabel = new Label("s");
+		minField.setPreferredSize(new Dimension(50, 15));
+		JLabel secLabel = new JLabel("s");
 		secondsField = new DoubleTextField();
 		secondsField.setEnabled(false);
-		CheckboxGroup signGroup = new CheckboxGroup();
-		plusBox = new Checkbox("+", signGroup, true);
+		secondsField.setPreferredSize(new Dimension(80, 15));
+		
+		ButtonGroup signGroup = new ButtonGroup();
+		plusBox = new JRadioButton("+", true);
 		plusBox.setEnabled(false);
-		minusBox = new Checkbox("-", signGroup, false);
+		minusBox = new JRadioButton("-", false);
 		minusBox.setEnabled(false);
+		signGroup.add(plusBox);
+		signGroup.add(minusBox);
+		
 		degreesField = new IntTextField();
 		degreesField.setEnabled(false);
-		Label degLabel = new Label("°");
+		degreesField.setPreferredSize(new Dimension(50, 15));
+		JLabel degLabel = new JLabel("°");
 		arcminField = new IntTextField();
 		arcminField.setEnabled(false);
-		Label arcminLabel = new Label("'");
+		arcminField.setPreferredSize(new Dimension(50, 15));
+		JLabel arcminLabel = new JLabel("'");
 		arcsecField = new DoubleTextField();
 		arcsecField.setEnabled(false);
-		Label rangeLabel = new Label("range: ");
+		arcsecField.setPreferredSize(new Dimension(80, 15));
+		
+		JLabel rangeLabel = new JLabel("range: ");
 		rangeField = new DoubleTextField();
 		rangeField.setEnabled(false);
-		Label arcsecLabel = new Label("\"");
-		Label dLimitLabel = new Label("limit: ");
+		rangeField.setPreferredSize(new Dimension(80, 15));
+		JLabel arcsecLabel = new JLabel("\"");
+		JLabel dLimitLabel = new JLabel("limit: ");
 		dLimitField = new IntTextField();
 		dLimitField.setEnabled(false);
+		dLimitField.setPreferredSize(new Dimension(80, 15));
 		
-		searchPanel.add(hLabel);
-		searchPanel.add(hoursField);
-		searchPanel.add(minLabel);
-		searchPanel.add(minField);
-		searchPanel.add(secLabel);
-		searchPanel.add(secondsField);
-		searchPanel.add(plusBox);
-		searchPanel.add(minusBox);
-		searchPanel.add(degreesField);
-		searchPanel.add(degLabel);
-		searchPanel.add(arcminField);
-		searchPanel.add(arcminLabel);
-		searchPanel.add(arcsecField);
-		searchPanel.add(arcsecLabel);
-		searchPanel.add(rangeLabel);
-		searchPanel.add(rangeField);
-		searchPanel.add(dLimitLabel);
-		searchPanel.add(dLimitField);
+		searchPanel.add(distancePanel);
+		distancePanel.add(hLabel);
+		distancePanel.add(hoursField);
+		distancePanel.add(minLabel);
+		distancePanel.add(minField);
+		distancePanel.add(secLabel);
+		distancePanel.add(secondsField);
+		distancePanel.add(plusBox);
+		distancePanel.add(minusBox);
+		distancePanel.add(degreesField);
+		distancePanel.add(degLabel);
+		distancePanel.add(arcminField);
+		distancePanel.add(arcminLabel);
+		distancePanel.add(arcsecField);
+		distancePanel.add(arcsecLabel);
+		distancePanel.add(rangeLabel);
+		distancePanel.add(rangeField);
+		distancePanel.add(dLimitLabel);
+		distancePanel.add(dLimitField);
 		
-		layout.putConstraint(SpringLayout.NORTH, hLabel, 0, SpringLayout.NORTH, coordBox);
-		layout.putConstraint(SpringLayout.WEST, hLabel, 25, SpringLayout.EAST, redShiftBox);
+		extLayout.putConstraint(SpringLayout.VERTICAL_CENTER, distancePanel, 0, SpringLayout.VERTICAL_CENTER, coordBox);
+		extLayout.putConstraint(SpringLayout.WEST, distancePanel, 25, SpringLayout.EAST, redshiftBox);
+		
+		layout.putConstraint(SpringLayout.NORTH, hLabel, 0, SpringLayout.NORTH, distancePanel);
+		layout.putConstraint(SpringLayout.WEST, hLabel, 0, SpringLayout.EAST, distancePanel);
 		
 		layout.putConstraint(SpringLayout.NORTH, hoursField, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, hoursField, 5, SpringLayout.EAST, hLabel);
-		layout.putConstraint(SpringLayout.EAST, hoursField, 30, SpringLayout.WEST, hoursField);
 		
 		layout.putConstraint(SpringLayout.NORTH, minLabel, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, minLabel, 10, SpringLayout.EAST, hoursField);
 		
 		layout.putConstraint(SpringLayout.NORTH, minField, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, minField, 5, SpringLayout.EAST, minLabel);
-		layout.putConstraint(SpringLayout.EAST, minField, 30, SpringLayout.WEST, minField);
 		
 		layout.putConstraint(SpringLayout.NORTH, secLabel, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, secLabel, 10, SpringLayout.EAST, minField);
 		
 		layout.putConstraint(SpringLayout.NORTH, secondsField, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, secondsField, 5, SpringLayout.EAST, secLabel);
-		layout.putConstraint(SpringLayout.EAST, secondsField, 60, SpringLayout.WEST, secondsField);
 		
 		layout.putConstraint(SpringLayout.NORTH, plusBox, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, plusBox, 10, SpringLayout.EAST, secondsField);
@@ -247,21 +270,18 @@ public class GalaxyView {
 		
 		layout.putConstraint(SpringLayout.NORTH, degreesField, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, degreesField, 10, SpringLayout.EAST, minusBox);
-		layout.putConstraint(SpringLayout.EAST, degreesField, 30, SpringLayout.WEST, degreesField);
 		
 		layout.putConstraint(SpringLayout.NORTH, degLabel, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, degLabel, 5, SpringLayout.EAST, degreesField);
 		
 		layout.putConstraint(SpringLayout.NORTH, arcminField, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, arcminField, 10, SpringLayout.EAST, degLabel);
-		layout.putConstraint(SpringLayout.EAST, arcminField, 30, SpringLayout.WEST, arcminField);
 		
 		layout.putConstraint(SpringLayout.NORTH, arcminLabel, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, arcminLabel, 5, SpringLayout.EAST, arcminField);
 		
 		layout.putConstraint(SpringLayout.NORTH, arcsecField, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, arcsecField, 10, SpringLayout.EAST, arcminLabel);
-		layout.putConstraint(SpringLayout.EAST, arcsecField, 60, SpringLayout.WEST, arcsecField);
 		
 		layout.putConstraint(SpringLayout.NORTH, arcsecLabel, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, arcsecLabel, 5, SpringLayout.EAST, arcsecField);
@@ -271,65 +291,77 @@ public class GalaxyView {
 		
 		layout.putConstraint(SpringLayout.NORTH, rangeField, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, rangeField, 5, SpringLayout.EAST, rangeLabel);
-		layout.putConstraint(SpringLayout.EAST, rangeField, 60, SpringLayout.WEST, rangeField);
 		
 		layout.putConstraint(SpringLayout.NORTH, dLimitLabel, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, dLimitLabel, 10, SpringLayout.EAST, rangeField);
 		
 		layout.putConstraint(SpringLayout.NORTH, dLimitField, 0, SpringLayout.NORTH, coordBox);
 		layout.putConstraint(SpringLayout.WEST, dLimitField, 5, SpringLayout.EAST, dLimitLabel);
-		layout.putConstraint(SpringLayout.EAST, dLimitField, 60, SpringLayout.WEST, dLimitField);
 	}
 	
-	private void initSearchByRedshift(SpringLayout layout) {
+	private void initSearchByRedshift(SpringLayout extLayout) {
+		
+		redshiftPanel = new JPanel();
+		SpringLayout layout = new SpringLayout();
+		
 		redshiftField = new DoubleTextField();
 		redshiftField.setEnabled(false);
+		redshiftField.setPreferredSize(new Dimension(100, 15));
 		rsLimitField = new IntTextField();
 		rsLimitField.setEnabled(false);
-		CheckboxGroup highLowGroup = new CheckboxGroup();
-		rsHigherBox = new Checkbox(">=", highLowGroup, true);
-		rsLowerBox = new Checkbox("<=", highLowGroup, false);
+		rsLimitField.setPreferredSize(new Dimension(50, 15));
+		
+		ButtonGroup highLowGroup = new ButtonGroup();
+		rsHigherBox = new JRadioButton(">=", true);
+		rsLowerBox = new JRadioButton("<=", false);
+		highLowGroup.add(rsHigherBox);
+		highLowGroup.add(rsLowerBox);
 		rsHigherBox.setEnabled(false);
 		rsLowerBox.setEnabled(false);
-		Label rsValueLabel = new Label("value: ");
-		Label rsLimitLabel = new Label("limit: ");
+		JLabel rsValueLabel = new JLabel("value: ");
+		JLabel rsLimitLabel = new JLabel("limit: ");
 		
-		searchPanel.add(rsValueLabel);
-		searchPanel.add(redshiftField);
-		searchPanel.add(rsHigherBox);
-		searchPanel.add(rsLowerBox);
-		searchPanel.add(rsLimitLabel);
-		searchPanel.add(rsLimitField);
+		searchPanel.add(redshiftPanel);
+		redshiftPanel.add(rsValueLabel);
+		redshiftPanel.add(redshiftField);
+		redshiftPanel.add(rsHigherBox);
+		redshiftPanel.add(rsLowerBox);
+		redshiftPanel.add(rsLimitLabel);
+		redshiftPanel.add(rsLimitField);
 		
-		layout.putConstraint(SpringLayout.NORTH, searchBtn, 20, SpringLayout.SOUTH, redShiftBox);
-		layout.putConstraint(SpringLayout.WEST, searchBtn, 25, SpringLayout.WEST, searchPanel);
+		extLayout.putConstraint(SpringLayout.NORTH, searchBtn, 20, SpringLayout.SOUTH, redshiftPanel);
+		extLayout.putConstraint(SpringLayout.WEST, searchBtn, 25, SpringLayout.WEST, searchPanel);
 		
-		layout.putConstraint(SpringLayout.NORTH, scrollPane, 20, SpringLayout.SOUTH, searchBtn);
-		layout.putConstraint(SpringLayout.WEST, scrollPane, 25, SpringLayout.WEST, searchPanel);
-		layout.putConstraint(SpringLayout.EAST, scrollPane, -25, SpringLayout.EAST, searchPanel);
+		extLayout.putConstraint(SpringLayout.NORTH, scrollPane, 20, SpringLayout.SOUTH, searchBtn);
+		extLayout.putConstraint(SpringLayout.WEST, scrollPane, 25, SpringLayout.WEST, searchPanel);
+		extLayout.putConstraint(SpringLayout.EAST, scrollPane, -25, SpringLayout.EAST, searchPanel);
 		
-		layout.putConstraint(SpringLayout.NORTH, rsValueLabel, 0, SpringLayout.NORTH, redShiftBox);
-		layout.putConstraint(SpringLayout.WEST, rsValueLabel, 25, SpringLayout.EAST, redShiftBox);
+		extLayout.putConstraint(SpringLayout.VERTICAL_CENTER, redshiftPanel, 0, SpringLayout.VERTICAL_CENTER, redshiftBox);
+		extLayout.putConstraint(SpringLayout.WEST, redshiftPanel, 25, SpringLayout.EAST, redshiftBox);
 		
-		layout.putConstraint(SpringLayout.NORTH, redshiftField, 0, SpringLayout.NORTH, redShiftBox);
+		layout.putConstraint(SpringLayout.NORTH, rsValueLabel, 0, SpringLayout.NORTH, redshiftPanel);
+		layout.putConstraint(SpringLayout.WEST, rsValueLabel, 0, SpringLayout.EAST, redshiftPanel);
+		
+		layout.putConstraint(SpringLayout.NORTH, redshiftField, 0, SpringLayout.NORTH, redshiftPanel);
 		layout.putConstraint(SpringLayout.WEST, redshiftField, 10, SpringLayout.EAST, rsValueLabel);
 		layout.putConstraint(SpringLayout.EAST, redshiftField, 60, SpringLayout.WEST, redshiftField);
 		
-		layout.putConstraint(SpringLayout.NORTH, rsHigherBox, 0, SpringLayout.NORTH, redShiftBox);
+		layout.putConstraint(SpringLayout.NORTH, rsHigherBox, 0, SpringLayout.NORTH, redshiftPanel);
 		layout.putConstraint(SpringLayout.WEST, rsHigherBox, 10, SpringLayout.EAST, redshiftField);
-		layout.putConstraint(SpringLayout.NORTH, rsLowerBox, 0, SpringLayout.NORTH, redShiftBox);
+		
+		layout.putConstraint(SpringLayout.NORTH, rsLowerBox, 0, SpringLayout.NORTH, redshiftPanel);
 		layout.putConstraint(SpringLayout.WEST, rsLowerBox, 10, SpringLayout.EAST, rsHigherBox);
 		
-		layout.putConstraint(SpringLayout.NORTH, rsLimitLabel, 0, SpringLayout.NORTH, redShiftBox);
+		layout.putConstraint(SpringLayout.NORTH, rsLimitLabel, 0, SpringLayout.NORTH, redshiftPanel);
 		layout.putConstraint(SpringLayout.WEST, rsLimitLabel, 10, SpringLayout.EAST, rsLowerBox);
 		
-		layout.putConstraint(SpringLayout.NORTH, rsLimitField, 0, SpringLayout.NORTH, redShiftBox);
+		layout.putConstraint(SpringLayout.NORTH, rsLimitField, 0, SpringLayout.NORTH, redshiftPanel);
 		layout.putConstraint(SpringLayout.WEST, rsLimitField, 10, SpringLayout.EAST, rsLimitLabel);
 		layout.putConstraint(SpringLayout.EAST, rsLimitField, 60, SpringLayout.WEST, rsLimitField);
 	}
 	
 	private void initButton(SpringLayout layout) {
-		searchBtn = new Button("Search");
+		searchBtn = new JButton("Search");
 		searchBtn.addActionListener(new ActionListener() {		
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -337,14 +369,14 @@ public class GalaxyView {
 				populate(null);
 				searchBtn.setEnabled(false);
 				
-				if (nameBox.getState()) {
+				if (nameBox.isSelected()) {
 					String name = nameField.getText();
 					if (name != null && !"".equals(name))
 						GalaxySearchController.instance().searchNames(name);
 					else searchBtn.setEnabled(true);		
 				}
 				
-				else if (coordBox.getState()) {
+				else if (coordBox.isSelected()) {
 					Integer h = hoursField.getValue(), m = minField.getValue(), 
 							d = degreesField.getValue(), arcm = arcminField.getValue(),
 							l = dLimitField.getValue();
@@ -360,13 +392,13 @@ public class GalaxyView {
 					else if (r == null) rangeField.requestFocus();
 					else if (l == null) dLimitField.requestFocus();
 					else {
-						Coordinates center = new Coordinates(h, m, s, plusBox.getState(), d, arcm, arcs);
+						Coordinates center = new Coordinates(h, m, s, plusBox.isSelected(), d, arcm, arcs);
 						GalaxySearchController.instance().searchInRange(center, r.doubleValue(), l.intValue());
 						searchBtn.setEnabled(false);
 					}
 				}
 				
-				else if (redShiftBox.getState()) {
+				else if (redshiftBox.isSelected()) {
 					Double redshift = redshiftField.getValue();
 					if (redshift == null) {
 						redshiftField.requestFocus();
@@ -379,7 +411,7 @@ public class GalaxyView {
 						searchBtn.setEnabled(true);
 						return;
 					}
-					boolean higherThen = rsHigherBox.getState();
+					boolean higherThen = rsHigherBox.isSelected();
 					GalaxySearchController.instance().searchByRedshiftValue(redshift.doubleValue(), higherThen, limit.intValue());
 				}
 				
@@ -459,5 +491,11 @@ public class GalaxyView {
 			rsHigherBox.setEnabled(enable);
 			rsLowerBox.setEnabled(enable);
 		}	
+	}
+
+	@Override
+	public void showError(Exception e) {
+		// TODO Auto-generated method stub
+		
 	}
 }
