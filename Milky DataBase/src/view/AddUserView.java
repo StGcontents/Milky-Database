@@ -12,40 +12,21 @@ import javax.swing.SpringLayout;
 
 import controller.AddUserController;
 import exception.UserExistsException;
-import model.Priviledge;
-import pattern.ExceptionObserverAdapter;
-import pattern.Observer;
 
 public class AddUserView extends View {
 
 	private static AddUserView me;
-
-	private AddUserView() {
-		errorObserver = new ExceptionObserverAdapter();
-		errorObserver.setAdaptee(this);
-	}
-
+	private AddUserView() { }
 	public static synchronized AddUserView instance() {
-		int currentPriviledgeLevel = Priviledge.instance().retrieveState();
-		if (me == null || me.priviledgeLevel != currentPriviledgeLevel) {
+		if (me == null) 
 			me = new AddUserView();
-			me.priviledgeLevel = currentPriviledgeLevel;
-		}
 		return me;
 	}
-
-	private int priviledgeLevel;
-
-	private ExceptionObserverAdapter errorObserver;
 
 	private Panel generalPanel;
 	private JTextField idField, passwordField, nameField, surnameField, mailField;
 	private JButton AddUserButton;
 	private JLabel errorLabel;
-
-	public Observer<Exception> getExceptionObserver() {
-		return this.errorObserver;
-	}
 
 	@Override
 	public Panel generateView() {

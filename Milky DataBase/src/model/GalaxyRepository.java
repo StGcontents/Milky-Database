@@ -190,7 +190,7 @@ public class GalaxyRepository extends Repository {
 		}
 		
 		release(connection, statement, set);
-		System.out.println(results);
+		
 		nameSubject.setState(results);
 	}
 	

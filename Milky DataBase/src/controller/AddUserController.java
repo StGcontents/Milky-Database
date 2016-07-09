@@ -4,8 +4,10 @@ import java.awt.Panel;
 import view.AddUserView;
 import model.User;
 import model.UserRepository;
+import pattern.ExceptionObserverAdapter;
+import pattern.ExceptionSubject;
 
-public class AddUserController {
+public class AddUserController extends ExceptionSubject {
 
 	private static AddUserController me;
 	private UserRepository repo;
@@ -14,7 +16,7 @@ public class AddUserController {
 	private AddUserController() { 
 		repo = new UserRepository(DataSource.byPriviledge());
 		view = AddUserView.instance();
-		view.getExceptionObserver().setSubject(repo.getExceptionSubject());
+		new ExceptionObserverAdapter(view).setSubject(this);
 	}
 	
 	public static synchronized AddUserController instance() {
@@ -35,8 +37,11 @@ public class AddUserController {
 			@Override
 			public void run() {
 				User user = UserFactory.instance().create(param0, param1, param2, param3, param4);
-				try { repo.persistUser(user); }
-				catch (Exception e) { repo.getExceptionSubject().setState(e); }
+				try { 
+					repo.persistUser(user);
+					setState(null);
+				}
+				catch (Exception e) { setState(e); }
 			}
 		}).start();
 	}

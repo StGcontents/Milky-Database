@@ -16,8 +16,10 @@ public abstract class NumericTextField<T extends Number> extends JTextArea {
 			public void keyTyped(KeyEvent e) {
 				
 				e.consume();
-				
-				if (e.isActionKey()) return;
+				if (e.isActionKey() && 
+					e.getID() != KeyEvent.VK_TAB && 
+					e.getID() != KeyEvent.VK_ENTER) 
+					return;
 				
 				Character c = e.getKeyChar();
 				

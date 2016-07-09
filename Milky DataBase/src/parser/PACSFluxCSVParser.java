@@ -10,6 +10,8 @@ import java.util.List;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 
+import controller.DataSource;
+import model.FluxRepository;
 import model.Galaxy;
 import model.Ion;
 import model.IonPool;
@@ -54,6 +56,13 @@ public abstract class PACSFluxCSVParser extends FluxCSVParser {
 		finally { 
 			try { reader.close(); } 
 			catch (Exception ignore) {} 
+		}
+		FluxRepository repo = new FluxRepository(DataSource.instance(DataSource.ADMIN));
+		for (Galaxy g : galaxies) {
+			try {
+				repo.persist(g);
+			}
+			catch (Exception e) {}
 		}
 		
 		return galaxies;

@@ -8,12 +8,17 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import model.Galaxy.Coordinates;
+import pattern.ExceptionObserverAdapter;
+import pattern.ExceptionSubject;
+import pattern.GalaxyListObserverAdapter;
+import pattern.GalaxyObserverAdapter;
 import model.AdaptableValue;
 import model.GalaxyRepository;
 import model.Priviledge;
+import view.GalaxyInfoView;
 import view.GalaxyView;
 
-public class GalaxySearchController implements ListSelectionListener {
+public class GalaxySearchController extends ExceptionSubject implements ListSelectionListener {
 	
 	private static GalaxySearchController me;
 	private GalaxySearchController() { 
@@ -32,8 +37,9 @@ public class GalaxySearchController implements ListSelectionListener {
 	
 	public JPanel callView() {
 		view = GalaxyView.instance();
-		view.getListObserver().setSubject(repo.getNameSubject());
-		view.getGalaxyObserver().setSubject(repo.getGalaxySubject());
+		new GalaxyListObserverAdapter(view).setSubject(repo.getNameSubject());
+		new GalaxyObserverAdapter(GalaxyInfoView.instance()).setSubject(repo.getGalaxySubject());
+		new ExceptionObserverAdapter(view).setSubject(this);
 		return view.generateView();
 	}
 	
@@ -43,7 +49,7 @@ public class GalaxySearchController implements ListSelectionListener {
 			@Override
 			public void run() {
 				try { repo.retrieveGalaxyNames(param0); }
-				catch (Exception e) { e.printStackTrace(); }
+				catch (Exception e) { setState(e); }
 			}
 		}).start();
 	}
@@ -56,7 +62,7 @@ public class GalaxySearchController implements ListSelectionListener {
 			@Override
 			public void run() {
 				try { repo.retrieveGalaxyByRedshiftValue(param0, param1, param2); }
-				catch (Exception e) { e.printStackTrace(); }
+				catch (Exception e) { setState(e); }
 			}
 		}).start();
 	}
@@ -69,7 +75,7 @@ public class GalaxySearchController implements ListSelectionListener {
 			@Override
 			public void run() {
 				try { repo.retrieveGalaxyInRange(param0, param1, param2); }
-				catch (Exception e) { e.printStackTrace(); }
+				catch (Exception e) { setState(e); }
 			}
 		}).start();
 	}

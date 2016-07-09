@@ -1,5 +1,6 @@
 package parser;
 
+import java.io.File;
 import java.util.Arrays;
 
 import controller.FluxFactory;
@@ -28,5 +29,13 @@ public class PACSLineFluxParser extends PACSFluxCSVParser {
 	@Override
 	protected FluxFactory getFactory() {
 		return FluxFactory.getLineFluxFactory();
+	}
+	
+	public static void main(String args[]) {
+		try {
+			instance().parseFile(new File("/home/stg/Downloads/progetto15161/MRTable4_flux.csv"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

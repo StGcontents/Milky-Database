@@ -2,6 +2,7 @@ package controller;
 
 import model.Priviledge;
 import model.UserRepository;
+import pattern.LogObserverAdapter;
 import view.LoginView;
 
 public class LoginController {
@@ -9,7 +10,7 @@ public class LoginController {
 	private static LoginController me;
 	private LoginController() { 
 		repo = new UserRepository(DataSource.readOnly()); 
-		LoginView.instance().setSubject(Priviledge.instance());
+		new LogObserverAdapter(LoginView.instance()).setSubject(Priviledge.instance());
 	}
 	public static synchronized LoginController instance() {
 		if (me == null) me = new LoginController();
@@ -25,7 +26,12 @@ public class LoginController {
 	public void log(String userID, String password) {
 		final String param0 = userID;
 		final String param1 = password;
-		new Thread(new Runnable() { @Override public void run() { repo.logUser(param0, param1); } }).start();
+		new Thread(new Runnable() { 
+			@Override 
+			public void run() { 
+				repo.logUser(param0, param1); 
+			} 
+		}).start();
 	}
 	
 	public void onLoginExit(int priviledgeLevel) {

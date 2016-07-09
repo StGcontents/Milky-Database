@@ -1,11 +1,13 @@
 package view;
 
+import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.ListIterator;
@@ -14,6 +16,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerListModel;
@@ -21,40 +24,53 @@ import javax.swing.SpringLayout;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import controller.FluxSearchController;
+import controller.GalaxyInfoController;
 import model.Flux;
 import model.Galaxy;
 import model.Ion;
 import model.IonPool;
 import model.Galaxy.Luminosity;
 
-@SuppressWarnings("serial")
-public class GalaxyPanel extends Panel {
+public class GalaxyInfoView extends View {
 
+	private static GalaxyInfoView me;
+	public static synchronized GalaxyInfoView instance() {
+		if (me == null) me = new GalaxyInfoView();
+		return me;
+	}
+	
 	private Galaxy galaxy;
+	private JPanel panel;
 	private JLabel nameLabel, rightAscLabel, declinationLabel, distanceLabel, 
 				   redShiftLabel, spectreLabel, lumLabel, metallicityLabel,
-				   spinnerLabel, lineLabel, continuousLabel, conRatioLabel, lineRatioLabel;
+				   spinnerLabel, lineLabel, continuousLabel, conRatioLabel, lineRatioLabel,
+				   errorLabel;
 	private JButton fluxBtn;
 	private JSpinner searchSpinner, ratioSpinner;
 	private JRadioButton cBox, _3x3Box, _5x5Box, hrBox, lrBox;
 	private JCheckBox conRatioBox, lineRatioBox, isConBox;
 	private SpinnerListModel model, differentModel;
 	
-	protected GalaxyPanel(Galaxy galaxy) {
-		setup();
-		setGalaxy(galaxy);
+	protected GalaxyInfoView() {
+		
 	}
 		
-	private void setup() {
-		SpringLayout layout = new SpringLayout();
-		setLayout(layout);
+	@Override
+	public Container generateView() {
+		if (panel == null) {
+			panel = new JPanel();
+			SpringLayout layout = new SpringLayout();
+			panel.setLayout(layout);
 		
-		initGalaxyResults(layout);		
-		initBasicOptions(layout);
-		initRatioOptions(layout);
-		initButton(layout);
-		initFluxResults(layout);		
+			initGalaxyResults(layout);		
+			initBasicOptions(layout);
+			initRatioOptions(layout);
+			initButton(layout);
+			initFluxResults(layout);
+		}
+		else setGalaxy(null);
+		
+		return panel;
 	}
 	
 	public void setGalaxy(Galaxy galaxy) {
@@ -63,7 +79,7 @@ public class GalaxyPanel extends Panel {
 	}
 	
 	private void updateInformation() {
-		if (galaxy == null) setVisible(false);
+		if (galaxy == null) reset();
 		else {
 			String name = "Name: " + galaxy.getName();
 			int howMany;
@@ -117,7 +133,7 @@ public class GalaxyPanel extends Panel {
 			conRatioLabel.setText(null);
 			lineRatioLabel.setText(null);
 			
-			setVisible(true);
+			panel.setVisible(true);
 		}
 	}
 	
@@ -207,76 +223,76 @@ public class GalaxyPanel extends Panel {
 	private void initGalaxyResults(SpringLayout layout) {
 		nameLabel = new JLabel();
 		nameLabel.setPreferredSize(new Dimension(200, 20));
-		this.add(nameLabel);
-		layout.putConstraint(SpringLayout.WEST, nameLabel, 0, SpringLayout.WEST, this);
-		layout.putConstraint(SpringLayout.NORTH, nameLabel, 25, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.EAST, nameLabel, -25, SpringLayout.HORIZONTAL_CENTER, this);
+		panel.add(nameLabel);
+		layout.putConstraint(SpringLayout.WEST, nameLabel, 0, SpringLayout.WEST, panel);
+		layout.putConstraint(SpringLayout.NORTH, nameLabel, 25, SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.EAST, nameLabel, -25, SpringLayout.HORIZONTAL_CENTER, panel);
 		
 		rightAscLabel = new JLabel();
 		rightAscLabel.setPreferredSize(new Dimension(200, 20));
-		this.add(rightAscLabel);
-		layout.putConstraint(SpringLayout.WEST, rightAscLabel, 0, SpringLayout.WEST, this);
+		panel.add(rightAscLabel);
+		layout.putConstraint(SpringLayout.WEST, rightAscLabel, 0, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.NORTH, rightAscLabel, 10, SpringLayout.SOUTH, nameLabel);
-		layout.putConstraint(SpringLayout.EAST, rightAscLabel, -25, SpringLayout.HORIZONTAL_CENTER, this);
+		layout.putConstraint(SpringLayout.EAST, rightAscLabel, -25, SpringLayout.HORIZONTAL_CENTER, panel);
 		
 		declinationLabel = new JLabel();
 		declinationLabel.setPreferredSize(new Dimension(200, 20));
-		this.add(declinationLabel);
-		layout.putConstraint(SpringLayout.WEST, declinationLabel, 0, SpringLayout.WEST, this);
+		panel.add(declinationLabel);
+		layout.putConstraint(SpringLayout.WEST, declinationLabel, 0, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.NORTH, declinationLabel, 10, SpringLayout.SOUTH, rightAscLabel);
-		layout.putConstraint(SpringLayout.EAST, declinationLabel, -25, SpringLayout.HORIZONTAL_CENTER, this);
+		layout.putConstraint(SpringLayout.EAST, declinationLabel, -25, SpringLayout.HORIZONTAL_CENTER, panel);
 		
 		redShiftLabel = new JLabel();
 		redShiftLabel.setPreferredSize(new Dimension(200, 20));
-		this.add(redShiftLabel);
-		layout.putConstraint(SpringLayout.WEST, redShiftLabel, 0, SpringLayout.WEST, this);
+		panel.add(redShiftLabel);
+		layout.putConstraint(SpringLayout.WEST, redShiftLabel, 0, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.NORTH, redShiftLabel, 10, SpringLayout.SOUTH, declinationLabel);
-		layout.putConstraint(SpringLayout.EAST, redShiftLabel, -25, SpringLayout.HORIZONTAL_CENTER, this);
+		layout.putConstraint(SpringLayout.EAST, redShiftLabel, -25, SpringLayout.HORIZONTAL_CENTER, panel);
 
 		distanceLabel = new JLabel();
 		distanceLabel.setPreferredSize(new Dimension(200, 20));
-		this.add(distanceLabel);
-		layout.putConstraint(SpringLayout.WEST, distanceLabel, 0, SpringLayout.WEST, this);
+		panel.add(distanceLabel);
+		layout.putConstraint(SpringLayout.WEST, distanceLabel, 0, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.NORTH, distanceLabel, 10, SpringLayout.SOUTH, redShiftLabel);
-		layout.putConstraint(SpringLayout.EAST, distanceLabel, -25, SpringLayout.HORIZONTAL_CENTER, this);
+		layout.putConstraint(SpringLayout.EAST, distanceLabel, -25, SpringLayout.HORIZONTAL_CENTER, panel);
 
 		spectreLabel = new JLabel();
 		spectreLabel.setPreferredSize(new Dimension(200, 20));
-		this.add(spectreLabel);
-		layout.putConstraint(SpringLayout.WEST, spectreLabel, 0, SpringLayout.WEST, this);
+		panel.add(spectreLabel);
+		layout.putConstraint(SpringLayout.WEST, spectreLabel, 0, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.NORTH, spectreLabel, 10, SpringLayout.SOUTH, distanceLabel);
-		layout.putConstraint(SpringLayout.EAST, spectreLabel, -25, SpringLayout.HORIZONTAL_CENTER, this);
+		layout.putConstraint(SpringLayout.EAST, spectreLabel, -25, SpringLayout.HORIZONTAL_CENTER, panel);
 		
 
 		lumLabel = new JLabel();
-		this.add(lumLabel);
-		layout.putConstraint(SpringLayout.WEST, lumLabel, 0, SpringLayout.WEST, this);
+		panel.add(lumLabel);
+		layout.putConstraint(SpringLayout.WEST, lumLabel, 0, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.NORTH, lumLabel, 10, SpringLayout.SOUTH, spectreLabel);
-		layout.putConstraint(SpringLayout.EAST, lumLabel, -25, SpringLayout.HORIZONTAL_CENTER, this);
+		layout.putConstraint(SpringLayout.EAST, lumLabel, -25, SpringLayout.HORIZONTAL_CENTER, panel);
 		
 
 		metallicityLabel = new JLabel();
 		metallicityLabel.setPreferredSize(new Dimension(200, 20));
-		this.add(metallicityLabel);
-		layout.putConstraint(SpringLayout.WEST, metallicityLabel, 0, SpringLayout.WEST, this);
+		panel.add(metallicityLabel);
+		layout.putConstraint(SpringLayout.WEST, metallicityLabel, 0, SpringLayout.WEST, panel);
 		layout.putConstraint(SpringLayout.NORTH, metallicityLabel, 10, SpringLayout.SOUTH, lumLabel);
-		layout.putConstraint(SpringLayout.EAST, metallicityLabel, -25, SpringLayout.HORIZONTAL_CENTER, this);
+		layout.putConstraint(SpringLayout.EAST, metallicityLabel, -25, SpringLayout.HORIZONTAL_CENTER, panel);
 	}
 	
 	private void initBasicOptions(SpringLayout layout) {
 		spinnerLabel = new JLabel("Select line and show fluxes:");
-		this.add(spinnerLabel);
-		layout.putConstraint(SpringLayout.WEST, spinnerLabel, -25, SpringLayout.HORIZONTAL_CENTER, this);
-		layout.putConstraint(SpringLayout.NORTH, spinnerLabel, 25, SpringLayout.NORTH, this);
-		layout.putConstraint(SpringLayout.EAST, spinnerLabel, -25, SpringLayout.EAST, this);
+		panel.add(spinnerLabel);
+		layout.putConstraint(SpringLayout.WEST, spinnerLabel, -25, SpringLayout.HORIZONTAL_CENTER, panel);
+		layout.putConstraint(SpringLayout.NORTH, spinnerLabel, 25, SpringLayout.NORTH, panel);
+		layout.putConstraint(SpringLayout.EAST, spinnerLabel, -25, SpringLayout.EAST, panel);
 		
 		model = new SpinnerListModel(IonPool.getIonList());
 		searchSpinner = new JSpinner(model);
 		searchSpinner.addChangeListener(new ExclusiveChangeListener((Ion) searchSpinner.getValue()));
-		this.add(searchSpinner);
+		panel.add(searchSpinner);
 		layout.putConstraint(SpringLayout.WEST, searchSpinner, 0, SpringLayout.WEST, spinnerLabel);
 		layout.putConstraint(SpringLayout.NORTH, searchSpinner, 5, SpringLayout.SOUTH, spinnerLabel);
-		layout.putConstraint(SpringLayout.EAST, searchSpinner, -25, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.EAST, searchSpinner, -25, SpringLayout.EAST, panel);
 		
 		JLabel apertureLabel = new JLabel("Aperture size/resolution: ");
 		ButtonGroup apertureGroup = new ButtonGroup();
@@ -293,13 +309,13 @@ public class GalaxyPanel extends Panel {
 		apertureGroup.add(lrBox);
 		apertureGroup.add(hrlrBox);
 		
-		this.add(apertureLabel);
-		this.add(cBox);
-		this.add(_3x3Box);
-		this.add(_5x5Box);
-		this.add(hrBox);
-		this.add(lrBox);
-		this.add(hrlrBox);
+		panel.add(apertureLabel);
+		panel.add(cBox);
+		panel.add(_3x3Box);
+		panel.add(_5x5Box);
+		panel.add(hrBox);
+		panel.add(lrBox);
+		panel.add(hrlrBox);
 		
 		layout.putConstraint(SpringLayout.WEST, apertureLabel, 0, SpringLayout.WEST, spinnerLabel);
 		layout.putConstraint(SpringLayout.NORTH, apertureLabel, 10, SpringLayout.SOUTH, searchSpinner);
@@ -319,7 +335,7 @@ public class GalaxyPanel extends Panel {
 	
 	private void initRatioOptions(SpringLayout layout) {
 		conRatioBox = new JCheckBox("Show line flux / continuous flux ratio");
-		this.add(conRatioBox);
+		panel.add(conRatioBox);
 		layout.putConstraint(SpringLayout.WEST, conRatioBox, 0, SpringLayout.WEST, cBox);
 		layout.putConstraint(SpringLayout.NORTH, conRatioBox, 10, SpringLayout.SOUTH, cBox);
 		
@@ -335,7 +351,7 @@ public class GalaxyPanel extends Panel {
 				isConBox.setEnabled(lineRatioBox.isSelected());
 			}
 		});
-		this.add(lineRatioBox);
+		panel.add(lineRatioBox);
 		layout.putConstraint(SpringLayout.WEST, lineRatioBox, 0, SpringLayout.WEST, conRatioBox);
 		layout.putConstraint(SpringLayout.NORTH, lineRatioBox, 10, SpringLayout.SOUTH, conRatioBox);
 		
@@ -345,14 +361,14 @@ public class GalaxyPanel extends Panel {
 		differentModel = new SpinnerListModel(ions);
 		ratioSpinner = new JSpinner(differentModel);
 		ratioSpinner.setEnabled(false);
-		this.add(ratioSpinner);
+		panel.add(ratioSpinner);
 		layout.putConstraint(SpringLayout.WEST, ratioSpinner, 10, SpringLayout.EAST, lineRatioBox);
 		layout.putConstraint(SpringLayout.NORTH, ratioSpinner, 0, SpringLayout.NORTH, lineRatioBox);
-		layout.putConstraint(SpringLayout.EAST, ratioSpinner, -25, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.EAST, ratioSpinner, -25, SpringLayout.EAST, panel);
 		
 		isConBox = new JCheckBox("Select for continuous flux ratio", false);
 		isConBox.setEnabled(false);
-		this.add(isConBox);
+		panel.add(isConBox);
 		layout.putConstraint(SpringLayout.WEST, isConBox, 10, SpringLayout.WEST, lineRatioBox);
 		layout.putConstraint(SpringLayout.NORTH, isConBox, 5, SpringLayout.SOUTH, lineRatioBox);
 	}
@@ -364,41 +380,48 @@ public class GalaxyPanel extends Panel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				fluxBtn.setEnabled(false);
+				errorLabel.setText(null);
 				if (!updateFluxes()) {
-					FluxSearchController.instance().retrieveFluxes(galaxy);
+					GalaxyInfoController.instance().retrieveFluxes(galaxy);
 					updateFluxes();
 				}
 			}
 		});
-		this.add(fluxBtn);
+		panel.add(fluxBtn);
 		layout.putConstraint(SpringLayout.WEST, fluxBtn, 0, SpringLayout.WEST, spinnerLabel);
 		layout.putConstraint(SpringLayout.NORTH, fluxBtn, 10, SpringLayout.SOUTH, isConBox);
+		
+		errorLabel = new JLabel();
+		errorLabel.setForeground(Color.RED);
+		panel.add(errorLabel);
+		layout.putConstraint(SpringLayout.WEST, errorLabel, 15, SpringLayout.EAST, fluxBtn);
+		layout.putConstraint(SpringLayout.VERTICAL_CENTER, errorLabel, 0, SpringLayout.VERTICAL_CENTER, fluxBtn);
 	}
 	
 	private void initFluxResults(SpringLayout layout) {
 		lineLabel = new JLabel();
-		this.add(lineLabel);
+		panel.add(lineLabel);
 		layout.putConstraint(SpringLayout.WEST, lineLabel, 0, SpringLayout.WEST, spinnerLabel);
 		layout.putConstraint(SpringLayout.NORTH, lineLabel, 10, SpringLayout.SOUTH, fluxBtn);
-		layout.putConstraint(SpringLayout.EAST, lineLabel, -25, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.EAST, lineLabel, -25, SpringLayout.EAST, panel);
 		
 		continuousLabel = new JLabel();
-		this.add(continuousLabel);
+		panel.add(continuousLabel);
 		layout.putConstraint(SpringLayout.WEST, continuousLabel, 0, SpringLayout.WEST, spinnerLabel);
 		layout.putConstraint(SpringLayout.NORTH, continuousLabel, 5, SpringLayout.SOUTH, lineLabel);
-		layout.putConstraint(SpringLayout.EAST, continuousLabel, -25, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.EAST, continuousLabel, -25, SpringLayout.EAST, panel);
 		
 		conRatioLabel = new JLabel();
-		this.add(conRatioLabel);
+		panel.add(conRatioLabel);
 		layout.putConstraint(SpringLayout.WEST, conRatioLabel, 0, SpringLayout.WEST, spinnerLabel);
 		layout.putConstraint(SpringLayout.NORTH, conRatioLabel, 5, SpringLayout.SOUTH, continuousLabel);
-		layout.putConstraint(SpringLayout.EAST, conRatioLabel, -25, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.EAST, conRatioLabel, -25, SpringLayout.EAST, panel);
 		
 		lineRatioLabel = new JLabel();
-		this.add(lineRatioLabel);
+		panel.add(lineRatioLabel);
 		layout.putConstraint(SpringLayout.WEST, lineRatioLabel, 0, SpringLayout.WEST, spinnerLabel);
 		layout.putConstraint(SpringLayout.NORTH, lineRatioLabel, 5, SpringLayout.SOUTH, conRatioLabel);
-		layout.putConstraint(SpringLayout.EAST, lineRatioLabel, -25, SpringLayout.EAST, this);
+		layout.putConstraint(SpringLayout.EAST, lineRatioLabel, -25, SpringLayout.EAST, panel);
 	}
 	
 	
@@ -421,5 +444,23 @@ public class GalaxyPanel extends Panel {
 			catch (ParseException e1) { e1.printStackTrace(); }
 			prev = current;
 		}
+	}
+
+	@Override
+	public void showError(Exception e) {
+		if (e == null)
+			errorLabel.setText(null);
+		else if (e instanceof SQLException)
+			errorLabel.setText("Could not retrieve values.");
+		else 
+			errorLabel.setText("An error occurred.");
+		
+		fluxBtn.setEnabled(true);
+	}
+
+	@Override
+	protected void reset() {
+		errorLabel.setText(null);
+		panel.setVisible(false);
 	}
 }

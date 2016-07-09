@@ -1,6 +1,14 @@
 package view;
 
-import java.awt.*;
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -19,9 +27,8 @@ import javax.swing.SpringLayout;
 
 import controller.DataSource;
 import controller.LoginController;
-import pattern.Observer;
 
-public class LoginView extends Observer<Integer> {
+public class LoginView extends View {
 	
 	private static LoginView me;
 	private LoginView() { }
@@ -57,7 +64,7 @@ public class LoginView extends Observer<Integer> {
 	static Point p;
 	
 	@SuppressWarnings("serial")
-	public void generateView() {
+	public Container generateView() {
 		frame = new Frame() {
 
 			@Override
@@ -85,7 +92,6 @@ public class LoginView extends Observer<Integer> {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				super.windowClosing(e);
-				System.out.println("exiting");
 				frame.dispose();
 			}
 		});
@@ -159,6 +165,8 @@ public class LoginView extends Observer<Integer> {
 		frame.setBackground(Color.getHSBColor(hsb[0], hsb[1], hsb[2]));
 		
 		frame.setVisible(true);
+		
+		return null;
 	}
 	
 	private void purge() {
@@ -170,10 +178,7 @@ public class LoginView extends Observer<Integer> {
 		logBtn = null;
 	}
 	
-	@Override
-	public void stateChanged() {
-		int priviledgeLevel = getSubject().retrieveState();
-		
+	public void logIn(int priviledgeLevel) {
 		if (priviledgeLevel > DataSource.INVALID) {
 			frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
 			purge();
@@ -192,5 +197,14 @@ public class LoginView extends Observer<Integer> {
 			label.setText(null);
 			LoginController.instance().log(userField.getText(), passField.getText());
 		}
+	}
+
+	@Override
+	public void showError(Exception e) {
+		// TODO Auto-generated method stub
+	}
+	@Override
+	protected void reset() {
+		// TODO Auto-generated method stub
 	}
 }

@@ -17,7 +17,11 @@ import model.Galaxy.Luminosity;
 public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 	
 	private final static List<Integer> INT_ENUM = Arrays.asList(new Integer[] { 1, 2, 5, 6 });
-	private final static List<Integer> DOUBLE_ENUM = Arrays.asList(new Integer[] { 3, 7, 8, 9, 17, 19, 21, 22, 23 });
+	private final static List<Integer> DOUBLE_ENUM = Arrays.asList(new Integer[] { 3, 7, 8, 9, 22, 23 });
+	
+	public static void main(String args[]) {
+		instance().parseFile(new File("/home/stg/Downloads/progetto15161/MRTable3_sample.csv"));
+	}
 	
 	private static GalaxyCSVParser me;
 	private GalaxyCSVParser() { }
@@ -41,7 +45,8 @@ public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 						spectre = parseName(nextLine[11]);
 				List<Integer> intValues = new ArrayList<>();
 				List<Double> doubleValues = new ArrayList<>();
-				boolean sign = parseSimbol(nextLine[4], "+");
+				boolean sign = parseSimbol(nextLine[4], "+"),
+						upper = false;
 				Double lum = null;
 				Luminosity[] luminosities = new Luminosity[3];
 				String[] alternativeNames = parseAlterNames(nextLine[25]);
@@ -55,12 +60,12 @@ public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 					else if (DOUBLE_ENUM.contains(i)) 
 						doubleValues.add(parseDouble(s));
 					else if (i >= 16 && i <= 21) {
-						if (i % 2 == 0) {
-							lum = parseDouble(s);
-						}
+						if (i % 2 == 0) 
+							upper = parseSimbol(s, "<");
 						else {
+							lum = parseDouble(s);
 							if (lum == null) continue;
-							else luminosities[(i - 17) / 2] = new Luminosity(lum, parseSimbol(s, "<"));
+							else luminosities[(i - 17) / 2] = new Luminosity(lum, upper);
 						}
 					}
 				}

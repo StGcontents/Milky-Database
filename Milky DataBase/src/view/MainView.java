@@ -53,7 +53,6 @@ public class MainView {
 			@Override
 			public void windowClosing(WindowEvent e) {
 				super.windowClosing(e);
-				System.out.println("exiting");
 				frame.dispose();
 			}
 		});

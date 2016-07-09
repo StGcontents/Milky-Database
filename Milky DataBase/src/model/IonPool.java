@@ -32,7 +32,7 @@ public class IonPool extends HashMap<Integer, Ion> {
 			if (ion.matches(name, chargedState, line)) 
 				return ion;
 		}
-		System.out.println("NOT FOUND");
+		
 		return null;
 	}
 	

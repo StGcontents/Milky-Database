@@ -2,12 +2,11 @@ package pattern;
 
 import view.View;
 
-public class ExceptionObserverAdapter extends Observer<Exception> {
+public class ExceptionObserverAdapter extends ViewObserverAdapter<Exception, View> {
 	
-	private View adaptee;
-
-	public View getAdaptee() { return adaptee; }
-	public void setAdaptee(View adaptee) { this.adaptee = adaptee; }
+	public ExceptionObserverAdapter(View adaptee) {
+		setAdaptee(adaptee);
+	}
 
 	@Override
 	public void stateChanged() {

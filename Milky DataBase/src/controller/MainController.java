@@ -14,13 +14,6 @@ import view.MainView;
 
 public class MainController implements ListSelectionListener {
 	
-	public static void main (String args []){
-		
-		instance().callView();
-		
-		
-	}
-	
 	private static MainController me;
 	private MainController(int priviledgeLevel) {
 		this.priviledgeLevel = priviledgeLevel;
