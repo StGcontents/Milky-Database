@@ -33,7 +33,7 @@ public class PACSLineFluxParser extends PACSFluxCSVParser {
 	
 	public static void main(String args[]) {
 		try {
-			instance().parseFile(new File("/home/stg/Downloads/progetto15161/MRTable4_flux.csv"));
+			instance().parseFile(new File(args[0]));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

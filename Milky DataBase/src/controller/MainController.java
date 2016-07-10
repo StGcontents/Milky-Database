@@ -11,6 +11,7 @@ import javax.swing.event.ListSelectionListener;
 
 import model.Priviledge;
 import view.MainView;
+import view.ImportFileView;
 
 public class MainController implements ListSelectionListener {
 	
@@ -68,16 +69,7 @@ public class MainController implements ListSelectionListener {
 			view.attachPanel(HeavyTaskController.instance().callView());
 			break;
 		case 2:
-			if (priviledgeLevel == DataSource.COMMON) {
-				view.close();
-				exitToLogin();
-			}
-			else {
-				Panel panel = new Panel(new FlowLayout());
-				Label label = new Label("You selected row #" + (index + 1));
-				panel.add(label);
-				view.attachPanel(panel);
-			}
+			view.attachPanel(ImportFileController.instance().callView());
 			break;
 		case 3:
 			view.attachPanel(AddUserController.instance().callView());
@@ -86,6 +78,7 @@ public class MainController implements ListSelectionListener {
 			view.close();
 			exitToLogin();
 			break;
+			
 		default:
 			Panel panel = new Panel(new FlowLayout());
 			Label label = new Label("You selected row #" + (index + 1));

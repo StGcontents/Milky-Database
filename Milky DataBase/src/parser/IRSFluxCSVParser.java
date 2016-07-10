@@ -24,6 +24,10 @@ public class IRSFluxCSVParser extends FluxCSVParser {
 	private IRSFluxCSVParser() { 
 		initEnums();
 	}
+	public static void main(String args[]) throws Exception {
+		instance().parseFile(new File(args[0]));
+	}
+	
 	protected static synchronized FluxCSVParser instance() {
 		if (me == null) me = new IRSFluxCSVParser();
 		return me;

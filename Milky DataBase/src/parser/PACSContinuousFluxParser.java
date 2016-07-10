@@ -1,5 +1,6 @@
 package parser;
 
+import java.io.File;
 import java.util.Arrays;
 
 import controller.FluxFactory;
@@ -36,6 +37,10 @@ public class PACSContinuousFluxParser extends PACSFluxCSVParser {
 		super.clearValues();
 		flags.add(false);
 		flags.add(false);
+	}
+	
+	public static void main(String args[]) throws Exception {
+		instance().parseFile(new File(args[0]));
 	}
 	
 }

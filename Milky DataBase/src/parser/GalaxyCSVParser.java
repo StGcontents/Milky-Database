@@ -20,7 +20,7 @@ public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 	private final static List<Integer> DOUBLE_ENUM = Arrays.asList(new Integer[] { 3, 7, 8, 9, 22, 23 });
 	
 	public static void main(String args[]) {
-		instance().parseFile(new File("/home/stg/Downloads/progetto15161/MRTable3_sample.csv"));
+		instance().parseFile(new File(args[0]));
 	}
 	
 	private static GalaxyCSVParser me;
