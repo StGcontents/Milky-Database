@@ -21,7 +21,7 @@ class CountdownRunnable implements Runnable {
 	public void okGo() { 
 		synchronized (connection) {
 			if (stillUsed > 0) 
-				stillUsed -= 1; 
+				stillUsed -= 1;
 		}
 	}
 	
@@ -34,7 +34,10 @@ class CountdownRunnable implements Runnable {
 		catch (InterruptedException e) { e.printStackTrace(); }
 		
 		synchronized(connection) {
-			if (stillUsed == 0) try { connection.close(); }
+			if (stillUsed == 0) try { 
+				connection.close(); 
+				System.out.println("CLOSED");
+			}
 			catch (Exception e) { e.printStackTrace(); }
 		}
 	}

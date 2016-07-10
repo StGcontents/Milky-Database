@@ -14,8 +14,11 @@ public abstract class Repository<C, R, U, D> {
 	public abstract void delete(D entity) throws Exception;
 	public abstract void update(U entity) throws Exception;
 	
-	protected void release(AutoCloseable... resources) throws Exception {
-		for (AutoCloseable resource : resources)
-			resource.close();
+	protected void release(AutoCloseable... resources) {
+		for (AutoCloseable resource : resources) {
+			try { resource.close(); }
+			catch (NullPointerException ignore) { }
+			catch (Exception e) { e.printStackTrace(); }
+		}
 	}
 }

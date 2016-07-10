@@ -19,17 +19,13 @@ public class IonRepository extends UniRepository<Ion> {
 		return me;
 	}
 	
-	@Override public void persist(Ion ion) throws Exception { }
-	
-	public void retrieveIons() throws Exception {
-		Connection connection = dataSource.getConnection();
-		String query = "SELECT * FROM ion";
-		PreparedStatement statement = connection.prepareStatement(query);
-		
-		read(statement);
-		
-		release(connection);
+	@Override 
+	public void persist(Ion ion) throws Exception { 
+		//TODO: since there's no way we can dynamically obtain ion information,
+		//ion table is populated manually; therefore, this method implementation is
+		//not required.
 	}
+	
 	@Override
 	public List<Ion> read(PreparedStatement statement) throws Exception {
 		ResultSet set = statement.executeQuery();
@@ -38,7 +34,32 @@ public class IonRepository extends UniRepository<Ion> {
 		return list;
 	}
 	
-	@Override public void update(Ion entity) throws Exception { }
+	public void retrieveIons() throws Exception {
+		Connection connection = null;
+		PreparedStatement statement = null;
+		
+		try {
+			connection = dataSource.getConnection();
+			String query = "SELECT * FROM ion";
+			statement = connection.prepareStatement(query, 
+					ResultSet.TYPE_FORWARD_ONLY,
+					ResultSet.CONCUR_READ_ONLY,
+					ResultSet.CLOSE_CURSORS_AT_COMMIT);
+		
+			read(statement);
+		}
+		finally {
+			release(statement, connection);
+		}
+	}
 	
-	@Override public void delete(Ion entity) throws Exception { }
+	@Override 
+	public void update(Ion entity) throws Exception { 
+		//TODO: not implemented for the same reason read is not implemented
+	}
+	
+	@Override 
+	public void delete(Ion entity) throws Exception {
+		//TODO: not implemented for the same reason read is not implemented
+	}
 }
