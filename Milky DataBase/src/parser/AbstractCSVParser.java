@@ -1,7 +1,12 @@
 package parser;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.List;
+
+import com.opencsv.CSVParser;
+import com.opencsv.CSVReader;
 
 public abstract class AbstractCSVParser<T> {
 	public static final int PACS_LINE = 0, 
@@ -23,6 +28,10 @@ public abstract class AbstractCSVParser<T> {
 	}
 	
 	public abstract List<T> parseFile(File file) throws Exception;
+	
+	protected CSVReader initReader(File file) throws FileNotFoundException {
+		return new CSVReader(new FileReader(file), ';', CSVParser.DEFAULT_QUOTE_CHARACTER);
+	}
 	
 	protected static Integer parseInt(String s) throws NumberFormatException {
 		if (s == null)

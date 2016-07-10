@@ -3,13 +3,14 @@ package model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 
 import controller.DataSource;
 import controller.UserFactory;
 import exception.UserExistsException;
 import pattern.ExceptionSubject;
 
-public class UserRepository extends Repository {
+public class UserRepository extends UniRepository<User> {
 	
 	private ExceptionSubject subject;
 	public ExceptionSubject getExceptionSubject() { return this.subject; }
@@ -55,7 +56,8 @@ public class UserRepository extends Repository {
 		Priviledge.instance().setPriviledge(result);
 	}
 	
-	public void persistUser(User user) throws Exception {
+	@Override
+	public void persist(User user) throws Exception {
 		Connection connection = dataSource.getConnection();
 		connection.setAutoCommit(false);
 		
@@ -90,5 +92,18 @@ public class UserRepository extends Repository {
 		connection.commit();
 		
 		subject.setState(null);
+	}
+
+	@Override
+	public void delete(User entity) throws Exception {
+	}
+
+	@Override
+	public void update(User entity) throws Exception {		
+	}
+
+	@Override
+	public List<User> read(PreparedStatement statement) throws Exception {
+		return null;
 	}
 }

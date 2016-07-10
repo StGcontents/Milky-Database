@@ -1,13 +1,10 @@
 package parser;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 
 import controller.GalaxyFactory;
@@ -19,10 +16,6 @@ public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 	private final static List<Integer> INT_ENUM = Arrays.asList(new Integer[] { 1, 2, 5, 6 });
 	private final static List<Integer> DOUBLE_ENUM = Arrays.asList(new Integer[] { 3, 7, 8, 9, 22, 23 });
 	
-	public static void main(String args[]) {
-		instance().parseFile(new File(args[0]));
-	}
-	
 	private static GalaxyCSVParser me;
 	private GalaxyCSVParser() { }
 	protected static synchronized GalaxyCSVParser instance() {
@@ -31,12 +24,12 @@ public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 	}
 	
 	@Override
-	public List<Galaxy> parseFile(File file) {
+	public List<Galaxy> parseFile(File file) throws Exception {
 		String[] nextLine;
 		List<Galaxy> galaxies = new ArrayList<Galaxy>();
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(file), ';', CSVParser.DEFAULT_QUOTE_CHARACTER);
+			reader = initReader(file);
 			
 			while ((nextLine = reader.readNext()) != null) {
 
@@ -81,13 +74,9 @@ public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 				galaxies.add(galaxy);
 			}
 		} 
-		catch (IOException e) { e.printStackTrace(); }
 		finally {
-			try {
-				if (reader != null) 
-					reader.close();
-			}
-			catch (IOException ignore) {}
+			try { reader.close(); }
+			catch (Exception ignore) { }
 		}
 		
 		return galaxies;

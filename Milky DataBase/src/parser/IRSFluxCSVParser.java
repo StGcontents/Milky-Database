@@ -1,13 +1,10 @@
 package parser;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 
 import controller.FluxFactory;
@@ -60,13 +57,13 @@ public class IRSFluxCSVParser extends FluxCSVParser {
 	}
 
 	@Override
-	public List<Galaxy> parseFile(File file) {
+	public List<Galaxy> parseFile(File file) throws Exception {
 		String[] nextLine;
 		List<Galaxy> galaxies = new ArrayList<Galaxy>();
 		CSVReader reader = null;
 		
 		try {
-			reader = new CSVReader(new FileReader(file), ';', CSVParser.DEFAULT_QUOTE_CHARACTER);
+			reader = initReader(file);
 
 			while ((nextLine = reader.readNext()) != null) {
 				
@@ -92,10 +89,9 @@ public class IRSFluxCSVParser extends FluxCSVParser {
 				galaxies.add(galaxy);
 			}
 		} 
-		catch (IOException e) { e.printStackTrace(); }
 		finally { 
 			try { reader.close(); } 
-			catch (Exception ignore) {} 
+			catch (Exception ignore) { } 
 		}
 		
 		return galaxies;

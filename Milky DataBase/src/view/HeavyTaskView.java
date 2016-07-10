@@ -194,7 +194,7 @@ public class HeavyTaskView extends View {
 		allBox.setSelected(true);
 		
 		avgLabel.setText(null);
-		avgLabel.setForeground(stddevLabel.getBackground());
+		avgLabel.setForeground(stddevLabel.getForeground());
 		stddevLabel.setText(null);
 		medLabel.setText(null);
 		madLabel.setText(null);

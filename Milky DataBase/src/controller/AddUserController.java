@@ -38,7 +38,7 @@ public class AddUserController extends ExceptionSubject {
 			public void run() {
 				User user = UserFactory.instance().create(param0, param1, param2, param3, param4);
 				try { 
-					repo.persistUser(user);
+					repo.persist(user);
 					setState(null);
 				}
 				catch (Exception e) { setState(e); }

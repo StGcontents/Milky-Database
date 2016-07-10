@@ -1,17 +1,12 @@
 package parser;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 
-import controller.DataSource;
-import model.FluxRepository;
 import model.Galaxy;
 import model.Ion;
 import model.IonPool;
@@ -19,13 +14,13 @@ import model.IonPool;
 public abstract class PACSFluxCSVParser extends FluxCSVParser {
 	
 	@Override
-	public List<Galaxy> parseFile(File file) {
+	public List<Galaxy> parseFile(File file) throws Exception {
 		String[] nextLine;
 		List<Galaxy> galaxies = new ArrayList<Galaxy>();
 		CSVReader reader = null;
 		
 		try {
-			reader = new CSVReader(new FileReader(file), ';', CSVParser.DEFAULT_QUOTE_CHARACTER);
+			reader = initReader(file);
 
 			while ((nextLine = reader.readNext()) != null) {
 				
@@ -51,18 +46,9 @@ public abstract class PACSFluxCSVParser extends FluxCSVParser {
 				galaxies.add(galaxy);
 			}
 		} 
-		catch (IOException e) { e.printStackTrace(); }
-		catch (Exception e) { e.printStackTrace(); }
 		finally { 
 			try { reader.close(); } 
-			catch (Exception ignore) {} 
-		}
-		FluxRepository repo = new FluxRepository(DataSource.instance(DataSource.ADMIN));
-		for (Galaxy g : galaxies) {
-			try {
-				repo.persist(g);
-			}
-			catch (Exception e) {}
+			catch (Exception ignore) { } 
 		}
 		
 		return galaxies;

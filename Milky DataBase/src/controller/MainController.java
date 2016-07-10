@@ -11,7 +11,6 @@ import javax.swing.event.ListSelectionListener;
 
 import model.Priviledge;
 import view.MainView;
-import view.ImportFileView;
 
 public class MainController implements ListSelectionListener {
 	
@@ -35,6 +34,7 @@ public class MainController implements ListSelectionListener {
 	}
 	
 	public void exitToLogin() {
+		view.close();
 		LoginController.instance().callView();
 	}
 	
@@ -69,13 +69,14 @@ public class MainController implements ListSelectionListener {
 			view.attachPanel(HeavyTaskController.instance().callView());
 			break;
 		case 2:
-			view.attachPanel(ImportFileController.instance().callView());
+			if (priviledgeLevel == DataSource.COMMON) 
+				exitToLogin();
+			else view.attachPanel(ImportFileController.instance().callView());
 			break;
 		case 3:
 			view.attachPanel(AddUserController.instance().callView());
 			break;
 		case 4:
-			view.close();
 			exitToLogin();
 			break;
 			

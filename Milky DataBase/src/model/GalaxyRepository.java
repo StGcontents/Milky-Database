@@ -15,7 +15,7 @@ import pattern.Subject;
 import pattern.ViewSubject;
 
 @SuppressWarnings("rawtypes")
-public class GalaxyRepository extends Repository {
+public class GalaxyRepository extends UniRepository<Galaxy> {
 	
 	private GalaxyNameSubjectAdapter nameSubject;
 	private GalaxySubjectAdapter galaxySubject;
@@ -28,6 +28,7 @@ public class GalaxyRepository extends Repository {
 	public Subject<List<AdaptableValue>> getNameSubject() { return this.nameSubject; }
 	public Subject<Galaxy> getGalaxySubject() { return this.galaxySubject; }
 	
+	@Override
 	public void persist(Galaxy galaxy) throws Exception {
 		
 		Connection connection = dataSource.getConnection();
@@ -110,6 +111,7 @@ public class GalaxyRepository extends Repository {
 		release(connection);
 	}
 	
+	@Override
 	public void delete(Galaxy galaxy) throws Exception {
 		Connection connection = dataSource.getConnection();
 		String delete = "DELETE FROM galaxy WHERE name LIKE ?";
@@ -274,5 +276,14 @@ public class GalaxyRepository extends Repository {
 		public Galaxy retrieveState() {
 			return result;
 		}
+	}
+
+	@Override
+	public List<Galaxy> read(PreparedStatement statement) throws Exception {
+		return null;
+	}
+
+	@Override
+	public void update(Galaxy entity) throws Exception {		
 	}
 }

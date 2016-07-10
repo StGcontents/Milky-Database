@@ -38,11 +38,16 @@ public class IonPool extends HashMap<Integer, Ion> {
 	
 	public static List<Ion> getIonList() {
 		initialize();
-		try {
-			IonRepository.instance(DataSource.byPriviledge()).retrieveIons();
-			return new ArrayList<>(me.values());
+		if (me.isEmpty()) {
+			try {
+				IonRepository.instance(DataSource.byPriviledge()).retrieveIons();
+			}
+			catch (Exception e) { 
+				e.printStackTrace(); 
+				return new ArrayList<>();
+			}
 		}
-		catch (Exception e) { e.printStackTrace(); }
-		return new ArrayList<>();
+		
+		return new ArrayList<>(me.values());
 	}
 }

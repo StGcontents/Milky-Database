@@ -12,7 +12,7 @@ import controller.FluxFactory;
 import pattern.Subject;
 import pattern.ViewSubject;
 
-public class FluxRepository extends Repository {
+public class FluxRepository extends Repository<Galaxy, Flux, Flux, Flux> {
 	
 	public FluxRepository(DataSource dataSource) { 
 		this.dataSource = dataSource;
@@ -26,11 +26,12 @@ public class FluxRepository extends Repository {
 	public Subject<Statistics> getStatSubject() { return statSubject; }
 	public Subject<Void> getFillerSubject() { return fillerSubject; }
 	
+	@Override
 	public void persist(Galaxy galaxy) throws Exception {
 		persist(galaxy, galaxy.getFluxes());
 	}
 	
-	public void persist(Galaxy galaxy, List<Flux> fluxes) throws Exception {
+	private void persist(Galaxy galaxy, List<Flux> fluxes) throws Exception {
 		Connection connection = dataSource.getConnection();
 		
 		for (Flux flux : fluxes) 
@@ -40,6 +41,8 @@ public class FluxRepository extends Repository {
 	}
 	
 	private void persistSingleFlux(Connection connection, Galaxy galaxy, Flux flux) throws Exception {
+		
+		System.out.println(flux.getAperture() + "|");
 		String table = flux.isContinuous() ? "continuous_flux" : "line_flux";
 		String query = "SELECT count(*) FROM " + table + " WHERE galaxy LIKE ? AND ion = ? AND aperture LIKE ?";
 		String insert = "INSERT INTO " + table + "(galaxy, ion, aperture, flux, error) VALUES (?, ?, ?, ?, ?)";
@@ -238,5 +241,20 @@ public class FluxRepository extends Repository {
 	
 	protected class FillerSubject extends ViewSubject<Void> {
 		@Override public Void retrieveState() { return null; }
+	}
+
+	@Override
+	public List<Flux> read(PreparedStatement statement) {
+		return null;
+	}
+	
+	@Override
+	public void delete(Flux flux) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void update(Flux flux) {
+		// TODO Auto-generated method stub
 	}
 }

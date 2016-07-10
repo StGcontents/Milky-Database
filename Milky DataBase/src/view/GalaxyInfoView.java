@@ -286,7 +286,10 @@ public class GalaxyInfoView extends View {
 		layout.putConstraint(SpringLayout.NORTH, spinnerLabel, 25, SpringLayout.NORTH, panel);
 		layout.putConstraint(SpringLayout.EAST, spinnerLabel, -25, SpringLayout.EAST, panel);
 		
-		model = new SpinnerListModel(IonPool.getIonList());
+		List<Ion> ions = IonPool.getIonList();
+		model = new SpinnerListModel();
+		if (!ions.isEmpty())
+			model.setList(ions);
 		searchSpinner = new JSpinner(model);
 		searchSpinner.addChangeListener(new ExclusiveChangeListener((Ion) searchSpinner.getValue()));
 		panel.add(searchSpinner);
@@ -355,10 +358,12 @@ public class GalaxyInfoView extends View {
 		layout.putConstraint(SpringLayout.WEST, lineRatioBox, 0, SpringLayout.WEST, conRatioBox);
 		layout.putConstraint(SpringLayout.NORTH, lineRatioBox, 10, SpringLayout.SOUTH, conRatioBox);
 		
-		differentModel = new SpinnerListModel(IonPool.getIonList());
+		differentModel = new SpinnerListModel();
 		List<Ion> ions = IonPool.getIonList();
-		ions.remove(model.getValue());
-		differentModel = new SpinnerListModel(ions);
+		if (!ions.isEmpty()) {
+			ions.remove(model.getValue());
+			differentModel.setList(ions);
+		}
 		ratioSpinner = new JSpinner(differentModel);
 		ratioSpinner.setEnabled(false);
 		panel.add(ratioSpinner);
