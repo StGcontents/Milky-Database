@@ -11,6 +11,8 @@ import java.awt.Shape;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -24,6 +26,7 @@ import java.sql.SQLException;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 import controller.DataSource;
@@ -45,7 +48,7 @@ public class LoginView extends View {
 	}
 	
 	private Frame frame;
-	private TextField userField, passField;
+	private HintTextField userField, passField;
 	private Button logBtn, exitBtn;
 	private JLabel label;
 	
@@ -121,8 +124,10 @@ public class LoginView extends View {
 			}
 		});
 		
-		userField = new TextField("Insert user ID");
-		passField = new TextField("Insert password");
+		userField = new HintTextField("Insert user ID");
+		passField = new HintTextField("Insert password");
+		//userField.validate();
+		//passField.validate();
 	
 		logBtn = new Button("LOG IN");
 		logBtn.setSize(50, 25);
@@ -173,6 +178,9 @@ public class LoginView extends View {
 		frame.setBackground(Color.getHSBColor(hsb[0], hsb[1], hsb[2]));
 		
 		frame.setVisible(true);
+		logBtn.requestFocusInWindow();
+		userField.setText("Insert user ID");
+		passField.setText("Insert password");
 		
 		return null;
 	}
@@ -206,6 +214,45 @@ public class LoginView extends View {
 			LoginController.instance().log(userField.getText(), passField.getText());
 		}
 	}
+	
+	class HintTextField extends TextField implements FocusListener {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private final String hint;
+		  private boolean showingHint;
+
+		  public HintTextField(final String hint) {
+		    super(hint);
+		    this.hint = hint;
+		    this.showingHint = true;
+		    super.addFocusListener(this);
+		    
+		    
+		  }
+
+		  @Override
+		  public void focusGained(FocusEvent e) {
+		    if(this.getText().isEmpty()) {
+		      super.setText("");
+		      showingHint = false;
+		    }
+		  }
+		  @Override
+		  public void focusLost(FocusEvent e) {
+		    if(this.getText().isEmpty()) {
+		      super.setText(hint);
+		      showingHint = true;
+		    }
+		  }
+
+		  @Override
+		  public String getText() {
+		    return showingHint ? "" : super.getText();
+		  }
+		}
 
 	@Override
 	public void showError(Exception e) {
