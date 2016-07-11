@@ -29,6 +29,12 @@ import javax.swing.SpringLayout;
 import controller.DataSource;
 import controller.LoginController;
 
+/**
+ * View to log in the application. All rights reserved to Stefano Giancristofaro.
+ * Each unauthorized use will be legally prosecuted. :D
+ * @author federico
+ *
+ */
 public class LoginView extends View {
 	
 	private static LoginView me;
@@ -43,6 +49,7 @@ public class LoginView extends View {
 	private Button logBtn, exitBtn;
 	private JLabel label;
 	
+	//wow such cool shapes!
 	private Shape coolshapes() {
 		Path2D path = new GeneralPath();
 		path.moveTo(0, 200);

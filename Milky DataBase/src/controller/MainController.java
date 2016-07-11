@@ -12,6 +12,11 @@ import javax.swing.event.ListSelectionListener;
 import model.Priviledge;
 import view.MainView;
 
+/**
+ * Controller related to MainView. Switches current view in Application
+ * @author federico
+ *
+ */
 public class MainController implements ListSelectionListener {
 	
 	private static MainController me;
@@ -58,6 +63,12 @@ public class MainController implements ListSelectionListener {
 		}
 	}
 	
+	/**
+	 * By receiving an index from the MainView, it allows to change view by calling the
+	 * related controller.
+	 * It also checks for privilege level of current User, offering different possibilities.
+	 * @param index
+	 */
 	private void act(int index) {
 		if (priviledgeLevel == DataSource.COMMON && index > MainView.LAST_COMMON_INDEX) return;
 		

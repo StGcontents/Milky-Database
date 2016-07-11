@@ -7,6 +7,12 @@ import pattern.ExceptionSubject;
 import pattern.LogObserverAdapter;
 import view.LoginView;
 
+/**
+ * Following class checks if parameters for login are correct. Related to LoginView
+ * @author federico
+ *
+ */
+
 public class LoginController extends ExceptionSubject {
 	
 	private static LoginController me;

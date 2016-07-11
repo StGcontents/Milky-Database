@@ -1,6 +1,7 @@
 package parser;
 
 import java.io.File;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +11,13 @@ import com.opencsv.CSVReader;
 import controller.GalaxyFactory;
 import model.Galaxy;
 import model.Galaxy.Luminosity;
+
+/**
+ * Parser to import data from the MR3 table (galaxies and their properties)
+ * Skips unwanted columns.
+ * @author federico
+ *
+ */
 
 public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 	

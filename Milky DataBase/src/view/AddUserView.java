@@ -12,7 +12,12 @@ import javax.swing.SpringLayout;
 
 import controller.AddUserController;
 import exception.UserExistsException;
-
+/**
+ *This view allows the administrator to register another user of the system, sending data to its 
+ *controller. 
+ * @author federico
+ *
+ */
 public class AddUserView extends View {
 
 	private static AddUserView me;

@@ -7,6 +7,11 @@ import controller.FluxFactory;
 import model.Galaxy;
 import model.Ion;
 
+/**
+ * Specializes AbstractCSVParser for fluxes files.
+ * @author federico
+ *
+ */
 public abstract class FluxCSVParser extends AbstractCSVParser<Galaxy> {
 	
 	protected final List<Integer> FLAG_ENUM = new ArrayList<>();

@@ -1,7 +1,11 @@
 package model;
 
 import pattern.Subject;
-
+/**
+ * class to give different kind of privileges to admin/user.
+ * @author federico
+ *
+ */
 public class Priviledge extends Subject<Integer> {
 	
 	private static Priviledge me;
