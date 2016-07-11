@@ -19,7 +19,12 @@ import javax.swing.SpringLayout;
 
 import controller.DataSource;
 import controller.MainController;
-
+/**
+ * Main view of the application. Allows to change functionality/view by sending an index to related
+ * controller.
+ * @author federico
+ *
+ */
 public class MainView {
 	
 	public static final int LAST_COMMON_INDEX = 2;

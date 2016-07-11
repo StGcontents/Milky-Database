@@ -12,6 +12,11 @@ import model.Galaxy;
 import model.Ion;
 import model.IonPool;
 
+/**
+ * Parser to import data from IRS table.
+ * @author federico
+ *
+ */
 public class IRSFluxCSVParser extends FluxCSVParser {
 	
 	private final static Integer[] FLAG_COLUMNS = new Integer[] { 1, 4, 7, 10, 13, 16, 19, 22, 25 };

@@ -6,6 +6,11 @@ import java.util.Arrays;
 import controller.FluxFactory;
 import parser.PACSFluxCSVParser;
 
+/**
+ * Parser to import line's flux data from PACS. 
+ * @author federico
+ *
+ */
 public class PACSLineFluxParser extends PACSFluxCSVParser {
 	
 	private final static Integer[] FLAG_COLUMNS = new Integer[] { 1, 4, 7, 10, 13, 16, 19 };

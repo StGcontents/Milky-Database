@@ -1,6 +1,7 @@
 package controller;
 
 import java.awt.Container;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,6 +19,15 @@ import pattern.ExceptionSubject;
 import view.ImportFileView;
 import view.View;
 import parser.AbstractCSVParser;
+
+/**
+ * The ImportFileController class allows to import a .csv file by receiving a path from the
+ * correspondent view (ImportFileView) and calling the parsers in the parser package in accordance with
+ * MVC pattern
+ * @author federico
+ *
+ */
+
 
 public class ImportFileController extends ExceptionSubject {
 	private static final int PARSERS[] = {  AbstractCSVParser.IRS, AbstractCSVParser.GLXY,
@@ -42,7 +52,10 @@ public class ImportFileController extends ExceptionSubject {
 		view = ImportFileView.instance();
 		return view.generateView();
 	}
-	
+	/**
+	 * Main method of the class. Tries the parsers onto the passed csv and persists the Data.
+	 * @param filePath
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void importCSV(String filePath) {
 		final String arg0 = filePath;

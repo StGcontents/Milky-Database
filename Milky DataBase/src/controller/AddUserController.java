@@ -7,6 +7,12 @@ import model.UserRepository;
 import pattern.ExceptionObserverAdapter;
 import pattern.ExceptionSubject;
 
+/**
+ * Following class allows to register the data of another user of the application. Receives
+ * informations from the correspondent view (AddUserView)
+ * @author federico
+ *
+ */
 public class AddUserController extends ExceptionSubject {
 
 	private static AddUserController me;
@@ -29,6 +35,14 @@ public class AddUserController extends ExceptionSubject {
 		view = AddUserView.instance();
 		return view.generateView();
 	}
+	/**
+	 * Main method of the class. Receives as input the parameters of the user to be persisted.
+	 * @param userID
+	 * @param password
+	 * @param name
+	 * @param surname
+	 * @param mail
+	 */
 	
 	public void addUser(String userID, String password, String name, String surname, String mail) {
 		

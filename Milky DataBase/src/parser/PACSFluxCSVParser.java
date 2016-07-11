@@ -10,6 +10,11 @@ import com.opencsv.CSVReader;
 import model.Galaxy;
 import model.Ion;
 import model.IonPool;
+/**
+ * Specializes FluxCSVParser in order to work with CSV's measurements.
+ * @author federico
+ *
+ */
 
 public abstract class PACSFluxCSVParser extends FluxCSVParser {
 	

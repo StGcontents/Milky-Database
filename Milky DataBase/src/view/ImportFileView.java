@@ -15,6 +15,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import controller.ImportFileController;
 import exception.TolerableSQLException;
 
+/**
+ * View that allows to choose .csv file to import through a JFileChooser
+ * A filter has been used to restraint user from importing different kinds of file.
+ * After selection, calls the controller for further actions.
+ * @author federico
+ *
+ */
 public class ImportFileView extends View {
 
 	private static ImportFileView me;
