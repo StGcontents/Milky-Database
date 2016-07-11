@@ -28,7 +28,6 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
 import controller.DataSource;
