@@ -25,6 +25,7 @@ public class UserRepository extends UniRepository<User> {
 		PreparedStatement qStatement = null,
 				statement = null;
 		ResultSet set = null;
+		boolean committed = false;
 		
 		try {
 			connection = dataSource.getConnection();
@@ -55,9 +56,12 @@ public class UserRepository extends UniRepository<User> {
 				throw new UserExistsException();
 			
 			connection.commit();
+			committed = true;
 			subject.setState(null);
 		}
 		finally {
+			if (!committed)
+				connection.rollback();
 			release(statement, set, qStatement, connection);
 		}
 	}
@@ -76,6 +80,7 @@ public class UserRepository extends UniRepository<User> {
 		
 		try {
 			connection = dataSource.getConnection();
+			connection.setAutoCommit(true);
 			
 			int result;
 			String query = "SELECT is_admin FROM user_admin WHERE id LIKE ? AND password LIKE ?";

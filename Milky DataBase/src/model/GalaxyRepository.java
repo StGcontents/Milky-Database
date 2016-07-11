@@ -35,6 +35,7 @@ public class GalaxyRepository extends UniRepository<Galaxy> {
 				statement = null,
 				alterStatement = null;
 		ResultSet set = null;
+		boolean committed = false;
 		
 		try {
 			connection = dataSource.getConnection();
@@ -114,8 +115,11 @@ public class GalaxyRepository extends UniRepository<Galaxy> {
 			}
 			
 			connection.commit();
+			committed = true;
 		}
 		finally {
+			if (!committed)
+				connection.rollback();
 			release(set, alterStatement, statement, qStatement, connection);
 		}
 	}
@@ -137,6 +141,7 @@ public class GalaxyRepository extends UniRepository<Galaxy> {
 		PreparedStatement statement = null,
 				alterStatement = null;
 		ResultSet alterSet = null;
+		boolean committed = false;
 		
 		try {		
 			connection = dataSource.getConnection();
@@ -164,11 +169,15 @@ public class GalaxyRepository extends UniRepository<Galaxy> {
 			if (force) 			
 				new FluxRepository(dataSource).retrieveGalaxyFluxes(galaxy);
 			else connection.commit();
+			
+			committed = true;
 		
 			GalaxyPool.insert(galaxy);
 			galaxySubject.setState(galaxy);
 		}
 		finally {
+			if (!committed)
+				connection.rollback();
 			release(alterSet, alterStatement, statement, connection);
 		}
 	}
@@ -180,6 +189,7 @@ public class GalaxyRepository extends UniRepository<Galaxy> {
 		
 		try {
 			connection = dataSource.getConnection();
+			connection.setAutoCommit(true);
 			
 			String query = "SELECT G.name, AN.alter_name "
 					 	+ "FROM galaxy G LEFT JOIN alternative_names AN ON (G.name LIKE AN.name) "
@@ -218,6 +228,7 @@ public class GalaxyRepository extends UniRepository<Galaxy> {
 		
 		try {
 			connection = dataSource.getConnection();
+			connection.setAutoCommit(true);
 			
 			double ra2 = 15 * (center.getRightAscensionHours() + center.getRightAscensionMinutes() / 60 + center.getRightAscensionSeconds() / 3600);
 			double dec2 = center.getDegrees() + center.getArcMinutes() / 60 + center.getArcSeconds() / 3600;
@@ -253,6 +264,7 @@ public class GalaxyRepository extends UniRepository<Galaxy> {
 		
 		try {
 			connection = dataSource.getConnection();
+			connection.setAutoCommit(true);
 			
 			String query = "SELECT name, redshift FROM galaxy WHERE redshift ";
 			query += higherThen ? ">= " : "<= ";

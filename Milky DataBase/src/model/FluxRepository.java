@@ -3,7 +3,6 @@ package model;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
@@ -37,6 +36,7 @@ public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 		Connection connection = null;
 		PreparedStatement queryStatement = null, statement = null;
 		ResultSet set = null;
+		boolean committed = false;
 		
 		try {
 			connection = dataSource.getConnection();
@@ -69,13 +69,14 @@ public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 				statement.executeUpdate();
 				connection.commit();
 			}
-			else update(galaxy, flux);
-		}
-		catch (SQLException e) {
-			connection.rollback();
-			throw e;
+			else 
+				update(galaxy, flux);
+			
+			committed = true;
 		}
 		finally {
+			if (!committed)
+				connection.rollback();
 			release(queryStatement, statement, set, connection);
 		}
 	}
@@ -100,6 +101,7 @@ public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 		
 		try {
 			connection = dataSource.getConnection();
+			connection.setAutoCommit(true);
 			String query = "SELECT CF.flux, CF.error, CF.aperture, I.id, I.name, I.charges, I.line "
 					+ "FROM line_flux CF JOIN ion I ON (CF.ion = I.id) "
 					+ "WHERE CF.galaxy LIKE ?";
@@ -120,6 +122,7 @@ public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 		
 		try {
 			connection = dataSource.getConnection();
+			connection.setAutoCommit(true);
 			String query = "SELECT CF.flux, CF.error, CF.aperture, I.id, I.name, I.charges, I.line "
 					+ "FROM continuous_flux CF JOIN ion I ON (CF.ion = I.id) "
 					+ "WHERE CF.galaxy LIKE ?";
@@ -142,6 +145,7 @@ public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 	private void update(Galaxy galaxy, Flux flux) throws Exception {
 		Connection connection = null;
 		PreparedStatement statement = null;
+		boolean committed = false;
 		
 		try {
 			connection = dataSource.getConnection();
@@ -161,8 +165,11 @@ public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 			
 			statement.executeUpdate();
 			connection.commit();
+			committed = true;
 		}
 		finally {
+			if (!committed) 
+				connection.rollback();
 			release(statement, connection);
 		}
 	}
@@ -179,6 +186,7 @@ public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 		
 		try {
 			connection = dataSource.getConnection();
+			connection.setAutoCommit(true);
 			
 			String delete = "DELETE FROM ? WHERE galaxy LIKE ? AND ion = ? AND aperture LIKE ?";
 			statement = connection.prepareStatement(delete);
@@ -201,6 +209,7 @@ public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 				medStatement = null,
 				madStatement = null;
 		ResultSet avgSet = null, madSet = null, medSet = null;
+		boolean committed = false;
 		
 		try {
 			connection = dataSource.getConnection();
@@ -289,9 +298,13 @@ public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 			dropStatement.execute(drop);
 			
 			connection.commit();		
+			committed = true;
+			
 			statSubject.setState(new Statistics(avg, stddev, med, mad));
 		}
 		finally {
+			if (!committed)
+				connection.rollback();
 			release(dropStatement, madSet, madStatement, medSet, medStatement, 
 					avgSet, avgStatement, viewStatement, connection);
 		}

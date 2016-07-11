@@ -21,6 +21,8 @@ import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Date;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JLabel;
@@ -70,8 +72,11 @@ public class LoginView extends View {
 
 			@Override
 			public void paint(Graphics g) {
+				Random random = new Random(new Date().getTime());
+				int flag = random.nextInt(8);
 				try {
-					BufferedImage im = ImageIO.read(new File("./res/stars.jpg"));
+					String path = flag == 5 ? "./res/doge.jpg" : "./res/stars.jpg";
+					BufferedImage im = ImageIO.read(new File(path));
 					g.drawImage(im, 0, 0, null);
 				}	
 				catch (Exception e) {
@@ -80,7 +85,7 @@ public class LoginView extends View {
 			
 				g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 52));
 				g.setColor(Color.WHITE);
-				g.drawString("WELCOME.", 325, 190);
+				g.drawString(flag == 5 ? "much login" : "WELCOME.", 325, 190);
 			}			
 		};
 		

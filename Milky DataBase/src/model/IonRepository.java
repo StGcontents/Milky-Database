@@ -40,6 +40,7 @@ public class IonRepository extends UniRepository<Ion> {
 		
 		try {
 			connection = dataSource.getConnection();
+			connection.setAutoCommit(true);
 			String query = "SELECT * FROM ion";
 			statement = connection.prepareStatement(query, 
 					ResultSet.TYPE_FORWARD_ONLY,
