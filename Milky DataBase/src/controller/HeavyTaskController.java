@@ -8,6 +8,11 @@ import pattern.ExceptionSubject;
 import pattern.StatisticsObserverAdapter;
 import view.HeavyTaskView;
 
+/**
+ * Controller that manages math operations.
+ * @author federico
+ *
+ */
 public class HeavyTaskController extends ExceptionSubject {
 	
 	private static HeavyTaskController me;

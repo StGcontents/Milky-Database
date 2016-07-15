@@ -26,6 +26,7 @@ public class GalaxyCSVParser extends AbstractCSVParser<Galaxy> {
 	
 	private static GalaxyCSVParser me;
 	private GalaxyCSVParser() { }
+	
 	protected static synchronized GalaxyCSVParser instance() {
 		if (me == null) me = new GalaxyCSVParser();
 		return me;

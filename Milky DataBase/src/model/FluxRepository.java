@@ -12,6 +12,12 @@ import controller.FluxFactory;
 import pattern.Subject;
 import pattern.ViewSubject;
 
+/**
+ * Repository of fluxes. Allows to query the DB  insert,delete,update and retrieve
+ * selected fluxes for functional requirements.
+ * @author federico
+ *
+ */
 public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 	
 	public FluxRepository(DataSource dataSource) { 
@@ -201,7 +207,7 @@ public class FluxRepository extends Repository<Galaxy, Flux, Galaxy, Galaxy> {
 			release(statement, connection);
 		}
 	}
-	
+	//allows to calculate desired values with or without the aperture size limit.
 	public void calculate(String spectralGroup, String apertureSize) throws Exception {
 		Connection connection = null;
 		Statement viewStatement = null, dropStatement = null;
