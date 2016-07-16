@@ -12,7 +12,7 @@ import org.junit.Test;
 import com.googlecode.jeneratedata.text.RandomStringGenerator;
 
 import controller.DataSource;
-import model.Priviledge;
+import model.Privilege;
 import model.UserRepository;
 import pattern.Observer;
 
@@ -50,7 +50,7 @@ public class LoginTest {
 				assertEquals(LEVELS[chosen], priviledgeLevel);
 			}
 		};
-		observer.setSubject(Priviledge.instance());
+		observer.setSubject(Privilege.instance());
 		
 		Random random = new Random(new Date().getTime());
 		chosen = random.nextInt(3);

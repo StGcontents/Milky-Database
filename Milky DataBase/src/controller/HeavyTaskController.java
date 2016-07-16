@@ -15,6 +15,9 @@ import view.HeavyTaskView;
  */
 public class HeavyTaskController extends ExceptionSubject {
 	
+	/*
+	 * Singleton
+	 */
 	private static HeavyTaskController me;
 	private HeavyTaskController() {
 		repo = new FluxRepository(DataSource.byPriviledge());
@@ -34,6 +37,14 @@ public class HeavyTaskController extends ExceptionSubject {
 		return view.generateView();
 	}
 	
+	/**
+	 * Request average, standard deviation, median and MAD of
+	 * Flux values from Galaxy belonging to a certain spectral group,
+	 * obtained with a certain aperture size.
+	 * @param spectralGroup String: Galaxies spectral group.
+	 * @param apertureSize String: aperture size of fluxes, or null
+	 * 	if every value counts.
+	 */
 	public void calculate(String spectralGroup, String apertureSize) {
 		final String param0 = spectralGroup;
 		final String param1 = apertureSize;

@@ -27,8 +27,6 @@ import parser.AbstractCSVParser;
  * @author federico
  *
  */
-
-
 public class ImportFileController extends ExceptionSubject {
 	private static final int PARSERS[] = {  AbstractCSVParser.IRS, AbstractCSVParser.GLXY,
 											AbstractCSVParser.PACS_LINE, AbstractCSVParser.PACS_CON };
@@ -52,9 +50,10 @@ public class ImportFileController extends ExceptionSubject {
 		view = ImportFileView.instance();
 		return view.generateView();
 	}
+	
 	/**
 	 * Main method of the class. Tries the parsers onto the passed csv and persists the Data.
-	 * @param filePath
+	 * @param filePath String: absolute filepath to .csv file.
 	 */
 	@SuppressWarnings("rawtypes")
 	public void importCSV(String filePath) {
@@ -82,6 +81,14 @@ public class ImportFileController extends ExceptionSubject {
 		}).start();
 	}
 	
+	/**
+	 * Tries every Parser until one is successful, or each of them fails to
+	 * interpret the .csv file.
+	 * @param file File: a .csv file to be parsed.
+	 * @param index int[]: container used to propagate correct Parser identity.
+	 * @return List<Galaxy>: a List of Galaxy pojos to be persisted.
+	 * @throws ParserException: if no Parser was able to parse the file.
+	 */
 	@SuppressWarnings({ "unchecked" })
 	public List<Galaxy> parseResults(File file, int index[]) throws Exception {
 		List<Galaxy> results = null;
@@ -100,6 +107,11 @@ public class ImportFileController extends ExceptionSubject {
 		return results;
 	}
 	
+	/**
+	 * Galaxy/Flux pojos persisting method. It manages GUI changes via Exceptions.
+	 * @param values List<Galaxy>: Collection of Galaxy pojos to be persisted.
+	 * @param repo Repository: a Repository object, chosen according to Parser identity.
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void persist(List<Galaxy> values, Repository repo) {
 		resetLog();
@@ -124,6 +136,9 @@ public class ImportFileController extends ExceptionSubject {
 		setState(exception);
 	}
 	
+	/*
+	 * Exceptions log management methods.
+	 */
 	private void report (SQLException exception) {
 		try { writer.append(exception.getMessage() + "\n"); }
 		catch (IOException e) { e.printStackTrace(); }

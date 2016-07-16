@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * Line or Continuous Flux pojo.
+ * @author stg
+ *
+ */
 public class Flux {
 	
 	private boolean isContinuous;

@@ -8,7 +8,9 @@ import model.Galaxy;
 import model.Ion;
 
 /**
- * Specializes AbstractCSVParser for fluxes files.
+ * AbstractCSVParser specialization, implemented to manage files collecting Flux data.
+ * It is in turn extended by other classes, each one developed for a certain type of
+ * Flux data file.
  * @author federico
  *
  */

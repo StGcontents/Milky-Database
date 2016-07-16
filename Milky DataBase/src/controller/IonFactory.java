@@ -6,6 +6,11 @@ import java.util.List;
 import model.Ion;
 import model.IonPool;
 
+/**
+ * Concrete Factory for Ion pojos, automatically cached into the IonPool cache.
+ * @author stg
+ *
+ */
 public class IonFactory extends AbstractFactory<Ion> {
 	
 	private static IonFactory me;

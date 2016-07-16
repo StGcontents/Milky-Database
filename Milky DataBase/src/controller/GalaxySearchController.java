@@ -14,19 +14,27 @@ import pattern.GalaxyListObserverAdapter;
 import pattern.GalaxyObserverAdapter;
 import model.AdaptableValue;
 import model.GalaxyRepository;
-import model.Priviledge;
+import model.Privilege;
 import view.GalaxyInfoView;
 import view.GalaxyView;
 
+/**
+ * Controller class for Galaxy research and selection.
+ * @author stg
+ *
+ */
 public class GalaxySearchController extends ExceptionSubject implements ListSelectionListener {
 	
+	/*
+	 * Singleton
+	 */
 	private static GalaxySearchController me;
 	private GalaxySearchController() { 
-		priviledgeLevel = Priviledge.instance().retrieveState();
+		priviledgeLevel = Privilege.instance().retrieveState();
 		repo = new GalaxyRepository(DataSource.byPriviledge());
 	}
 	public static synchronized GalaxySearchController instance() {
-		if (me == null || me.priviledgeLevel != Priviledge.instance().retrieveState()) 
+		if (me == null || me.priviledgeLevel != Privilege.instance().retrieveState()) 
 			me = new GalaxySearchController();
 		return me;
 	}
@@ -35,6 +43,9 @@ public class GalaxySearchController extends ExceptionSubject implements ListSele
 	private GalaxyView view;
 	private GalaxyRepository repo;
 	
+	/*
+	 * Test only
+	 */
 	public GalaxyRepository getRepo() { return repo; }
 	
 	public JPanel callView() {
@@ -45,6 +56,11 @@ public class GalaxySearchController extends ExceptionSubject implements ListSele
 		return view.generateView();
 	}
 	
+	/**
+	 * Implementation of research by input key.
+	 * @param partial String: a key specified by the user for name based galaxy
+	 *  search.
+	 */
 	public void searchNames(String partial) {		
 		final String param0 = partial;
 		new Thread(new Runnable() {
@@ -56,6 +72,13 @@ public class GalaxySearchController extends ExceptionSubject implements ListSele
 		}).start();
 	}
 	
+	/**
+	 * Redshift value based galaxy research.
+	 * @param redshift double: redshift value for confrontation.
+	 * @param higherThen boolean: whether or not results have to be higher than or lower than
+	 * 	the redshift value.
+	 * @param limit int: numerical limit to fetch size.
+	 */
 	public void searchByRedshiftValue(double redshift, boolean higherThen, int limit) {
 		final double param0 = redshift;
 		final boolean param1 = higherThen;
@@ -69,6 +92,12 @@ public class GalaxySearchController extends ExceptionSubject implements ListSele
 		}).start();
 	}
 	
+	/**
+	 * Distance from a point based galaxy research.
+	 * @param center Coordinates: coordinates specified by the user
+	 * @param range double: distance range accepted
+	 * @param limit int: numerical limit to fetch size.
+	 */
 	public void searchInRange(Coordinates center, double range, int limit) {
 		final Coordinates param0 = center;
 		final double param1 = range;
@@ -82,6 +111,10 @@ public class GalaxySearchController extends ExceptionSubject implements ListSele
 		}).start();
 	}
 	
+	/**
+	 * Fetch a Galaxy object by name.
+	 * @param name String: a Galaxy name.
+	 */
 	public void retrieveGalaxyByName(String name) {
 		final String arg0 = name;
 		new Thread(new Runnable() {

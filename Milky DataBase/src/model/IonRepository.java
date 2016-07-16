@@ -8,6 +8,11 @@ import java.util.List;
 import controller.DataSource;
 import controller.IonFactory;
 
+/**
+ * Repository implementation for Ion pojos persisting, retrieval, update or deletion.
+ * @author stg
+ *
+ */
 public class IonRepository extends UniRepository<Ion> {
 	
 	private static IonRepository me;

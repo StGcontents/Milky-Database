@@ -7,6 +7,11 @@ import java.util.List;
 import model.Galaxy;
 import model.Galaxy.Luminosity;
 
+/**
+ * Concrete Factory for Galaxy pojos construction.
+ * @author stg
+ *
+ */
 public class GalaxyFactory extends AbstractFactory<Galaxy> {
 	
 	private static GalaxyFactory me;

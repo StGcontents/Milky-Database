@@ -7,7 +7,7 @@ import controller.FluxFactory;
 import parser.PACSFluxCSVParser;
 
 /**
- * Parser to import line's continuous flux data from PACS.
+ * Parser that imports line's continuous flux data from PACS tables.
  * @author federico
  *
  */

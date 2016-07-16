@@ -7,14 +7,15 @@ import controller.DataSource;
 /**
  * Repositories have the job to connect with the Database and execute SQL query/operations on it
  * through the use of jdbc driver.
- * Overrode method can be found in proper repositories, specific to the entity treated.
+ * Overridden methods can be found in proper repositories, specific to the entity treated.
+ * Every CRUD method possibly manages different kinds of objects.
  * 
  * @author federico
  *
- * @param <C>
- * @param <R>
- * @param <U>
- * @param <D>
+ * @param <C>: Type of objects persisted.
+ * @param <R>: Type of objects retrieved.
+ * @param <U>: Type of objects updated.
+ * @param <D>: Type of objects deleted.
  */
 
 public abstract class Repository<C, R, U, D> {

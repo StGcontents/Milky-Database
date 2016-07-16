@@ -25,14 +25,14 @@ import javax.swing.SpringLayout;
 import controller.GalaxySearchController;
 import model.AdaptableValue;
 import model.Galaxy.Coordinates;
-import model.Priviledge;
+import model.Privilege;
 
 @SuppressWarnings("rawtypes")
 public class GalaxyView extends View {
 	
 	private static GalaxyView me;
 	public static synchronized GalaxyView instance() {
-		int currentPriviledgeLevel = Priviledge.instance().retrieveState();
+		int currentPriviledgeLevel = Privilege.instance().retrieveState();
 		if (me == null || me.lastPriviledgeLevel != currentPriviledgeLevel) {
 			me = new GalaxyView();
 			me.lastPriviledgeLevel = currentPriviledgeLevel;

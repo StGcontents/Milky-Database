@@ -9,6 +9,11 @@ import controller.DataSource;
 import exception.UserExistsException;
 import pattern.ExceptionSubject;
 
+/**
+ * Repository implementation for User objects persisting, retrieval, update and deletion.
+ * @author stg
+ *
+ */
 public class UserRepository extends UniRepository<User> {
 	
 	private ExceptionSubject subject;
@@ -93,7 +98,7 @@ public class UserRepository extends UniRepository<User> {
 				result = set.getBoolean(1) ? DataSource.ADMIN : DataSource.COMMON;
 			else result = DataSource.INVALID;
 			
-			Priviledge.instance().setPriviledge(result);
+			Privilege.instance().setPriviledge(result);
 		}
 		finally {
 			release(set, statement, connection);

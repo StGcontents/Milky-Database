@@ -1,5 +1,12 @@
 package pattern;
 
+/**
+ * Abstract Observer. This pattern is used for View-Model direct communication or
+ * Exception-driven GUI update.
+ * @author stg
+ *
+ * @param <T>: Type of object managed by the Observer-Subject couple.
+ */
 public abstract class Observer<T> {
 	protected Subject<T> subject;
 	

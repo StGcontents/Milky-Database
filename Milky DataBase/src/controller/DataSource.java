@@ -8,8 +8,15 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-import model.Priviledge;
+import model.Privilege;
 
+/**
+ * Utility class, whose purpose is to manage Connection establishment
+ * with the DBMS. It supports 3 kinds of Connection, read only, normal and
+ * administration. 
+ * @author stg
+ *
+ */
 public abstract class DataSource {
 	
 	private static String URI;// = "jdbc:postgresql://localhost/galaxy";
@@ -48,8 +55,11 @@ public abstract class DataSource {
 		}
 	}
 	
+	/*
+	 * AbstractFactory behavior
+	 */
 	public static synchronized DataSource byPriviledge() {
-		int priviledgeLevel = Priviledge.instance().retrieveState();
+		int priviledgeLevel = Privilege.instance().retrieveState();
 		return instance(priviledgeLevel);
 	}
 	
@@ -96,6 +106,12 @@ public abstract class DataSource {
 	protected abstract String getUser() ;
 	protected abstract String getPassword() ;
 	
+	/**
+	 * DataSource that only establishes read only Connections to the DBMS.
+	 * It actually has permission to read for user_admin table only.
+	 * @author stg
+	 *
+	 */
 	private static class ReadOnlyDataSource extends DataSource {
 		private static ReadOnlyDataSource me;
 		private ReadOnlyDataSource() { }
@@ -110,6 +126,12 @@ public abstract class DataSource {
 		@Override protected String getPassword() { return ReadOnlyDataSource.password; }
 	}
 	
+	/**
+	 * DataSource used by common users. It grants read permission to all tables, except
+	 * for user_admin. 
+	 * @author stg
+	 *
+	 */
 	private static class CommonDataSource extends DataSource {
 		private static CommonDataSource me;
 		private CommonDataSource() { }
@@ -124,6 +146,11 @@ public abstract class DataSource {
 		@Override protected String getPassword() { return CommonDataSource.password; }
 	}
 	
+	/**
+	 * Administrator DataSource, granting all privileges to its user.
+	 * @author stg
+	 *
+	 */
 	private static class AdminDataSource extends DataSource {
 		private static AdminDataSource me;
 		private AdminDataSource() { }

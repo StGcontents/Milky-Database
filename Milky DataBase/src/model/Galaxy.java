@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Galaxy pojo. It has an expiration date for caching management.
+ * @author stg
+ *
+ */
 public class Galaxy {
 	private static final long EXPIRATION = 600000l;
 	
@@ -75,6 +80,11 @@ public class Galaxy {
 		return getName() + " " + getRedShift() + " " + getSpectre();
 	}
 
+	/**
+	 * Coordinates pojo.
+	 * @author stg
+	 *
+	 */
 	public static class Coordinates {
 		
 		private int rightAscensionHours;

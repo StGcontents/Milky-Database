@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * User pojo.
+ * @author stg
+ *
+ */
 public class User {
 	
 	private String id, password, name, surname, mail;

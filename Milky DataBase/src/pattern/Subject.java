@@ -3,6 +3,13 @@ package pattern;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Abstract Subject. Used in conjunction with coupled Observer for
+ * View-Model direct communication or Exception-driven GUI update. 
+ * @author stg
+ *
+ * @param <T>: Type of object stored in a Subject instance.
+ */
 @SuppressWarnings("rawtypes")
 public abstract class Subject<T> {
 	private List<Observer> observers = new ArrayList<>();

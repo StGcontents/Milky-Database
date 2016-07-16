@@ -1,5 +1,10 @@
 package model;
 
+/**
+ * Ion pojo.
+ * @author stg
+ *
+ */
 public class Ion {
 	
 	private int id;

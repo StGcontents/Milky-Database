@@ -9,7 +9,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import model.Priviledge;
+import model.Privilege;
 import view.MainView;
 
 /**
@@ -19,22 +19,25 @@ import view.MainView;
  */
 public class MainController implements ListSelectionListener {
 	
+	/*
+	 * Singleton
+	 */
 	private static MainController me;
 	private MainController(int priviledgeLevel) {
-		this.priviledgeLevel = priviledgeLevel;
+		this.privilegeLevel = priviledgeLevel;
 	}
 	public static synchronized MainController instance() {
-		int level = Priviledge.instance().retrieveState();
-		if (me == null || me.priviledgeLevel != level) 
+		int level = Privilege.instance().retrieveState();
+		if (me == null || me.privilegeLevel != level) 
 			me = new MainController(level);
 		return me;
 	}
 	
-	private int priviledgeLevel;
+	private int privilegeLevel;
 	private MainView view;
 	
 	public void callView() {
-		view = new MainView(priviledgeLevel);
+		view = new MainView(privilegeLevel);
 		view.generateView();
 	}
 	
@@ -71,7 +74,7 @@ public class MainController implements ListSelectionListener {
 	 * @param index
 	 */
 	private void act(int index) {
-		if (priviledgeLevel == DataSource.COMMON && index > MainView.LAST_COMMON_INDEX) return;
+		if (privilegeLevel == DataSource.COMMON && index > MainView.LAST_COMMON_INDEX) return;
 		System.out.println("INDEX " + index);
 		switch(index) {
 		case 0:
@@ -81,7 +84,7 @@ public class MainController implements ListSelectionListener {
 			view.attachPanel(HeavyTaskController.instance().callView());
 			break;
 		case 2:
-			if (priviledgeLevel == DataSource.COMMON) 
+			if (privilegeLevel == DataSource.COMMON) 
 				exitToLogin();
 			else view.attachPanel(ImportFileController.instance().callView());
 			break;

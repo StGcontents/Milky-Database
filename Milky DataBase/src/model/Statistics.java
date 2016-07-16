@@ -1,5 +1,11 @@
 package model;
 
+/**
+ * Pojo class for average, standard deviation, median and MAD of Flux values
+ * presentation.
+ * @author stg
+ *
+ */
 public class Statistics {
 	
 	private double avg, stddev, med, mad;

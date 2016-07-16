@@ -8,6 +8,12 @@ import model.Flux;
 import model.Ion;
 import model.IonPool;
 
+/**
+ * Concrete Factory for Flux objects instantiation. It has two subclasses,
+ * one for Line Flux objects and the other for Continuous Flux objects.
+ * @author stg
+ *
+ */
 public abstract class FluxFactory extends AbstractFactory<Flux> {
 	
 	public static FluxFactory getFactoryByType(boolean isContinuous) {

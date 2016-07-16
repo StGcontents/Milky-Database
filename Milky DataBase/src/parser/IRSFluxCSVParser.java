@@ -13,7 +13,7 @@ import model.Ion;
 import model.IonPool;
 
 /**
- * Parser to import data from IRS table.
+ * Parser that imports data from Spitzer satellite files.
  * @author federico
  *
  */

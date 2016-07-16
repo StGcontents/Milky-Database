@@ -14,6 +14,11 @@ import model.Galaxy.Luminosity;
 import pattern.Subject;
 import pattern.ViewSubject;
 
+/**
+ * Repository for Galaxy pojos persisting, retrieval, update or deletion.
+ * @author stg
+ *
+ */
 @SuppressWarnings("rawtypes")
 public class GalaxyRepository extends UniRepository<Galaxy> {
 	

@@ -11,7 +11,8 @@ import model.Galaxy;
 import model.Ion;
 import model.IonPool;
 /**
- * Specializes FluxCSVParser in order to work with CSV's measurements.
+ * Specializes FluxCSVParser in order to work with CSV's measurements from
+ * Herschel satellite.
  * @author federico
  *
  */

@@ -2,6 +2,12 @@ package exception;
 
 import java.sql.SQLException;
 
+/**
+ * Exception subclass used for Exception-driven GUI management.
+ * It keeps count of SQLExcpetions thrown by .csv file importation.
+ * @author stg
+ *
+ */
 @SuppressWarnings("serial")
 public class TolerableSQLException extends SQLException {
 	private int counter;

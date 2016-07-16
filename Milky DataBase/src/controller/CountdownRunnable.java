@@ -2,6 +2,12 @@ package controller;
 
 import java.sql.Connection;
 
+/**
+ * Runnable object whose purpose is to delay a Connection closure. It allows
+ * for a Connection to be re-used multiple times before is actually closed. 
+ * @author stg
+ *
+ */
 class CountdownRunnable implements Runnable {
 
 	private static final long timeout = 5000l;

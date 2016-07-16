@@ -7,7 +7,7 @@ import controller.FluxFactory;
 import parser.PACSFluxCSVParser;
 
 /**
- * Parser to import line's flux data from PACS. 
+ * Parser that imports line's flux data from Herschel satellite measurements. 
  * @author federico
  *
  */

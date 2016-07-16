@@ -1,5 +1,11 @@
 package model;
 
+/**
+ * Utility pojo, used for ListCell rendering.
+ * @author stg
+ *
+ * @param <T>
+ */
 @SuppressWarnings("rawtypes")
 public abstract class AdaptableValue<T> {
 	

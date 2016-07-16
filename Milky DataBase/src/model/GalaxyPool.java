@@ -2,6 +2,11 @@ package model;
 
 import java.util.HashMap;
 
+/**
+ * Utility class for Galaxy pojos caching.
+ * @author stg
+ *
+ */
 @SuppressWarnings("serial")
 public class GalaxyPool extends HashMap<String, Galaxy> {
 	

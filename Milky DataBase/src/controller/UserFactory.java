@@ -7,6 +7,11 @@ import java.util.List;
 
 import model.User;
 
+/**
+ * Concrete Factory for User pojos construction.
+ * @author stg
+ *
+ */
 public class UserFactory extends AbstractFactory<User> {
 
 	private static UserFactory me;

@@ -6,6 +6,11 @@ import java.util.List;
 
 import controller.DataSource;
 
+/**
+ * Ion pojos caching management class.
+ * @author stg
+ *
+ */
 @SuppressWarnings("serial")
 public class IonPool extends HashMap<Integer, Ion> {
 	

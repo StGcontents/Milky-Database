@@ -9,14 +9,14 @@ import com.opencsv.CSVParser;
 import com.opencsv.CSVReader;
 
 /**
- * Follows abstract factory pattern to instantiate the parser specific to a determinated file.
- * Offers methods to work with the type of data present in the .csv file
- * (integers, doubles, booleans, strings")
+ * Follows abstract factory pattern to instantiate a parser specifically implemented
+ * to parse a certain type of .csv file.
+ * It implements methods that interprets the various types of data collected in the .csv file
+ * (integers, doubles, booleans, strings)
  * @author federico
  *
- * @param <T>
+ * @param <T>: Type of pojo ultimately returned by the parseFile method of this class.
  */
-
 public abstract class AbstractCSVParser<T> {
 	public static final int PACS_LINE = 0, 
 							PACS_CON = 1, 
