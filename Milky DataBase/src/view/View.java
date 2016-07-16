@@ -9,4 +9,6 @@ public abstract class View {
 	public abstract void showError(Exception e) ;
 	
 	protected abstract void reset() ;
+	
+	public abstract boolean isCurrentlyShown() ; 
 }

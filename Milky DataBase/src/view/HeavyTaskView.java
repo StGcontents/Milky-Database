@@ -1,9 +1,7 @@
 package view;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -38,13 +36,13 @@ public class HeavyTaskView extends View {
 	private JButton taskBtn;
 	
 	@Override
-	public Container generateView() {
+	public JPanel generateView() {
 		if (taskPanel == null) {
 			taskPanel = new JPanel();
 			SpringLayout layout = new SpringLayout();
 			taskPanel.setLayout(layout);
 			
-			Label apertureLabel = new Label("Choose aperture size:");
+			JLabel apertureLabel = new JLabel("Choose aperture size:");
 			ButtonGroup apertureGroup = new ButtonGroup();
 			allBox = new JRadioButton("All", true);
 			cBox = new JRadioButton("c", false);
@@ -238,5 +236,10 @@ public class HeavyTaskView extends View {
 			avgLabel.setText("Cannot reach server.");
 		else 
 			avgLabel.setText("An error occurred.");
+	}
+	
+	@Override
+	public boolean isCurrentlyShown() {
+		return taskPanel != null && taskPanel.isVisible();
 	}
 }

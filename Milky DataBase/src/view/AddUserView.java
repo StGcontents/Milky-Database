@@ -1,12 +1,12 @@
 package view;
 
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 
@@ -28,17 +28,17 @@ public class AddUserView extends View {
 		return me;
 	}
 
-	private Panel generalPanel;
+	private JPanel generalPanel;
 	private JTextField idField, passwordField, nameField, surnameField, mailField;
 	private JButton AddUserButton;
 	private JLabel errorLabel;
 
 	@Override
-	public Panel generateView() {
+	public JPanel generateView() {
 		if (generalPanel == null) {
 
 			SpringLayout layout = new SpringLayout();
-			generalPanel = new Panel();
+			generalPanel = new JPanel();
 			generalPanel.setLayout(layout);
 
 			idField = new JTextField(20);
@@ -47,7 +47,7 @@ public class AddUserView extends View {
 			surnameField = new JTextField(20);
 			mailField = new JTextField(20);
 
-			AddUserButton = new JButton("Enter");
+			AddUserButton = new JButton("Confirm");
 			JLabel jlId = new JLabel("Id: ");
 			JLabel jlPassword = new JLabel("Password: ");
 			JLabel jlName = new JLabel("Name: ");
@@ -150,5 +150,10 @@ public class AddUserView extends View {
 			errorLabel.setText("An SQL error occurred");
 		else
 			errorLabel.setText("An error occurred");
+	}
+	
+	@Override
+	public boolean isCurrentlyShown() {
+		return generalPanel != null && generalPanel.isVisible();
 	}
 }

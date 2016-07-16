@@ -35,6 +35,8 @@ public class GalaxySearchController extends ExceptionSubject implements ListSele
 	private GalaxyView view;
 	private GalaxyRepository repo;
 	
+	public GalaxyRepository getRepo() { return repo; }
+	
 	public JPanel callView() {
 		view = GalaxyView.instance();
 		new GalaxyListObserverAdapter(view).setSubject(repo.getNameSubject());
@@ -80,6 +82,17 @@ public class GalaxySearchController extends ExceptionSubject implements ListSele
 		}).start();
 	}
 	
+	public void retrieveGalaxyByName(String name) {
+		final String arg0 = name;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try { repo.retrieveGalaxyByName(arg0, false); } 
+				catch (Exception e) { e.printStackTrace(); }
+			}
+		}).start();
+	}
+	
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
@@ -105,9 +118,7 @@ public class GalaxySearchController extends ExceptionSubject implements ListSele
 			if (i == -1) return;
 			
 			DefaultListModel<AdaptableValue> model = (DefaultListModel<AdaptableValue>) list.getModel();
-			
-			try { repo.retrieveGalaxyByName(model.get(i).getName(), false); } 
-			catch (Exception e1) { e1.printStackTrace(); }
+			retrieveGalaxyByName(model.get(i).getName());
 		}
 	}
 }

@@ -20,6 +20,7 @@ public class PACSContinuousFluxParser extends PACSFluxCSVParser {
 	private PACSContinuousFluxParser() {
 		initEnums();
 		clearValues();
+		endColumn = 21;
 	}
 	protected static synchronized FluxCSVParser instance() {
 		if (me == null) me = new PACSContinuousFluxParser();

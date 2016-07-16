@@ -1,6 +1,7 @@
 package controller;
 
-import java.awt.Panel;
+import javax.swing.JPanel;
+
 import view.AddUserView;
 import model.User;
 import model.UserRepository;
@@ -31,7 +32,7 @@ public class AddUserController extends ExceptionSubject {
 		return me;
 	}
 	
-	public Panel callView() {
+	public synchronized JPanel callView() {
 		view = AddUserView.instance();
 		return view.generateView();
 	}
@@ -44,7 +45,7 @@ public class AddUserController extends ExceptionSubject {
 	 * @param mail
 	 */
 	
-	public void addUser(String userID, String password, String name, String surname, String mail) {
+	public synchronized void addUser(String userID, String password, String name, String surname, String mail) {
 		
 		final String param0 = userID, param1 = password, param2 = name, param3 = surname, param4 = mail;
 		new Thread(new Runnable() {

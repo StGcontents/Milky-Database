@@ -462,4 +462,9 @@ public class GalaxyView extends View {
 		
 		searchBtn.setEnabled(true);
 	}
+	
+	@Override
+	public boolean isCurrentlyShown() {
+		return searchPanel != null && searchPanel.isVisible();
+	}
 }

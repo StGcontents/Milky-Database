@@ -9,11 +9,7 @@ public class LogObserverAdapter extends ViewObserverAdapter<Integer, LoginView> 
 	}
 
 	@Override
-	public void stateChanged() {
+	public void doStuff() {
 		adaptee.logIn(subject.retrieveState().intValue());
-		
 	}
-	
-	
-
 }

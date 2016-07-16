@@ -27,7 +27,9 @@ public class Ion {
 	}
 	@Override
 	public String toString() {
-		return getAtom() + getChargedState() + " " + getLine();
+		double d = Math.floor(getLine());
+		d += (d - Math.floor(getLine() * 10) / 10.0);
+		return getAtom() + getChargedState() + " " + d;
 	}
 	
 	public boolean matches(String atom, int chargedState, double line) {

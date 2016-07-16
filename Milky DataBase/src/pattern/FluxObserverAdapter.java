@@ -8,7 +8,8 @@ public class FluxObserverAdapter extends ViewObserverAdapter<Void, GalaxyInfoVie
 		setAdaptee(adaptee); 
 	}
 	
-	@Override public void stateChanged() { 
+	@Override 
+	public void doStuff() { 
 		adaptee.updateFluxes(); 
 	}
 }

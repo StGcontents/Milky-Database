@@ -62,6 +62,10 @@ public abstract class DataSource {
 		return instance(DataSource.READONLY);
 	}
 	
+	public static DataSource testOnly() {
+		return instance(DataSource.ADMIN);
+	}
+	
 	/*************************************************************************************
 	 * @return Connection: a Connection object representing a new DB session.			 *
 	 * 																					 *

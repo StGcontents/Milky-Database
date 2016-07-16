@@ -45,6 +45,7 @@ public class MainController implements ListSelectionListener {
 	
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
+		if (e.getValueIsAdjusting()) return;
 		@SuppressWarnings("unchecked")
 		ListSelectionModel model = ((JList<String>) e.getSource()).getSelectionModel();
 		if (!model.isSelectionEmpty()) {
@@ -71,7 +72,7 @@ public class MainController implements ListSelectionListener {
 	 */
 	private void act(int index) {
 		if (priviledgeLevel == DataSource.COMMON && index > MainView.LAST_COMMON_INDEX) return;
-		
+		System.out.println("INDEX " + index);
 		switch(index) {
 		case 0:
 			view.attachPanel(GalaxySearchController.instance().callView());

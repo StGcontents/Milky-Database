@@ -1,7 +1,6 @@
 package view;
 
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -56,7 +55,7 @@ public class GalaxyInfoView extends View {
 	}
 		
 	@Override
-	public Container generateView() {
+	public JPanel generateView() {
 		if (panel == null) {
 			panel = new JPanel();
 			SpringLayout layout = new SpringLayout();
@@ -95,15 +94,15 @@ public class GalaxyInfoView extends View {
 			Galaxy.Coordinates coordinates = galaxy.getCoordinates();
 			rightAscLabel.setText("Right ascension: " + coordinates.getRightAscensionHours() + "h "
 								+ coordinates.getRightAscensionMinutes() + "m "
-								+ coordinates.getRightAscensionSeconds() + "s");
+								+ (truncate(coordinates.getRightAscensionSeconds())) + "s");
 			declinationLabel.setText("Declination: " + (coordinates.getSign() ? "+" : "-")
 								   + coordinates.getDegrees() + "° "
 								   + coordinates.getArcMinutes() + "' "
-								   + coordinates.getArcSeconds() + "\"" );
+								   + (truncate(coordinates.getArcSeconds())) + "\"" );
 			
 			redShiftLabel.setText("Redshift: " + galaxy.getRedShift());
 			distanceLabel.setText("Distance: " + 
-				(galaxy.getDistance() == null ? "/" : galaxy.getDistance().intValue() + " Mpc"));
+				(galaxy.getDistance() == null ? "/" : truncate(galaxy.getDistance().doubleValue()) + " Mpc"));
 			spectreLabel.setText("Spectral group: " + galaxy.getSpectre());
 			
 			String luminosity = "<html>Luminosity:";
@@ -116,16 +115,16 @@ public class GalaxyInfoView extends View {
 				
 				if (valueExists) luminosity += ",";
 				else valueExists = true;
-				luminosity += "<br>&#32;&#32;&#32;&#45;&#32;" + ions[i] + " " + lums[i].getValue() + " keV " + (lums[i].isLimit() ? "[limit]" : "");
+				luminosity += "<br>&#32;&#32;&#32;&#45;&#32;" + ions[i] + " " + truncate(lums[i].getValue()) + " keV " + (lums[i].isLimit() ? "[limit]" : "");
 			}
 			if (!valueExists) luminosity += " /";
 			lumLabel.setText(luminosity + "</html>");
 			
 			String metallicity = "Metallicity: ";
 			metallicity += galaxy.getMetallicity() == null ? "/" :
-				galaxy.getMetallicity() + 
+				truncate(galaxy.getMetallicity().doubleValue()) + 
 					(galaxy.getMetallicityError() == null ? "" : 
-						" [error: " + galaxy.getMetallicityError().intValue() + "]");
+						" [error: " + truncate(galaxy.getMetallicityError().doubleValue()) + "]");
 			metallicityLabel.setText(metallicity);
 			
 			lineLabel.setText(null);
@@ -199,24 +198,35 @@ public class GalaxyInfoView extends View {
 		return true;
 	}
 	
+	private double truncate(double d) {
+		double value = Math.floor(d);
+		value = value + Math.floor((d - value) * 10000) / 10000.0;
+		return value;
+	}
+	
 	private void updateFluxLabel(JLabel label, Flux flux, String partial) {
-		if (flux == null) partial += "/";
-		else if (flux.isUpperLimit()) partial += flux.getValue() + " [Upper limit]";
-		else partial += flux.getValue() + " [error: " + flux.getError()+"]";
+		if (flux == null) 
+			partial += "/";
+		else if (flux.isUpperLimit()) 
+			partial += truncate(flux.getValue()) + " [Upper limit]";
+		else 
+			partial += truncate(flux.getValue()) + " [error: " + truncate(flux.getError())+"]";
+		
 		label.setText(partial);
 	}
 	
 	private void updateContinuousRatioLabel(Flux lineFlux, Flux conFlux) {
 		String ratioString = "Line flux/Continuous flux ratio: ";
 		if (lineFlux != null && conFlux != null) 
-			ratioString += (lineFlux.getValue() / conFlux.getValue());
+			ratioString += (truncate(lineFlux.getValue() / conFlux.getValue()));
 		else ratioString += "/";
 		conRatioLabel.setText(ratioString);
 	}
 	
 	private void updateLineRatioLabel(Flux lineFlux, Flux otherFlux) {
 		if (lineFlux != null && otherFlux != null) 
-			lineRatioLabel.setText(lineRatioLabel.getText() + (lineFlux.getValue() / otherFlux.getValue()));
+			lineRatioLabel.setText(lineRatioLabel.getText() + 
+					truncate(lineFlux.getValue() / otherFlux.getValue()));
 		else lineRatioLabel.setText(lineRatioLabel.getText() + "/");
 	}
 	
@@ -467,5 +477,10 @@ public class GalaxyInfoView extends View {
 	protected void reset() {
 		errorLabel.setText(null);
 		panel.setVisible(false);
+	}
+	
+	@Override
+	public boolean isCurrentlyShown() {
+		return panel != null;
 	}
 }

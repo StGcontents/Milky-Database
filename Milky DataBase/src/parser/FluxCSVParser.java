@@ -32,9 +32,7 @@ public abstract class FluxCSVParser extends AbstractCSVParser<Galaxy> {
 	
 	protected void fillGalaxy(Galaxy galaxy, String aperture) {
 		int top = ION_ENUM.size();
-		System.out.println(top);
 		for (int i = 0; i < top; ++i) {
-			System.out.println(i);
 			if (values.get(2 * i) != null) {
 				galaxy.addFlux(getFactory().create( 
 					ION_ENUM.get(i), values.get(2 * i), 

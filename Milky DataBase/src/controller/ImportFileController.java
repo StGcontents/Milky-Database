@@ -56,7 +56,7 @@ public class ImportFileController extends ExceptionSubject {
 	 * Main method of the class. Tries the parsers onto the passed csv and persists the Data.
 	 * @param filePath
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("rawtypes")
 	public void importCSV(String filePath) {
 		final String arg0 = filePath;
 		new Thread(new Runnable() {
@@ -64,59 +64,64 @@ public class ImportFileController extends ExceptionSubject {
 			public void run() {
 				File file = new File(arg0);
 				List<Galaxy> results = null;
-				int chosen = -1;
-				for (int flag : PARSERS) {
-					try {
-						System.out.println("PARSER " + flag);
-						results = AbstractCSVParser.instance(flag).parseFile(file);
-						chosen = flag;
-						break;
-					}
-					catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
-						continue;
-					}
-					catch (Exception e) {
-						setState(e);
-						return;
-					}
-				}
-				
-				if (results == null) {
-					System.out.println("NO PARSER");
-					setState(new ParserException());
-				}
+				int chosen[] = new int[1];
+				try { results = parseResults(file, chosen); }
+				catch (Exception e) { setState(e); }
 				
 				Repository repo;
-				switch (chosen) {
+				switch (chosen[0]) {
 					case AbstractCSVParser.GLXY:
 						repo = new GalaxyRepository(DataSource.byPriviledge());
 						break;
 					default:
 						repo = new FluxRepository(DataSource.byPriviledge());
 				}
-				
-				resetLog();
-				openLog();
-				TolerableSQLException exception = null;
-				
-				for (Galaxy galaxy : results) {
-					try { repo.persist(galaxy); } 
-					catch (SQLException e) {
-						report(e);
-						if (exception == null)
-							exception = new TolerableSQLException(new File("./res/log.txt").getAbsolutePath());
-						else exception.increment(); 
-					}
-					catch(Exception e) {
-						closeLog();
-						setState(e); 
-						return; 
-					}
-				}
-				closeLog();
-				setState(exception);
+			
+				persist(results, repo);
 			}
 		}).start();
+	}
+	
+	@SuppressWarnings({ "unchecked" })
+	public List<Galaxy> parseResults(File file, int index[]) throws Exception {
+		List<Galaxy> results = null;
+		for (int flag : PARSERS) {
+			try {
+				results = AbstractCSVParser.instance(flag).parseFile(file);
+				index[0] = flag;
+				break;
+			}
+			catch (ArrayIndexOutOfBoundsException | NumberFormatException e) {
+				continue;
+			}
+		}
+		if (results == null) 
+			throw new ParserException();
+		return results;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void persist(List<Galaxy> values, Repository repo) {
+		resetLog();
+		openLog();
+		TolerableSQLException exception = null;
+		
+		for (Galaxy galaxy : values) {
+			try { repo.persist(galaxy); } 
+			catch (SQLException e) {
+				report(e);
+				if (exception == null)
+					exception = new TolerableSQLException(new File("./res/log.txt").getAbsolutePath());
+				else exception.increment(); 
+			}
+			catch(Exception e) {
+				closeLog();
+				setState(e); 
+				return;
+			}
+		}
+		closeLog();
+		setState(exception);
 	}
 	
 	private void report (SQLException exception) {

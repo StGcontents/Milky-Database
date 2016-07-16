@@ -230,11 +230,11 @@ public class GalaxyRepository extends UniRepository<Galaxy> {
 			connection = dataSource.getConnection();
 			connection.setAutoCommit(true);
 			
-			double ra2 = 15 * (center.getRightAscensionHours() + center.getRightAscensionMinutes() / 60 + center.getRightAscensionSeconds() / 3600);
-			double dec2 = center.getDegrees() + center.getArcMinutes() / 60 + center.getArcSeconds() / 3600;
+			double ra2 = 15 * (center.getRightAscensionHours() + center.getRightAscensionMinutes() / 60.0 + center.getRightAscensionSeconds() / 3600.0);
+			double dec2 = center.getDegrees() + center.getArcMinutes() / 60.0 + center.getArcSeconds() / 3600.0;
 			dec2 *= center.getSign() ? 1 : -1;
 			
-			String nestedQuery = "SELECT * FROM (SELECT name, (ACOS(SIN(15 * (hours + minutes / 60 + seconds / 3600)) * SIN(?) + COS(15 * (hours + minutes / 60 + seconds / 3600)) * COS(?) * COS(sign * (degrees + arcmin / 60 + arcsec / 3600) - ?))) AS EXP "
+			String nestedQuery = "SELECT * FROM (SELECT name, (ABS(ACOS(SIN(15 * (hours + minutes / 60.0 + seconds / 3600.0)) * SIN(?) + COS(15 * (hours + minutes / 60.0 + seconds / 3600.0)) * COS(?) * COS(sign * (degrees + arcmin / 60.0 + arcsec / 3600.0) - ?)))) AS EXP "
 					+ "FROM galaxy) AS GD WHERE GD.EXP < ? ORDER BY GD.exp LIMIT ?";
 			
 			statement = connection.prepareStatement(nestedQuery);

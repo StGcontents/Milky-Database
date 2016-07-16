@@ -18,6 +18,8 @@ import model.IonPool;
 
 public abstract class PACSFluxCSVParser extends FluxCSVParser {
 	
+	protected int endColumn;
+	
 	@Override
 	public List<Galaxy> parseFile(File file) throws Exception {
 		String[] nextLine;
@@ -30,7 +32,7 @@ public abstract class PACSFluxCSVParser extends FluxCSVParser {
 			while ((nextLine = reader.readNext()) != null) {
 				
 				String name = parseName(nextLine[0]), 
-					aperture = parseName(nextLine[nextLine.length - 2]);
+					aperture = parseName(nextLine[endColumn]);
 				
 				clearValues();
 

@@ -9,7 +9,7 @@ public class ExceptionObserverAdapter extends ViewObserverAdapter<Exception, Vie
 	}
 
 	@Override
-	public void stateChanged() {
+	public void doStuff() {
 		adaptee.showError(subject.retrieveState());
 	}
 }

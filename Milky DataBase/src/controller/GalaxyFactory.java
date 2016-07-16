@@ -31,7 +31,7 @@ public class GalaxyFactory extends AbstractFactory<Galaxy> {
 					h = set.getInt(2);
 					min = set.getInt(3);
 					sec = set.getDouble(4);
-					sign = "+".equals(set.getString(5));
+					sign = set.getInt(5) > 0;
 					deg = set.getInt(6);
 					arcmin = set.getInt(7);
 					arcsec = set.getDouble(8);

@@ -13,7 +13,7 @@ public class GalaxyListObserverAdapter extends ViewObserverAdapter<List<Adaptabl
 	} 
 	
 	@Override 
-	public void stateChanged() { 
+	public void doStuff() { 
 		synchronized (adaptee) {
 			adaptee.populate(getSubject().retrieveState());
 		}

@@ -10,7 +10,7 @@ public class GalaxyObserverAdapter extends ViewObserverAdapter<Galaxy, GalaxyInf
 	}
 	
 	@Override
-	public void stateChanged() {
+	public void doStuff() {
 		adaptee.setGalaxy(subject.retrieveState());
 	}
 }

@@ -85,7 +85,8 @@ public class MainView {
 		frame.add(list);
 		
 		panel = new Panel(new GridLayout(1, 1));
-		label = new Label(priviledgeLevel == DataSource.ADMIN ? "WELCOME ADMIN" : "WELCOME STRANGER");
+		label = new Label(priviledgeLevel == DataSource.ADMIN ? "WELCOME ADMIN" : "WELCOME USER");
+		label.setAlignment(Label.CENTER);
 		panel.add(label);
 		frame.add(panel);
 		
@@ -107,11 +108,13 @@ public class MainView {
 	}
 	
 	public void attachPanel(Container panel) {
+		this.panel.setVisible(false);
+		SpringLayout layout = (SpringLayout) frame.getLayout();
+		layout.removeLayoutComponent(this.panel);
 		frame.remove(this.panel);
 		this.panel = panel;
 		frame.add(this.panel);
-		
-		SpringLayout layout = (SpringLayout) frame.getLayout();
+		this.panel.setVisible(true);
 		
 		layout.putConstraint(SpringLayout.EAST, this.panel, 0, SpringLayout.EAST, frame);
 		layout.putConstraint(SpringLayout.NORTH, this.panel, 0, SpringLayout.NORTH, frame);

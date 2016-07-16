@@ -270,4 +270,9 @@ public class LoginView extends View {
 	protected void reset() {
 		// TODO Auto-generated method stub
 	}
+	
+	@Override
+	public boolean isCurrentlyShown() {
+		return frame != null && frame.isVisible();
+	}
 }

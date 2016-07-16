@@ -23,6 +23,10 @@ public abstract class AdaptableValue<T> {
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
 	
+	public boolean isNameLike(String partial) {
+		return this.name.contains(partial);
+	}
+	
 	public String getDescription() { return name + parseParameter(); }
 	
 	protected abstract String parseParameter();
@@ -32,12 +36,17 @@ public abstract class AdaptableValue<T> {
 		setParameter(parameter);
 	}
 	
-	private static class NameValue extends AdaptableValue<String> {
+	public static class NameValue extends AdaptableValue<String> {
 		protected NameValue(String name, String alterName) { super(name, alterName); }
 
 		@Override protected String parseParameter() { 
 			if (parameter != null) return " (aka " + parameter + ")";
 			else return "";
+		}
+		
+		@Override
+		public boolean isNameLike(String partial) {
+			return super.isNameLike(partial) || parameter.contains(partial);
 		}
 	}
 	
@@ -50,7 +59,7 @@ public abstract class AdaptableValue<T> {
 		}
 	}
 	
-	private static class DistanceValue extends DoubleValue {
+	public static class DistanceValue extends DoubleValue {
 		protected DistanceValue(String name, double distance) { 
 			super(name, distance);
 			precision = 10000.0;
@@ -58,10 +67,10 @@ public abstract class AdaptableValue<T> {
 		@Override protected String parseParameter() { return " (distance from center: " + truncatedValue() + ")"; }
 	}
 	
-	private static class RedshiftValue extends DoubleValue {
+	public static class RedshiftValue extends DoubleValue {
 		protected RedshiftValue(String name, double redshift) { 
 			super(name, redshift);
-			precision = 1000000.0;
+			precision = 100000.0;
 		}
 		@Override protected String parseParameter() { return " (redshift value: " + truncatedValue() + ")"; }
 	}

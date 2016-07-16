@@ -10,7 +10,7 @@ public class StatisticsObserverAdapter extends ViewObserverAdapter<Statistics, H
 	}
 
 	@Override
-	public void stateChanged() {
+	public void doStuff() {
 		adaptee.update(subject.retrieveState());
 	}
 

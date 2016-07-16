@@ -19,6 +19,7 @@ public class PACSLineFluxParser extends PACSFluxCSVParser {
 	private static PACSLineFluxParser me;
 	private PACSLineFluxParser() {
 		initEnums();
+		endColumn = 22;
 	}
 	protected static synchronized FluxCSVParser instance() {
 		if (me == null) me = new PACSLineFluxParser();

@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
@@ -10,6 +9,7 @@ import java.sql.SQLException;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import controller.ImportFileController;
@@ -37,12 +37,12 @@ public class ImportFileView extends View {
 
 	private JButton importButton;
 	private JLabel resultLabel;
-	private Panel generalPanel;
+	private JPanel generalPanel;
 
-	public Panel generateView() {
+	public JPanel generateView() {
 		if (generalPanel == null) {
 			SpringLayout layout = new SpringLayout();
-			generalPanel = new Panel();
+			generalPanel = new JPanel();
 			generalPanel.setLayout(layout);
 			
 			importButton = new JButton("Import");
@@ -101,5 +101,10 @@ public class ImportFileView extends View {
 	@Override
 	protected void reset() {
 		resultLabel.setText(null);
+	}
+
+	@Override
+	public boolean isCurrentlyShown() {
+		return generalPanel != null && generalPanel.isVisible();
 	}
 }

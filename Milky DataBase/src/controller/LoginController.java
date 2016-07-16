@@ -16,7 +16,7 @@ import view.LoginView;
 public class LoginController extends ExceptionSubject {
 	
 	private static LoginController me;
-	private LoginController() { 
+	private LoginController() {
 		repo = new UserRepository(DataSource.readOnly()); 
 		new LogObserverAdapter(LoginView.instance()).setSubject(Priviledge.instance());
 		new ExceptionObserverAdapter(LoginView.instance()).setSubject(this);
